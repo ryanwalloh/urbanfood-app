@@ -25,3 +25,8 @@ env/
 *.pyo
 *.swp
 *.DS_Store
+"env/" 
+"*.pyc" 
+"db.sqlite3" 
+"*.log" 
+"staticfiles/" 
