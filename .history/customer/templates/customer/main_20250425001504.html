@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+{% load static %}
+<div class="main-container">
+    <div class="main-components">
+        <div class="search-box-container">
+            <form action="browse_restaurants.php" method="GET" class="search-form">
+                <img class="search" src="{% static 'main_page/images/icons/search.svg' %}">
+                <input type="text" name="search_query" placeholder="Search for restaurants..." class="search-input">
+                <!-- <button type="submit" class="search-button">Search</button> -->
+            </form>
+        </div>
+
+        <div class="promo-box-container">
+            <img class="promotional" src="promotional/promotional.png">
+        </div>
+
+        <div class="cuisine-box-container">
+            <h1>Your favorite cuisines</h1>
+            <div class="cuisine-list">
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/shawarma.jpeg">
+                    </div>
+                    <h1>Shawarma</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/coffee.jpeg">
+                    </div>
+                    <h1>Coffee</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/chicken.jpeg">
+                    </div>
+                    <h1>chicken</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/cake.jpeg">
+                    </div>
+                    <h1>Cake</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/pizza.jpeg">
+                    </div>
+                    <h1>Pizza</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/icecream.jpeg">
+                    </div>
+                    <h1>Ice Cream</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/sushi.jpeg">
+                    </div>
+                    <h1>Sushi</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/fries.jpeg">
+                    </div>
+                    <h1>Fries</h1>
+                </div>
+                <div class="wrap-image1">
+                    <div class="img-container1">
+                        <img class="food-card" src="cuisine/donuts.jpeg">
+                    </div>
+                    <h1>Donuts</h1>
+                </div>
+                <div class="wrap-next">
+                    <img class="next" src="icons/right.svg">
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="vendor-list-box-container">
+            <h1>All restaurants</h1>
+            <div class="vendor-container" id="vendor-container"></div>
+        </div>
+    </div>
+</div>
+
+
+

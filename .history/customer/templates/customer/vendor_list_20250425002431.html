@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Soti Delivery</title>
+</head>
+<body>
+  <div id="vendor-container">
+    {% for restaurant in restaurants %}
+      <div class="vendor-card-container" 
+           onclick="window.location.href='/restaurants/{{ restaurant.id }}/'">
+        <div class="img-container">
+          <img src="{{ restaurant.profile_picture.url }}" alt="{{ restaurant.name }}">
+        </div>
+  
+        <div class="details-container">
+          <h1>{{ restaurant.name }}</h1>
+          <h1> &mdash; </h1>
+          <h1>{{ restaurant.baranggay }}</h1>
+          <p>{{ restaurant.restaurant_type }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
