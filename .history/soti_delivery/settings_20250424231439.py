@@ -92,15 +92,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'soti_delivery.wsgi.application'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Add any other directories for static files here.
 ]
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 # Magic Link
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

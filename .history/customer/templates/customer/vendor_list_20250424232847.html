@@ -1,14 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Soti Delivery</title>
-</head>
-<body>
-  <div id="vendor-container">
+
+<div id="vendor-container">
     {% for restaurant in restaurants %}
-      <div class="vendor-card-container" 
-           onclick="window.location.href='/restaurants/{{ restaurant.id }}/'">
+      <div class="vendor-card-container" onclick="window.location.href='{% url 'restaurant_detail' restaurant.id %}'"
         <div class="img-container">
           <img src="{{ restaurant.profile_picture.url }}" alt="{{ restaurant.name }}">
         </div>
@@ -22,5 +16,4 @@
       </div>
     {% endfor %}
   </div>
-</body>
-</html>
+  

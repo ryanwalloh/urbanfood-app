@@ -37,7 +37,6 @@ urlpatterns = [
     path('customer/', views.customer_home, name='customer-home'),
     path('restaurant/', views.restaurant_home, name='restaurant-home'),
     path('rider/', views.rider_home, name='rider-home'),
-    path('restaurants/', include(('restaurant.urls', 'restaurant'), namespace='restaurant')),
-
+    path('restaurants/', include('restaurant.urls')),
     path('', include('customer.urls')), 
 ]
