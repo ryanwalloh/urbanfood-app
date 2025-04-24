@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    {% include 'layout/header.html' %}
+</head>
+<body>
+    {% include 'layout/navbar.html' %}
+    <div class="flex">
+        {% include 'components/sidebar.html' %}
+        <main class="flex-1 p-4">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% include 'layout/footer.html' %}
+</body>
+</html>
