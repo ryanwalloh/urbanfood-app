@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+
+
+
+{% extends 'components/storefront_base.html' %}
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+    {% include 'restaurant/heading.html' %}
+    {% include 'restaurant/heading.html' %}
+    
+{% endblock %}
