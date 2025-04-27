@@ -22,7 +22,7 @@ def checkout(request):
 
     if not restaurant_id:
         messages.error(request, 'No restaurant selected.')
-        return redirect('vendor_list')  # Or another fallback page
+        return redirect('vendor_li')  # Or another fallback page
 
     try:
         restaurant = Restaurant.objects.get(id=restaurant_id)
