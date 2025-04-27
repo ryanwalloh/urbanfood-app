@@ -6,44 +6,25 @@ from .models import Restaurant  # Import Restaurant from the restaurant app
 from django.contrib.auth.decorators import login_required
 from menu.models import CartItem
 
-def cart_view(request):
-    session_cart = request.session.get('cart', {})
-
-    cart_items = []
-    for product_id, quantity in session_cart.items():
-        try:
-            product = Product.objects.get(id=product_id)
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-            })
-        except Product.DoesNotExist:
-            continue  # just skip if product doesn't exist anymore
-
-    context = {
-        'cart_items': cart_items,
-    }
-    return render(request, 'cart.html', context)
-
 def sync_cart_with_session(request):
+    # Get cart items from the database for the logged-in user
     cart_items = CartItem.objects.filter(user=request.user)
 
+    # If there are items in the database, sync with the session cart
     session_cart = request.session.get('cart', {})
 
     for item in cart_items:
+         print('Product:', item.product.name)
+        print('Picture:', item.product.product_picture)
+        print('Picture URL:', item.product.product_picture.url if item.product.product_picture else 'No picture')
         if str(item.product.id) not in session_cart:
-            # Check if product has an uploaded picture
-            if item.product.product_picture and hasattr(item.product.product_picture, 'url'):
-                image_url = item.product.product_picture.url
-            else:
-                image_url = '/static/default-product.jpg'  # your fallback image
-            
             session_cart[str(item.product.id)] = {
                 'name': item.product.name,
-                'price': float(item.product.price),
-                'image': image_url,
+                'price': float(item.product.price),  # Convert Decimal to float
+                'image':  item.product.product_picture.url if item.product.product_picture else '/static/default-product.jpg', 
                 'quantity': item.quantity
             }
+
 
     request.session['cart'] = session_cart
     

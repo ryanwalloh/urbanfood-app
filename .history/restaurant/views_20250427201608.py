@@ -6,25 +6,6 @@ from .models import Restaurant  # Import Restaurant from the restaurant app
 from django.contrib.auth.decorators import login_required
 from menu.models import CartItem
 
-def cart_view(request):
-    session_cart = request.session.get('cart', {})
-
-    cart_items = []
-    for product_id, quantity in session_cart.items():
-        try:
-            product = Product.objects.get(id=product_id)
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-            })
-        except Product.DoesNotExist:
-            continue  # just skip if product doesn't exist anymore
-
-    context = {
-        'cart_items': cart_items,
-    }
-    return render(request, 'cart.html', context)
-
 def sync_cart_with_session(request):
     cart_items = CartItem.objects.filter(user=request.user)
 

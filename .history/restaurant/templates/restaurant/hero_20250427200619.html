@@ -60,7 +60,7 @@
                         {% for item in cart_items %}
                         <div class="cart-item" data-product-id="{{ item.product.id }}">
                             <div class="item-image-container">
-                                <img class="item-image" src="{{ item.product.product_picture.url }}" alt="{{ item.product.name }}">
+                                <img class="item-image" src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
                             </div>
                             <div class="wrapper1">
                                 <div class="item-details-container">
@@ -133,19 +133,10 @@
                 .catch(error => console.error("Error:", error));
             });
         });
-
-            // 2. Fetch cart immediately on page load
-        fetch("{% url 'menu:get_cart_json' %}")
-            .then(response => response.json())
-            .then(data => updateCartUI(data))
-            .catch(error => console.error("Error fetching cart on page load:", error));
-
-      
     
         function updateCartUI(data) {
             const cartItemsContainer = document.getElementById("cart-items");
             cartItemsContainer.innerHTML = "";
-            const reviewPaymentAddress = document.getElementById('review-payment-address');
     
             data.items.forEach(item => {
                 const itemHTML = `
@@ -167,40 +158,22 @@
                     </div>
                 `;
                 cartItemsContainer.innerHTML += itemHTML;
-               
+                reviewPaymentAddress.style.backgroundColor = '#2c786c';
+        reviewPaymentAddress.style.cursor = 'pointer';
+        
+        reviewPaymentAddress.addEventListener('mouseover', function() {
+            reviewPaymentAddress.style.backgroundColor = '#004445';
+        });
+        reviewPaymentAddress.addEventListener('mouseout', function() {
+            reviewPaymentAddress.style.backgroundColor = '#2c786c';
+        });
             });
-
-            updateReviewButtonState(data.items);
-
-            // (Optional: Only add hover effects if enabled)
-            if (data.items.length > 0) {
-                reviewPaymentAddress.addEventListener('mouseover', function() {
-                    reviewPaymentAddress.style.backgroundColor = '#004445';
-                });
-                reviewPaymentAddress.addEventListener('mouseout', function() {
-                    reviewPaymentAddress.style.backgroundColor = '#2c786c';
-                });
-            }
     
             document.getElementById("sub-total").textContent = `₱${data.subtotal}`;
             document.getElementById("total-price").textContent = `₱${data.total}`;
             document.getElementById("subtotal-wrap").value = data.subtotal;
             document.getElementById("total-wrap").value = data.total;
             document.getElementById("quantity-wrap").value = data.total_quantity;
-        }
-
-        function updateReviewButtonState(items) {
-            const reviewPaymentAddress = document.getElementById('review-payment-address');
-            
-            if (items.length > 0) {
-                reviewPaymentAddress.disabled = false;
-                reviewPaymentAddress.style.backgroundColor = '#2c786c';
-                reviewPaymentAddress.style.cursor = 'pointer';
-            } else {
-                reviewPaymentAddress.disabled = true;
-                reviewPaymentAddress.style.backgroundColor = '#cccccc';  // gray color for disabled
-                reviewPaymentAddress.style.cursor = 'not-allowed';
-            }
         }
     });
     </script>

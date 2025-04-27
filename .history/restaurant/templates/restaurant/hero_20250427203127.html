@@ -136,9 +136,9 @@
 
             // 2. Fetch cart immediately on page load
         fetch("{% url 'menu:get_cart_json' %}")
-            .then(response => response.json())
-            .then(data => updateCartUI(data))
-            .catch(error => console.error("Error fetching cart on page load:", error));
+        .then(response => response.json())
+        .then(data => updateCartUI(data))
+        .catch(error => console.error("Error fetching cart on page load:", error));
 
       
     
