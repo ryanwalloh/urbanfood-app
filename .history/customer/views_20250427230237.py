@@ -8,7 +8,6 @@ from .forms import AddressForm, PersonalDetailsForm, PaymentMethodForm
 from .models import Address
 from django.contrib import messages
 from django.http import JsonResponse
-from menu.models import CartItem
 
 def vendor_list(request):
     restaurants = Restaurant.objects.all()
@@ -17,20 +16,6 @@ def vendor_list(request):
 # View to handle the checkout page
 @login_required
 def checkout(request):
-    # Get the restaurant_id from the session
-    restaurant_id = request.session.get('restaurant_id')
-
-    if not restaurant_id:
-        messages.error(request, 'No restaurant selected.')
-        return redirect('vendor_list')  # Or another fallback page
-
-    # Now you can fetch the restaurant object if needed
-    try:
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-    except Restaurant.DoesNotExist:
-        messages.error(request, 'Restaurant not found.')
-        return redirect('vendor_list')
-
     # Get the customer's current address, or create a new one
     address = Address.objects.filter(user=request.user).first()
     address_form = AddressForm(instance=address)
@@ -58,10 +43,11 @@ def checkout(request):
                 messages.success(request, 'Personal details updated successfully!')
                 return redirect('checkout')
         elif 'payment-submit' in request.POST:
-            # Capture the selected payment method from the POST data
-            payment_method = request.POST.get('payment_method')
-            if payment_method:
-                # Store the payment method or trigger any payment-related process
+            # Process Payment method form
+            payment_form = PaymentMethodForm(request.POST)
+            if payment_form.is_valid():
+                payment_method = payment_form.cleaned_data['payment_method']
+                # Here you can store the payment method to the order, or trigger any payment-related process
                 messages.success(request, f'Payment method {payment_method} selected!')
                 return redirect('order_complete')
 
@@ -74,10 +60,8 @@ def checkout(request):
         'subtotal': subtotal,
         'total': total,
         'quantity': quantity,
-        'restaurant': restaurant,  # Add restaurant to context if needed
     }
     return render(request, 'customer/checkout.html', context)
-
 
 
 # View to handle saving personal details
@@ -127,27 +111,3 @@ def save_address(request):
         return JsonResponse({'success': False, 'message': 'Address update failed.'})
 
     return JsonResponse({'success': False, 'message': 'Invalid request.'})
-
-@login_required
-def checkout_summary(request):
-    # Get the restaurant from the request (this can be passed from the frontend)
-    restaurant_id = request.POST.get('restaurant_id')  # Or you can use query parameters
-    restaurant = Restaurant.objects.get(id=restaurant_id)
-
-    # Get all the cart items for the current user and the selected restaurant
-    cart_items = CartItem.objects.filter(user=request.user, restaurant=restaurant)
-
-    # Calculate subtotal, total quantity, and total cost
-    subtotal = sum(item.subtotal() for item in cart_items)
-    total_quantity = sum(item.quantity for item in cart_items)
-    total = subtotal + 39  # Assuming a fixed delivery fee of 39
-
-    context = {
-        'restaurant': restaurant,
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'total': total,
-        'total_quantity': total_quantity,
-    }
-
-    return render(request, 'customer/checkout.html', context)

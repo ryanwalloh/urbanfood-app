@@ -40,8 +40,8 @@ class PersonalDetailsForm(forms.ModelForm):
         self.fields['email'].label = "Email"
         self.fields['email'].label_class="floating-label"
         
-        self.fields['phone'].label = "number"
-        self.fields['phone'].label_class="floating-label"
+        self.fields['number'].label = "number"
+        self.fields['number'].label_class="floating-label"
 
 
 # Form for Payment Method (could be extended with specific models later)

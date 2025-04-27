@@ -5,7 +5,7 @@ from django.db import models
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     address = models.TextField()
-    phone = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15)
 
     def __str__(self):
         return self.user.username

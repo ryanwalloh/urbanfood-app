@@ -19,7 +19,7 @@ class PersonalDetailsForm(forms.ModelForm):
     phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'number'}))
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone'] 
+        fields = ['first_name', 'last_name', 'email', 'phone_number'] 
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': 'First Name', 'class': 'name'}),
             'last_name': forms.TextInput(attrs={'placeholder': 'Last Name', 'class': 'name'}),
@@ -40,8 +40,8 @@ class PersonalDetailsForm(forms.ModelForm):
         self.fields['email'].label = "Email"
         self.fields['email'].label_class="floating-label"
         
-        self.fields['phone'].label = "number"
-        self.fields['phone'].label_class="floating-label"
+        self.fields['number'].label = "number"
+        self.fields['number'].label_class="floating-label"
 
 
 # Form for Payment Method (could be extended with specific models later)

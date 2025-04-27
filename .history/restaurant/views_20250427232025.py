@@ -50,8 +50,6 @@ def sync_cart_with_session(request):
 def restaurant_detail(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     products = Product.objects.filter(restaurant=restaurant)
-    
-    request.session['restaurant_id'] = restaurant.id
 
     cart_items = []
     subtotal = 0
@@ -73,3 +71,23 @@ def restaurant_detail(request, restaurant_id):
         'total_quantity': total_quantity,
     })
     
+@login_required
+def checkout_summary(request):
+    # Assuming the order summary is for a single restaurant (could be extended for multiple restaurants in cart)
+    restaurant_id = request.POST.get('restaurant_id')  # Get the restaurant
+    cart_items = CartItem.objects.filter(user=request.user, restaurant=restaurant).select_related('product')
+
+    # Calculate subtotal, total quantity, and total cost
+    subtotal = sum(item.product.price * item.quantity for item in cart_items)
+    total_quantity = sum(item.quantity for item in cart_items)
+    total = subtotal + 39  # Assuming a fixed delivery fee of 39 (or can be dynamically calculated)
+
+    context = {
+        'restaurant': restaurant,
+        'cart_items': cart_items,
+        'subtotal': subtotal,
+        'total': total,
+        'total_quantity': total_quantity,
+    }
+
+    return render(request, 'customer/checkout.html', context)

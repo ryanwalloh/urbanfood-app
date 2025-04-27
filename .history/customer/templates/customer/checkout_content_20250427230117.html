@@ -151,9 +151,9 @@
                 <form method="POST" action="{% url 'checkout' %}">
                     {% csrf_token %}
                     
-
+                    <!-- Custom Payment Options -->
                     <div class="form-group">
-                        <label class="floating-label"></label>
+                        <label class="floating-label">Payment Method</label>
                         <ul class="filter-options">
                             <li>
                                 <label>
@@ -194,43 +194,6 @@
                 
             </div>
         </div>
-
-        <div class="order-summary-container">
-            <div class="order-summary">
-                <h1>Your order from</h1>
-                <p class="order-from">{{ restaurant.name }} - {{ restaurant.address }}</p>
-        
-                <div id="item-summary" class="items-summary">
-                    {% for item in cart_items %}
-                        <div class="total-summary">
-                            <p>{{ item.quantity }} x {{ item.product.name }}</p>
-                            <p>&#8369;{{ item.product.price|floatformat:2 }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-        
-                <hr style="margin-bottom: 10px; margin-top: 30px; width: 100%; height: 1px; border: none; border-bottom: 1px solid #ccc;">
-        
-                <div class="total-summary">
-                    <p>Subtotal</p>
-                    <p id="sub-total">&#8369;{{ subtotal|floatformat:2 }}</p>
-                </div>
-                <div class="total-summary">
-                    <p>Standard delivery</p>
-                    <p>&#8369;39</p>
-                </div>
-                <div id="total-summary" class="total-summary">
-                    <p id="total-summary-p" class="total">Total</p>
-                    <p class="total" id="total">
-                        &#8369;{{ total|floatformat:2 }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        
-        
-
     </div>
 </div>
 

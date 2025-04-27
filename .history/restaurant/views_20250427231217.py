@@ -50,8 +50,6 @@ def sync_cart_with_session(request):
 def restaurant_detail(request, restaurant_id):
     restaurant = get_object_or_404(Restaurant, id=restaurant_id)
     products = Product.objects.filter(restaurant=restaurant)
-    
-    request.session['restaurant_id'] = restaurant.id
 
     cart_items = []
     subtotal = 0
@@ -72,4 +70,5 @@ def restaurant_detail(request, restaurant_id):
         'total': total,
         'total_quantity': total_quantity,
     })
+    
     

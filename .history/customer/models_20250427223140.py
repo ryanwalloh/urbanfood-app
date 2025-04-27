@@ -12,7 +12,7 @@ class Customer(models.Model):
     
 
 class Address(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     street = models.CharField(max_length=255)
     barangay = models.CharField(max_length=255)
     note = models.CharField(max_length=255, blank=True, null=True)

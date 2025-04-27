@@ -17,20 +17,6 @@ def vendor_list(request):
 # View to handle the checkout page
 @login_required
 def checkout(request):
-    # Get the restaurant_id from the session
-    restaurant_id = request.session.get('restaurant_id')
-
-    if not restaurant_id:
-        messages.error(request, 'No restaurant selected.')
-        return redirect('vendor_list')  # Or another fallback page
-
-    # Now you can fetch the restaurant object if needed
-    try:
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-    except Restaurant.DoesNotExist:
-        messages.error(request, 'Restaurant not found.')
-        return redirect('vendor_list')
-
     # Get the customer's current address, or create a new one
     address = Address.objects.filter(user=request.user).first()
     address_form = AddressForm(instance=address)
@@ -42,6 +28,28 @@ def checkout(request):
     total = request.POST.get('total')
     quantity = request.POST.get('quantity')
 
+    # Get the restaurant_id from the POST or GET request (if it's coming from the frontend)
+    restaurant_id = request.POST.get('restaurant_id') or request.GET.get('restaurant_id')
+    if not restaurant_id:
+        # Handle case where no restaurant_id is provided
+        messages.error(request, 'No restaurant selected.')
+        return redirect('vendor_list')
+
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        messages.error(request, 'Restaurant not found.')
+        return redirect('vendor_list')
+
+    # Get all the cart items for the current user and the selected restaurant
+    cart_items = CartItem.objects.filter(user=request.user, restaurant=restaurant)
+
+    # Calculate subtotal, total quantity, and total cost
+    subtotal = sum(item.subtotal() for item in cart_items)
+    total_quantity = sum(item.quantity for item in cart_items)
+    total = subtotal + 39  # Assuming a fixed delivery fee of 39
+
+    # Handle POST request for form submissions (address, personal details, payment method)
     if request.method == 'POST':
         if 'address-submit' in request.POST:
             # Process Address form
@@ -61,7 +69,7 @@ def checkout(request):
             # Capture the selected payment method from the POST data
             payment_method = request.POST.get('payment_method')
             if payment_method:
-                # Store the payment method or trigger any payment-related process
+                # Here you can store the payment method to the order or trigger any payment-related process
                 messages.success(request, f'Payment method {payment_method} selected!')
                 return redirect('order_complete')
 
@@ -71,14 +79,13 @@ def checkout(request):
         'personal_form': personal_form,
         'payment_form': payment_form,
         'customer_address': address,
+        'restaurant': restaurant,
+        'cart_items': cart_items,
         'subtotal': subtotal,
         'total': total,
-        'quantity': quantity,
-        'restaurant': restaurant,  # Add restaurant to context if needed
+        'total_quantity': total_quantity,
     }
     return render(request, 'customer/checkout.html', context)
-
-
 
 # View to handle saving personal details
 @login_required
@@ -128,26 +135,3 @@ def save_address(request):
 
     return JsonResponse({'success': False, 'message': 'Invalid request.'})
 
-@login_required
-def checkout_summary(request):
-    # Get the restaurant from the request (this can be passed from the frontend)
-    restaurant_id = request.POST.get('restaurant_id')  # Or you can use query parameters
-    restaurant = Restaurant.objects.get(id=restaurant_id)
-
-    # Get all the cart items for the current user and the selected restaurant
-    cart_items = CartItem.objects.filter(user=request.user, restaurant=restaurant)
-
-    # Calculate subtotal, total quantity, and total cost
-    subtotal = sum(item.subtotal() for item in cart_items)
-    total_quantity = sum(item.quantity for item in cart_items)
-    total = subtotal + 39  # Assuming a fixed delivery fee of 39
-
-    context = {
-        'restaurant': restaurant,
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'total': total,
-        'total_quantity': total_quantity,
-    }
-
-    return render(request, 'customer/checkout.html', context)

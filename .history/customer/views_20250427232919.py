@@ -17,20 +17,6 @@ def vendor_list(request):
 # View to handle the checkout page
 @login_required
 def checkout(request):
-    # Get the restaurant_id from the session
-    restaurant_id = request.session.get('restaurant_id')
-
-    if not restaurant_id:
-        messages.error(request, 'No restaurant selected.')
-        return redirect('vendor_list')  # Or another fallback page
-
-    # Now you can fetch the restaurant object if needed
-    try:
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-    except Restaurant.DoesNotExist:
-        messages.error(request, 'Restaurant not found.')
-        return redirect('vendor_list')
-
     # Get the customer's current address, or create a new one
     address = Address.objects.filter(user=request.user).first()
     address_form = AddressForm(instance=address)
@@ -61,7 +47,7 @@ def checkout(request):
             # Capture the selected payment method from the POST data
             payment_method = request.POST.get('payment_method')
             if payment_method:
-                # Store the payment method or trigger any payment-related process
+                # Here you can store the payment method to the order or trigger any payment-related process
                 messages.success(request, f'Payment method {payment_method} selected!')
                 return redirect('order_complete')
 
@@ -74,10 +60,8 @@ def checkout(request):
         'subtotal': subtotal,
         'total': total,
         'quantity': quantity,
-        'restaurant': restaurant,  # Add restaurant to context if needed
     }
     return render(request, 'customer/checkout.html', context)
-
 
 
 # View to handle saving personal details

@@ -98,14 +98,6 @@
                 <div id="personal-details-wrap-container">
                     <form method="POST" action="{% url 'checkout' %}">
                         {% csrf_token %}
-
-                        <div class="form-group">
-                            {{ personal_form.email.errors }}
-                            <label class="{{ personal_form.email.label_class }}" for="{{ personal_form.email.id_for_label }}">
-                                {{ personal_form.email.label }}
-                            </label>
-                            {{ personal_form.email }}
-                        </div>
                         
                         <div class="form-group">
                             {{ personal_form.first_name.errors }}
@@ -123,14 +115,20 @@
                             {{ personal_form.last_name }}
                         </div>
                         
-                       
+                        <div class="form-group">
+                            {{ personal_form.email.errors }}
+                            <label class="{{ personal_form.email.label_class }}" for="{{ personal_form.email.id_for_label }}">
+                                {{ personal_form.email.label }}
+                            </label>
+                            {{ personal_form.email }}
+                        </div>
 
                         <div class="form-group">
-                            {{ personal_form.phone.errors }}
-                            <label class="{{ personal_form.phone.label_class }}" for="{{ personal_form.phone.id_for_label }}">
-                                {{ personal_form.phone.label }}
+                            {{ personal_form.phone_number.errors }}
+                            <label class="{{ personal_form.phone_number.label_class }}" for="{{ personal_form.phone_number.id_for_label }}">
+                                {{ personal_form.phone_number.label }}
                             </label>
-                            {{ personal_form.phone }}
+                            {{ personal_form.phone_number }}
                         </div>
                         
                         <button class="submit" type="submit">SUBMIT</button>
@@ -150,87 +148,43 @@
                 <h1>Payment</h1>
                 <form method="POST" action="{% url 'checkout' %}">
                     {% csrf_token %}
-                    
-
-                    <div class="form-group">
-                        <label class="floating-label"></label>
-                        <ul class="filter-options">
-                            <li>
-                                <label>
-                                    <div class="wrapper4">
-                                        <div class="wrapper5">
-                                            <input id="maya" type="radio" name="payment_method" value="maya" required>
-                                            <img class="payment-icon" src="{% static 'icons/maya.svg' %}">
-                                            <p>Maya</p>
-                                        </div>
-                                        <div class="wrapper3">
-                                            <p class="instruction-container">You will be redirected to GCash after checkout...</p>
-                                        </div>
+                    {{ payment_form.as_p }}
+                    <ul class="filter-options">
+                        <li>
+                            <label>
+                                <div class="wrapper4">
+                                    <div class="wrapper5">
+                                        <input id="maya" type="radio" name="payment_method" value="maya" required>
+                                        <img class="payment-icon" src="{% static 'icons/maya.svg' %}">
+                                        <p>Maya</p>
                                     </div>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input id="card" type="radio" name="payment_method" value="credit" required>
-                                    <img class="payment-icon" src="{% static 'icons/credit.svg' %}">
-                                    <p>Credit / Debit Card</p>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input id="cash-on-delivery" type="radio" name="payment_method" value="COD" required checked>
-                                    <img class="payment-icon" src="{% static 'icons/cod.svg' %}">
-                                    <p>Cash On Delivery</p>
-                                </label>
-                            </li>
-                        </ul>
-                    </div>
-                
-                    <!-- Submit Button -->
+                                    <div class="wrapper3">
+                                        <p class="instruction-container">You will be redirected to GCash after checkout...</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input id="card" type="radio" name="payment_method" value="credit" required>
+                                <img class="payment-icon" src="{% static 'icons/credit.svg' %}">
+                                <p>Credit / Debit Card</p>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                <input id="cash-on-delivery" type="radio" name="payment_method" value="COD" required checked>
+                                <img class="payment-icon" src="{% static 'icons/cash.svg' %}">
+                                <p>Cash On Delivery</p>
+                            </label>
+                        </li>
+                    </ul>
                     <div class="form-group">
                         <button class="submit" type="submit" name="payment-submit">CHECKOUT</button>
                     </div>
                 </form>
-                
             </div>
         </div>
-
-        <div class="order-summary-container">
-            <div class="order-summary">
-                <h1>Your order from</h1>
-                <p class="order-from">{{ restaurant.name }} - {{ restaurant.address }}</p>
-        
-                <div id="item-summary" class="items-summary">
-                    {% for item in cart_items %}
-                        <div class="total-summary">
-                            <p>{{ item.quantity }} x {{ item.product.name }}</p>
-                            <p>&#8369;{{ item.product.price|floatformat:2 }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-        
-                <hr style="margin-bottom: 10px; margin-top: 30px; width: 100%; height: 1px; border: none; border-bottom: 1px solid #ccc;">
-        
-                <div class="total-summary">
-                    <p>Subtotal</p>
-                    <p id="sub-total">&#8369;{{ subtotal|floatformat:2 }}</p>
-                </div>
-                <div class="total-summary">
-                    <p>Standard delivery</p>
-                    <p>&#8369;39</p>
-                </div>
-                <div id="total-summary" class="total-summary">
-                    <p id="total-summary-p" class="total">Total</p>
-                    <p class="total" id="total">
-                        &#8369;{{ total|floatformat:2 }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        
-        
-
     </div>
 </div>
 
