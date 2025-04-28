@@ -47,15 +47,12 @@ def checkout(request):
 
     if request.method == 'POST':
         if 'address-submit' in request.POST:
+            # Process Address form
             address_form = AddressForm(request.POST, instance=address)
             if address_form.is_valid():
-                address = address_form.save(commit=False)  # Create but don't commit to DB yet
-                if not address.user_id:  # Assign the user if it's a new address
-                    address.user = request.user
-                address.save()
+                address_form.save()
                 messages.success(request, 'Address updated successfully!')
                 return redirect('checkout')
-
         elif 'personal-details-submit' in request.POST:
             # Process Personal Details form
             personal_form = PersonalDetailsForm(request.POST, instance=request.user)

@@ -49,22 +49,22 @@
                                 <h1>Add a Label</h1>                        
                                 <div class="radio-wrapper">
                                     <div class="radio-option" onclick="selectImage('option1')">
-                                        <input type="radio" id="option1" name="label" value="home" {% if customer_address.label == 'home' %}checked{% endif %} required>
+                                        <input type="radio" id="option1" name="imageRadio" value="home" {% if customer_address.label == 'home' %}checked{% endif %} required>
                                         <img src="{% static 'icons/home.svg' %}" alt="Home">
                                         <p>Home</p>
                                     </div>
                                     <div class="radio-option" onclick="selectImage('option2')">
-                                        <input type="radio" id="option2" name="label" value="work" {% if customer_address.label == 'work' %}checked{% endif %} required>
+                                        <input type="radio" id="option2" name="imageRadio" value="work" {% if customer_address.label == 'work' %}checked{% endif %} required>
                                         <img src="{% static 'icons/work.svg' %}">
                                         <p>Work</p>
                                     </div>
                                     <div class="radio-option" onclick="selectImage('option3')">
-                                        <input type="radio" id="option3" name="label" value="partner" {% if customer_address.label == 'partner' %}checked{% endif %} required>
+                                        <input type="radio" id="option3" name="imageRadio" value="partner" {% if customer_address.label == 'partner' %}checked{% endif %} required>
                                         <img src="{% static 'icons/partner.svg' %}">
                                         <p>Partner</p>
                                     </div>
                                     <div class="radio-option" onclick="selectImage('option4')">
-                                        <input type="radio" id="option4" name="label" value="other" {% if customer_address.label == 'other' %}checked{% endif %} required>
+                                        <input type="radio" id="option4" name="imageRadio" value="other" {% if customer_address.label == 'other' %}checked{% endif %} required>
                                         <img src="{% static 'icons/other.svg' %}">
                                         <p>Other</p>
                                     </div>
@@ -442,7 +442,7 @@
         const street = document.querySelector("#street").value.trim();
         const addressDetails = document.querySelector("input[name='address-details']").value.trim();
         const note = document.querySelector("input[name='note']").value.trim();
-        const addressLabel = document.querySelector("input[name='label']:checked");
+        const addressLabel = document.querySelector("input[name='imageRadio']:checked");
 
         const firstName = document.querySelector("#first-name").value.trim();
         const lastName = document.querySelector("#last-name").value.trim();
