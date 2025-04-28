@@ -106,7 +106,6 @@ def update_personal_details(request):
 
 @login_required
 def finalize_order(request):
-    print("Finalizing order...")
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
@@ -121,7 +120,7 @@ def finalize_order(request):
 
         # Calculate total amount
         total = sum(item.subtotal() for item in cart_items)
-        rider_fee = 39  # You can set logic here if needed
+        rider_fee = 0  # You can set logic here if needed
         small_order_fee = 29 if total < 200 else 0  # Example: apply small order fee if total < 200
 
         # Debugging: Print order calculation details

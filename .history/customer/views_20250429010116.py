@@ -106,7 +106,6 @@ def update_personal_details(request):
 
 @login_required
 def finalize_order(request):
-    print("Finalizing order...")
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
@@ -121,12 +120,8 @@ def finalize_order(request):
 
         # Calculate total amount
         total = sum(item.subtotal() for item in cart_items)
-        rider_fee = 39  # You can set logic here if needed
+        rider_fee = 0  # You can set logic here if needed
         small_order_fee = 29 if total < 200 else 0  # Example: apply small order fee if total < 200
-
-        # Debugging: Print order calculation details
-        print(f"Total amount before fees: {total}, Rider fee: {rider_fee}, Small order fee: {small_order_fee}")
-        print(f"Restaurant selected: {restaurant.name}")
 
         # Begin the Order creation process
         try:
@@ -141,9 +136,6 @@ def finalize_order(request):
                 status='pending',
             )
 
-            # Debugging: Print the order details
-            print(f"Order created: {order}, Payment method: {payment_method}")
-
             # Create OrderLine entries
             for item in cart_items:
                 OrderLine.objects.create(
@@ -155,20 +147,16 @@ def finalize_order(request):
 
             # Clear the cart after order is successfully created
             cart_items.delete()
-
-            # Debugging: Print the cart items that were cleared
-            print(f"Cart items cleared: {cart_items}")
-
+            print(f"Order details: customer={request.user}, restaurant={restaurant}, total={total}")
+            print(f"Cart items: {cart_items}")
             messages.success(request, f'Order placed successfully with {payment_method}!')
             return redirect('order_complete')
 
         except Exception as e:
             messages.error(request, f'Error creating order: {str(e)}')
-            print(f"Error during order creation: {str(e)}")
             return redirect('checkout')
 
     return redirect('checkout')
-
 
 def order_complete(request):
     return render(request, 'customer/order_tracking.html')

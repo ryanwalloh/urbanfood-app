@@ -31,9 +31,6 @@ def checkout(request):
         messages.error(request, 'Restaurant not found.')
         return redirect('vendor_list')
 
-    # Debugging: Print restaurant and cart info
-    print(f"Restaurant selected: {restaurant.name}")
-
     # Get the customer's current address, or create a new one
     address = Address.objects.filter(user=request.user).first()
     address_form = AddressForm(instance=address)
@@ -45,11 +42,7 @@ def checkout(request):
     subtotal = sum(item.subtotal() for item in cart_items)
     total_quantity = sum(item.quantity for item in cart_items)
 
-    # Debugging: Print cart info
-    print(f"Cart items: {cart_items}")
-    print(f"Subtotal: {subtotal}, Total quantity: {total_quantity}")
-
-    total = subtotal + 39 + 29  # Assuming a fixed delivery fee of 39
+    total = subtotal + 39 + 29 # Assuming a fixed delivery fee of 39
 
     if request.method == 'POST':
         if 'address-submit' in request.POST:
@@ -73,8 +66,7 @@ def checkout(request):
             # Capture the selected payment method from the POST data
             payment_method = request.POST.get('payment_method')
             if payment_method:
-                # Debugging: Print the selected payment method
-                print(f"Payment method selected: {payment_method}")
+                # Store the payment method or trigger any payment-related process
                 messages.success(request, f'Payment method {payment_method} selected!')
                 return redirect('order_complete')
 
@@ -92,6 +84,7 @@ def checkout(request):
     }
     return render(request, 'customer/checkout.html', context)
 
+
 # View to handle saving personal details
 @login_required
 def update_personal_details(request):
@@ -106,7 +99,6 @@ def update_personal_details(request):
 
 @login_required
 def finalize_order(request):
-    print("Finalizing order...")
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
 
@@ -121,54 +113,36 @@ def finalize_order(request):
 
         # Calculate total amount
         total = sum(item.subtotal() for item in cart_items)
-        rider_fee = 39  # You can set logic here if needed
+        rider_fee = 0  # You can set logic here if needed
         small_order_fee = 29 if total < 200 else 0  # Example: apply small order fee if total < 200
 
-        # Debugging: Print order calculation details
-        print(f"Total amount before fees: {total}, Rider fee: {rider_fee}, Small order fee: {small_order_fee}")
-        print(f"Restaurant selected: {restaurant.name}")
+        # Create the Order
+        orders = Order.objects.create(
+            customer=request.user,
+            restaurant=restaurant.user,  # restaurant is User based on your Order model
+            total_amount=total + rider_fee + small_order_fee,
+            rider_fee=rider_fee,
+            small_order_fee=small_order_fee,
+            payment_method=payment_method,
+            status='pending',
+        )
 
-        # Begin the Order creation process
-        try:
-            # Create the Order
-            order = Order.objects.create(
-                customer=request.user,
-                restaurant=restaurant.user,  # Ensure this is the correct User linked to the Restaurant
-                total_amount=total + rider_fee + small_order_fee,
-                rider_fee=rider_fee,
-                small_order_fee=small_order_fee,
-                payment_method=payment_method,
-                status='pending',
+        # Create OrderLine entries
+        for item in cart_items:
+            OrderLine.objects.create(
+                order=order,
+                product=item.product,
+                quantity=item.quantity,
+                subtotal=item.subtotal(),
             )
 
-            # Debugging: Print the order details
-            print(f"Order created: {order}, Payment method: {payment_method}")
+        # Clear the cart
+        cart_items.delete()
 
-            # Create OrderLine entries
-            for item in cart_items:
-                OrderLine.objects.create(
-                    order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    subtotal=item.subtotal(),
-                )
-
-            # Clear the cart after order is successfully created
-            cart_items.delete()
-
-            # Debugging: Print the cart items that were cleared
-            print(f"Cart items cleared: {cart_items}")
-
-            messages.success(request, f'Order placed successfully with {payment_method}!')
-            return redirect('order_complete')
-
-        except Exception as e:
-            messages.error(request, f'Error creating order: {str(e)}')
-            print(f"Error during order creation: {str(e)}")
-            return redirect('checkout')
+        messages.success(request, f'Order placed successfully with {payment_method}!')
+        return redirect('order_complete')
 
     return redirect('checkout')
-
 
 def order_complete(request):
     return render(request, 'customer/order_tracking.html')

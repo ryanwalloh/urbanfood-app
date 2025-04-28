@@ -1,5 +1,5 @@
 from django import forms
-from .models import Address, Customer
+from .models import Address
 from django.contrib.auth.models import User
 
 # Form for Address

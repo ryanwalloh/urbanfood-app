@@ -5,11 +5,10 @@ from restaurant.models import Restaurant
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AddressForm, PersonalDetailsForm, PaymentMethodForm
-from .models import Address, Customer
+from .models import Address
 from django.contrib import messages
 from django.http import JsonResponse
 from menu.models import CartItem
-from orders.models import Order, OrderLine
 
 def vendor_list(request):
     restaurants = Restaurant.objects.all()
@@ -31,9 +30,6 @@ def checkout(request):
         messages.error(request, 'Restaurant not found.')
         return redirect('vendor_list')
 
-    # Debugging: Print restaurant and cart info
-    print(f"Restaurant selected: {restaurant.name}")
-
     # Get the customer's current address, or create a new one
     address = Address.objects.filter(user=request.user).first()
     address_form = AddressForm(instance=address)
@@ -45,11 +41,7 @@ def checkout(request):
     subtotal = sum(item.subtotal() for item in cart_items)
     total_quantity = sum(item.quantity for item in cart_items)
 
-    # Debugging: Print cart info
-    print(f"Cart items: {cart_items}")
-    print(f"Subtotal: {subtotal}, Total quantity: {total_quantity}")
-
-    total = subtotal + 39 + 29  # Assuming a fixed delivery fee of 39
+    total = subtotal + 39 + 29 # Assuming a fixed delivery fee of 39
 
     if request.method == 'POST':
         if 'address-submit' in request.POST:
@@ -63,9 +55,19 @@ def checkout(request):
                 return redirect('checkout')
 
         elif 'personal-details-submit' in request.POST:
+            # Process Personal Details form
             personal_form = PersonalDetailsForm(request.POST, instance=request.user)
             if personal_form.is_valid():
-                personal_form.save()  # No need to manually update customer anymore
+                personal_form.save()
+                
+                # Update the Customer model with personal details (phone, first name, last name)
+                customer, created = Customer.objects.get_or_create(user=request.user)
+                customer.phone = personal_form.cleaned_data['phone']
+                # Assuming first_name and last_name are part of the PersonalDetailsForm
+                customer.user.first_name = personal_form.cleaned_data['first_name']
+                customer.user.last_name = personal_form.cleaned_data['last_name']
+                customer.save()
+
                 messages.success(request, 'Personal details updated successfully!')
                 return redirect('checkout')
 
@@ -73,8 +75,7 @@ def checkout(request):
             # Capture the selected payment method from the POST data
             payment_method = request.POST.get('payment_method')
             if payment_method:
-                # Debugging: Print the selected payment method
-                print(f"Payment method selected: {payment_method}")
+                # Store the payment method or trigger any payment-related process
                 messages.success(request, f'Payment method {payment_method} selected!')
                 return redirect('order_complete')
 
@@ -92,6 +93,7 @@ def checkout(request):
     }
     return render(request, 'customer/checkout.html', context)
 
+
 # View to handle saving personal details
 @login_required
 def update_personal_details(request):
@@ -104,72 +106,20 @@ def update_personal_details(request):
             return JsonResponse({'success': False, 'message': 'Invalid form.'})
     return JsonResponse({'success': False, 'message': 'Invalid request.'})
 
+# View for finalizing the order (payment processing)
 @login_required
 def finalize_order(request):
-    print("Finalizing order...")
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
-
-        cart_items = CartItem.objects.filter(user=request.user)
-
-        if not cart_items.exists():
-            messages.error(request, 'Your cart is empty.')
-            return redirect('checkout')
-
-        # Assume all items are from the same restaurant
-        restaurant = cart_items.first().restaurant
-
-        # Calculate total amount
-        total = sum(item.subtotal() for item in cart_items)
-        rider_fee = 39  # You can set logic here if needed
-        small_order_fee = 29 if total < 200 else 0  # Example: apply small order fee if total < 200
-
-        # Debugging: Print order calculation details
-        print(f"Total amount before fees: {total}, Rider fee: {rider_fee}, Small order fee: {small_order_fee}")
-        print(f"Restaurant selected: {restaurant.name}")
-
-        # Begin the Order creation process
-        try:
-            # Create the Order
-            order = Order.objects.create(
-                customer=request.user,
-                restaurant=restaurant.user,  # Ensure this is the correct User linked to the Restaurant
-                total_amount=total + rider_fee + small_order_fee,
-                rider_fee=rider_fee,
-                small_order_fee=small_order_fee,
-                payment_method=payment_method,
-                status='pending',
-            )
-
-            # Debugging: Print the order details
-            print(f"Order created: {order}, Payment method: {payment_method}")
-
-            # Create OrderLine entries
-            for item in cart_items:
-                OrderLine.objects.create(
-                    order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    subtotal=item.subtotal(),
-                )
-
-            # Clear the cart after order is successfully created
-            cart_items.delete()
-
-            # Debugging: Print the cart items that were cleared
-            print(f"Cart items cleared: {cart_items}")
-
-            messages.success(request, f'Order placed successfully with {payment_method}!')
-            return redirect('order_complete')
-
-        except Exception as e:
-            messages.error(request, f'Error creating order: {str(e)}')
-            print(f"Error during order creation: {str(e)}")
-            return redirect('checkout')
-
+        # Here we would integrate with a payment provider or handle the order status
+        # For example, save the order in the database and set it as 'pending'
+        # Assume an Order model exists:
+        # order = Order.objects.create(user=request.user, payment_method=payment_method, status='pending')
+        messages.success(request, f'Order placed with {payment_method} payment method!')
+        return redirect('order_complete')
     return redirect('checkout')
 
-
+# View for the order completion page
 def order_complete(request):
     return render(request, 'customer/order_tracking.html')
 
