@@ -114,7 +114,7 @@ def finalize_order(request):
 
 # View for the order completion page
 def order_complete(request):
-    return render(request, 'customer/order_tracking.html')
+    return render(request, 'order_tracking.html')
 
 # View to handle address saving
 @login_required

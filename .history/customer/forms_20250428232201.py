@@ -16,7 +16,7 @@ class AddressForm(forms.ModelForm):
 # Form for updating Personal Details
 class PersonalDetailsForm(forms.ModelForm):
     
-    phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={ 'class': 'number'}))
+    phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={'placeholder': 'Mobile Number', 'class': 'number'}))
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email', 'phone'] 

@@ -89,7 +89,7 @@ def checkout(request):
 
 # View to handle saving personal details
 @login_required
-def update_personal_details(request):
+def update_details(request):
     if request.method == 'POST':
         personal_form = PersonalDetailsForm(request.POST, instance=request.user)
         if personal_form.is_valid():
@@ -114,7 +114,7 @@ def finalize_order(request):
 
 # View for the order completion page
 def order_complete(request):
-    return render(request, 'customer/order_tracking.html')
+    return render(request, 'order_complete.html')
 
 # View to handle address saving
 @login_required
@@ -129,16 +129,8 @@ def save_address(request):
         form = AddressForm(request.POST, instance=address)
         
         if form.is_valid():
-            updated_address = form.save()  # Save the form and get the updated address instance
-
-            # Return the updated address data in the response
-            return JsonResponse({
-                'success': True,
-                'label': updated_address.label,  # Send the updated label
-                'street': updated_address.street,  # Send the updated street
-                'barangay': updated_address.barangay,  # Send the updated barangay
-                'note': updated_address.note,  # Send any additional note if needed
-            })
+            form.save()
+            return JsonResponse({'success': True})
 
         return JsonResponse({'success': False, 'message': 'Address update failed.'})
 

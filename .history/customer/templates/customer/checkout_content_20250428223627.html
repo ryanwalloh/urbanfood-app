@@ -76,7 +76,7 @@
                 </div>
                 <div id="saved-address-container" class="saved-address-container">
                     <div class="label-container">
-                        <img id="address-label" class="address-label" src="{% static 'icons/home.svg' %}" alt="Address Label">  <!-- Default image -->
+                        <img id="address-label" class="address-label" src="" alt="Address Label">
                         <p id="label">{{ customer_address.label }}</p>
                     </div>
                     <div class="address-details-container">
@@ -100,25 +100,37 @@
                         {% csrf_token %}
 
                         <div class="form-group">
+                            {{ personal_form.email.errors }}
+                            <label class="{{ personal_form.email.label_class }}" for="{{ personal_form.email.id_for_label }}">
+                                {{ personal_form.email.label }}
+                            </label>
                             {{ personal_form.email }}
-                            <label for="email" class="floating-label">Email</label>
-                        </div>
-
-                        <div class="align-container">
-                            <div class="form-group">
-                                {{ personal_form.first_name }}
-                                <label for="first_name" class="floating-label">First name</label>
-                            </div>
-                            
-                            <div class="form-group">
-                                {{ personal_form.last_name }}
-                                <label for="last_name" class="floating-label">Last name</label>
-                            </div>
                         </div>
                         
                         <div class="form-group">
+                            {{ personal_form.first_name.errors }}
+                            <label class="{{ personal_form.first_name.label_class }}" for="{{ personal_form.first_name.id_for_label }}">
+                                {{ personal_form.first_name.label }}
+                            </label>
+                            {{ personal_form.first_name }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ personal_form.last_name.errors }}
+                            <label class="{{ personal_form.last_name.label_class }}" for="{{ personal_form.last_name.id_for_label }}">
+                                {{ personal_form.last_name.label }}
+                            </label>
+                            {{ personal_form.last_name }}
+                        </div>
+                        
+                       
+
+                        <div class="form-group">
+                            {{ personal_form.phone.errors }}
+                            <label class="{{ personal_form.phone.label_class }}" for="{{ personal_form.phone.id_for_label }}">
+                                {{ personal_form.phone.label }}
+                            </label>
                             {{ personal_form.phone }}
-                            <label for="phone" class="floating-label">Mobile Number</label>
                         </div>
                         
                         <button class="submit" type="submit">SUBMIT</button>
@@ -280,27 +292,13 @@
                 document.getElementById('address-wrap-container').style.display = 'none';
                 document.getElementById('saved-address-container').style.display = 'flex';
 
+                // Update the UI with the submitted address data
+                document.getElementById('address-label').src = `icons/${formData.get('label')}.svg`; // Set label icon
+                document.getElementById('label').textContent = formData.get('label'); // Set label
                 document.getElementById('street-details').textContent = formData.get('street'); // Set street
                 document.getElementById('address-details').textContent = formData.get('barangay'); // Set barangay
                 document.getElementById('note').value = formData.get('note'); // Set note
                 document.getElementById('edit-address').style.display = "flex";
-
-                 // Update label and corresponding image
-                const label = formData.get('label');
-                document.getElementById('label').textContent = label;
-
-                // Update the image based on selected label
-                const labelImage = document.getElementById('address-label');
-                if (label === 'home') {
-                    labelImage.src = '/static/icons/home.svg';
-                } else if (label === 'work') {
-                    labelImage.src = '/static/icons/work.svg';
-                } else if (label === 'partner') {
-                    labelImage.src = '/static/icons/partner.svg';
-                } else {
-                    labelImage.src = '/static/icons/other.svg';
-                }
-
             } else {
                 alert(data.message); // Show any error message from Django backend
             }
@@ -314,7 +312,7 @@
 
         const formData = new FormData(this);
 
-        fetch('/customer/update_personal_details/', {  // Adjust the URL to match your Django URL pattern
+        fetch('/customer/update_details/', {  // Adjust the URL to match your Django URL pattern
             method: 'POST',
             body: formData,
             headers: {
