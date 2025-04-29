@@ -1,9 +1,8 @@
-{% extends 'components/order_tracking_base.html' %}
 <!DOCTYPE html>
-{% load static %}
+{ % load static % }
 
 
-
+{% extends 'components/order_tracking_base.html' %}
 
 {% if not user.is_authenticated %}
     <script>window.location.href = "/";</script>

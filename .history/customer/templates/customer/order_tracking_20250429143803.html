@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+
+{% extends 'components/checkout_base.html' %}
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+<div class="test-success" style="display: flex;">
+    <h1>Success</h1>
+    <p>It works now</p>
+</div>
+
+{% endblock %}

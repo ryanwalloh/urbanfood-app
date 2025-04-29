@@ -708,8 +708,5 @@ input:not(:placeholder-shown) + .floating-label {
 }
 
 .test-success {
-  border: 1px solid red;
-  display: flex;
-  margin: 0 auto;
-  padding: 20px;
+  
 }

@@ -1,9 +1,7 @@
-{% extends 'components/order_tracking_base.html' %}
 <!DOCTYPE html>
-{% load static %}
 
 
-
+{% extends 'components/order_tracking_base.html' %}
 
 {% if not user.is_authenticated %}
     <script>window.location.href = "/";</script>
@@ -52,17 +50,17 @@
                 </div>
              
                 <div class="details-container">
-                    <h3>{restaurant.name} {restaurant.baranggay}</h3>
+                    <h3><?php echo $restaurant_name.'<span> &#x2014; </span>'. $baranggay?></h3>
                     <p>order number</p>
                     
                     <p>Delivery Address</p>
-                    <h4 id="streetAddress">{address.street}</h4>
+                    <h4 id="streetAddress"><?php echo $street ?></h4>
                     <p>Marawi City</p>
                 </div>
             </div>
 
             <div class="total-price">
-                <h4>&#8369;{total}</h4>
+                <h4>&#8369;<?php echo number_format($subtotal + 39 + 29, 2); ?></h4>
             </div>
             
             
@@ -72,23 +70,23 @@
 
         <div class="view-details">
             <h1>View Details</h1>
-            { for orderItem as item }
+            <?php foreach ($orderItems as $item): ?>
             <div class="space-between-wrap">
                 <div class="wrap-label">
-                    <p>{item.quantity} x {item.product.name}</p>
+                    <p><?php echo $item['quantity']; ?> x <?php echo htmlspecialchars($item['product_name']); ?></p>
                 </div>
                 <div class="wrap-price">
-                    <p>&#8369;{item.product.price}</p>
+                    <p>&#8369;<?php echo number_format($item['price'], 2); ?></p>
                 </div>
             </div>
-            { endfor }
+            <?php endforeach; ?>
             <hr class="hr2">
             <div class="space-between-wrap">
                 <div class="wrap-label">
                     <p>Subtotal</p>
                 </div>
                 <div class="wrap-price">
-                    <p>{ subtotal }</p>
+                    <p>&#8369;<?php echo number_format($subtotal, 2); ?></p>
                 </div>
             </div>
             <div class="space-between-wrap">
@@ -104,7 +102,7 @@
                     <h2>Total</h2>
                 </div>
                 <div class="wrap-price">
-                    <p>&#8369;{ total }</p>
+                    <p>&#8369;<?php echo number_format($subtotal + 39 + 29, 2); ?></p>
                 </div>
             </div>
             <hr class="hr2">
@@ -113,13 +111,12 @@
                     <h4 class="gray">Paid With</h4>
                     <div class="wrap-label">
                         <img class="payment-icon" src="icons/cod.svg">
-                        <img class="payment-icon" src="{% static 'icons/cod.svg' %}">
                         <p class="gray">Cash On Delivery</p>
                     </div>
                     
                 </div>
                 <div class="wrap-price">
-                    <p id="bottom-price" class="gray">&#8369;{ total }</p>
+                    <p id="bottom-price" class="gray">&#8369;<?php echo number_format($subtotal + 39 + 29, 2); ?></p>
                 </div>
             </div>
             

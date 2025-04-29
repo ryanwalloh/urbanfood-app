@@ -1,9 +1,7 @@
-{% extends 'components/order_tracking_base.html' %}
 <!DOCTYPE html>
-{% load static %}
 
 
-
+{% extends 'components/order_tracking_base.html' %}
 
 {% if not user.is_authenticated %}
     <script>window.location.href = "/";</script>
@@ -104,7 +102,7 @@
                     <h2>Total</h2>
                 </div>
                 <div class="wrap-price">
-                    <p>&#8369;{ total }</p>
+                    <p>&#8369;<?php echo number_format($subtotal + 39 + 29, 2); ?></p>
                 </div>
             </div>
             <hr class="hr2">
@@ -113,13 +111,12 @@
                     <h4 class="gray">Paid With</h4>
                     <div class="wrap-label">
                         <img class="payment-icon" src="icons/cod.svg">
-                        <img class="payment-icon" src="{% static 'icons/cod.svg' %}">
                         <p class="gray">Cash On Delivery</p>
                     </div>
                     
                 </div>
                 <div class="wrap-price">
-                    <p id="bottom-price" class="gray">&#8369;{ total }</p>
+                    <p id="bottom-price" class="gray">&#8369;<?php echo number_format($subtotal + 39 + 29, 2); ?></p>
                 </div>
             </div>
             
