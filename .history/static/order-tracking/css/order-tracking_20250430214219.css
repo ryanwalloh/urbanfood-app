@@ -1,0 +1,228 @@
+.main-container {
+    /* border: 1px solid red; */
+    height: 100%;
+    padding: 48px 64px 48px 64px;
+    background-color: whitesmoke;
+    font-family: "Palanquin", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.order-tracking-container {
+    /* border: 1px solid green; */
+    padding: 10px 20px 0px 20px;
+    width: 640px;
+    margin-top: 80px;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.order-tracking-container p {
+    color: #8d8c8c;
+}
+
+
+.arrival-time {
+    line-height: 10px;
+    margin-bottom: 40px;
+}
+
+.left {
+    /* border: 1px solid blueviolet; */
+    min-width: 500px;
+
+}
+
+.progress-bar {
+    /* border: 1px solid pink; */
+    height: 15px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress1 {
+    width: 25%;
+    height: 8px;
+    background-color: #2c786c; 
+    border-radius: 20px;
+}
+.progress2 {
+    width: 25%;
+    height: 8px;
+    border-radius: 20px;
+    background-color: #dddddd;
+}
+.progress3 {
+    width: 25%;
+    height: 8px;
+    border-radius: 20px;
+    background-color: #dddddd;
+}
+.progress4 {
+    width: 25%;
+    height: 8px;
+    border-radius: 20px;
+    background-color: #dddddd ;
+}
+
+.arrival-notice {
+    line-height: 20px;
+}
+
+.right {
+    /* border: 1px solid salmon; */
+    width: 100%;
+    /* height: 100%; */
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    position: relative;
+    bottom: 30px;
+}
+
+.img-container {
+    /* border: 1px solid yellow; */
+    /* width: 100px; */
+    /* margin-left: 30px; */
+    object-fit: cover;
+    overflow: hidden;
+    padding: 0px 0px 0px 0px;
+}
+
+
+
+.status-image{
+    width: 140px;
+    transform: translate(0px, 50px);
+    border: 1px solid red;
+
+}
+
+.order-details-container {
+    /* border: 1px solid red; */
+    padding: 0px 20px 20px 20px;
+    width: 640px;
+    margin-top: 40px;
+    /* background-color: white; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    border-radius: 10px;
+    color: #333333;
+    background-color: white;
+}
+
+.order-details-container h1 {
+    position: relative;
+    bottom: 20px;
+    font-size: 1.5rem;
+    
+}
+
+.order-details {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.wrap-left {
+    display: flex;
+    position: relative;
+    bottom: 10px;
+}
+
+.restaurant-image-container {
+    /* border: 1px solid green; */
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+.image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.details-container {
+    /* border: 1px solid pink; */
+    padding: 0px 10px 0px 10px;
+    display: flex;
+    flex-direction: column;
+    font-size: small;
+    line-height: 0px;
+    position: relative;
+    bottom: 8px;
+    width: 350px;
+
+   
+}
+
+#streetAddress {
+    line-height: 15px;
+}
+.total-price {
+    position: relative;
+    bottom: 40px;
+}
+
+hr {
+    width: 100%; 
+    height: 1px; 
+    border: none; 
+    border-bottom: 1px solid #ccc;
+    margin-top: 20px;
+    margin-bottom: 20px;
+      
+}
+.hr2 {
+    width: 100%; 
+    height: 1px; 
+    border: none; 
+    border-bottom: 1px solid #ccc;
+    margin-top: 10px;
+    margin-bottom: 5px;
+      
+}
+
+.view-details {
+    /* border: 1px solid brown; */
+    line-height: 10px;
+  
+}
+
+.payment-icon {
+    width: 40px;
+    margin-right: 10px;
+
+}
+
+.space-between-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+
+.wrap-label {
+    display: flex;
+}
+
+.gray {
+    color: #8d8c8c;
+}
+
+#bottom-price {
+    position: relative;
+    top: 30px;
+}
+
