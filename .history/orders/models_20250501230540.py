@@ -1,23 +1,18 @@
 from django.db import models
 from users.models import User
 from menu.models import Product
-import random, string
-from django.db.utils import OperationalError
+import random
+import string
 
 
 
-
-def generate_unique_token():
-    chars = string.digits
-    for _ in range(10):  # limit retries
-        token = ''.join(random.choices(chars, k=6))
-        try:
-            if not Order.objects.filter(token_number=token).exists():
-                return token
-        except OperationalError:
-            # Token field doesn't exist yet (e.g. during migrations)
+def generate_unique_token(length=6):
+    characters = string.ascii_uppercase + string.digits
+    while True:
+        token = ''.join(random.choice(characters) for _ in range(length))
+        from .models import Order
+        if not Order.objects.filter(token_number=token).exists():
             return token
-    raise Exception("Failed to generate a unique token after 10 tries.")
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -30,13 +25,7 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    token_number = models.CharField(
-    max_length=6,
-    unique=True,
-    default=generate_unique_token,
-    null=False,
-    blank=False,
-)
+    token_number = models.CharField(max_length=6, unique=True, default=generate_unique_token, editable=False)
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_orders', limit_choices_to={'role': 'customer'})
     restaurant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='restaurant_orders', limit_choices_to={'role': 'restaurant'})
     rider = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='rider_orders', limit_choices_to={'role': 'rider'})

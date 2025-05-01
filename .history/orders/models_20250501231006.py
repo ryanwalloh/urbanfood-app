@@ -2,7 +2,6 @@ from django.db import models
 from users.models import User
 from menu.models import Product
 import random, string
-from django.db.utils import OperationalError
 
 
 
@@ -32,10 +31,9 @@ class Order(models.Model):
 
     token_number = models.CharField(
     max_length=6,
-    unique=True,
     default=generate_unique_token,
-    null=False,
-    blank=False,
+    null=True,
+    blank=True,
 )
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_orders', limit_choices_to={'role': 'customer'})
     restaurant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='restaurant_orders', limit_choices_to={'role': 'restaurant'})

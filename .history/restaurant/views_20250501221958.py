@@ -5,8 +5,6 @@ from menu.models import Product  # Import Product from the menu app
 from .models import Restaurant  # Import Restaurant from the restaurant app
 from django.contrib.auth.decorators import login_required
 from menu.models import CartItem
-from orders.models import Order
-from django.contrib import messages
 
 
 def cart_view(request):

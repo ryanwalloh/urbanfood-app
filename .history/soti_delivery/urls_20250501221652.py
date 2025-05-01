@@ -44,7 +44,7 @@ urlpatterns = [
     path('customer/', include('customer.urls')),
     path('menu/', include('menu.urls')),
     
-
+    path('restaurant/', include('restaurant.urls')),
 ]
 
 if settings.DEBUG:
