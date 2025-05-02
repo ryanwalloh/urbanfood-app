@@ -1,0 +1,21 @@
+{% extends 'components/dashboard_base.html' %}
+
+{% load static %}
+
+
+
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+
+  <header></header>  
+
+
+
+
+
+{% endblock %}

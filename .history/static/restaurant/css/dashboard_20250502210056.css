@@ -1,0 +1,59 @@
+body {
+   margin: 26px 64px;
+}
+
+.header {
+    display: flex;
+}
+
+.logo-container {
+    display: flex;
+}
+
+.logo-img {
+    width: 48px;
+    height: 48px;
+    border: 1px solid red;
+    border-radius: 50%;
+}
+
+.logo-container h1 {
+    font-size: 1rem;
+}
+
+.header-elements {
+    display: flex;
+
+}
+
+.element-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 18px;
+    object-fit: cover;
+    overflow: hidden;
+    border-radius: 50%;
+    background-color: gainsboro;
+    margin-right: 10px;
+    
+}
+
+.element-icon {
+    width: 100%;
+    object-fit: cover;
+    
+}
+
+#menu-book-img {
+    width: 28px;
+    padding-right: 10px;
+}
+
+#menu-book {
+    border: 1px solid red;
+    width: 168px;
+    padding: 0px;
+    border-radius: 20px;
+}

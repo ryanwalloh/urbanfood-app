@@ -1,0 +1,34 @@
+{% extends 'components/dashboard_base.html' %}
+
+{% load static %}
+
+
+
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+
+  <header class="header">
+
+    <div class="logo-container">
+      <img class="logo-img" src="{restaurant.profile.url}">
+      <h1>{restaurant.name}</h1>
+    </div>
+
+    <div class="header-elements">
+      <div class="element-icon-container">
+        <img class="element-icon" src="{% static 'icons/cooking.png' %}">
+      </div>
+    </div>
+ 
+  </header>  
+
+
+
+
+
+{% endblock %}

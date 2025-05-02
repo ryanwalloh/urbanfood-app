@@ -47,7 +47,7 @@
 
     <form action="" method="GET" class="search-form">
       <img class="search" src="{% static 'storefront/images/icons/search.svg' %}">
-      <input type="text" name="search_query" placeholder="Enter token number or order ID to search" class="search-input">
+      <input type="text" name="search_query" placeholder="Search in Menu" class="search-input">
     </form>
 
     <div class="tool-icon-container">
@@ -63,38 +63,13 @@
       </div>
 
       <div class="tool-icon-wrap">
-        <h3>Online</h3>
         <img id="toggle-icon" class="tool-icon" src="{% static 'restaurant/images/offline.png' %}">
-        
+        <h3>Online</h3>
       </div>
-
+      
     </div>
     
   </div>
-
-  <main>
-    <aside>
-      <div class="aside-container">
-        <div class="aside-element">
-          <img class="aside-icon" src="{% static 'restaurant/images/orders.svg' %}">
-          <h3>All Orders</h3>
-        </div>
-        <div class="aside-element">
-          <img class="aside-icon" src="{% static 'restaurant/images/menu2.svg' %}">
-          <h3>Menu</h3>
-        </div>
-        <div class="aside-element">
-          <img class="aside-icon" src="{% static 'restaurant/images/clock.svg' %}">
-          <h3>Order History</h3>
-        </div>
-
-        <div class="quick-add-container">
-          <img class="quick-add-image" src="{% static 'restaurant/images/fast-food.png' %}">
-          <button class="add-button"> <span class="plus">+</span> Add Channel</button>
-        </div>
-      </div>
-    </aside>
-  </main>
 
 
 
