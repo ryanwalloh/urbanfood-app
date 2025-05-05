@@ -13,7 +13,6 @@ from django.contrib.auth import get_user_model
 from users.models import User
 import logging
 from restaurant.models import Restaurant
-from orders.models import Order, OrderLine
 
 
 def landing_page(request):
@@ -94,18 +93,10 @@ def restaurant_home(request):
     if not request.user.is_authenticated or request.user.role != 'restaurant':
         return redirect('core:landing_page')
 
-    try:
-        restaurant = request.user.restaurant  # Assuming OneToOneField
-    except:
-        restaurant = None
-
-    pending_orders = Order.objects.filter(
-        restaurant=request.user,
-        status='pending'
-    ).order_by('-created_at').prefetch_related('items__product', 'customer')
+    # Get pending orders for the logged-in restaurant
+    pending_orders = Order.objects.filter(restaurant=request.user, status='pending').order_by('-created_at').prefetch_related('items__product', 'customer')
 
     return render(request, 'restaurant/dashboard.html', {
-        'restaurant': restaurant,
         'pending_orders': pending_orders
     })
 

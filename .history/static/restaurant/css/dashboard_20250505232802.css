@@ -334,22 +334,7 @@ aside {
     border-radius: 20px;
     border: none;
     font-size: large;
-    cursor: pointer;
 }
-.prepare-order-btn {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(74, 206, 91);
-    color: white;
-    padding: 10px 40px 10px 40px;
-    border-radius: 20px;
-    border: none;
-    font-size: large;
-    cursor: pointer;
-}
-
 #ready-button {
     max-width: 6vw;
     display: flex;
@@ -450,7 +435,7 @@ aside {
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 25%;
+    width: 80%;
   }
   
   /* The Close Button */

@@ -336,7 +336,7 @@ aside {
     font-size: large;
     cursor: pointer;
 }
-.prepare-order-btn {
+#prepare-order {
     width: 100%;
     display: flex;
     justify-content: center;

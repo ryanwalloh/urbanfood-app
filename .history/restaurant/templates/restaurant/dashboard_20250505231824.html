@@ -12,12 +12,10 @@
 
 {% block content %}
 
-
-
   <header class="header">
 
     <div class="logo-container">
-      <img class="logo-img" src="{{ restaurant.profile_picture.url }}" alt="Profile Picture">
+      <img class="logo-img" src="{% if restaurant and restaurant.profile_picture %}{{ restaurant.profile_picture.url }}{% else %}{% static 'restaurant/images/default-logo.png' %}{% endif %}">
       <h1>Blooper</h1>
     </div>
 
@@ -127,60 +125,41 @@
         <div class="orders-container">
           <h3 class="main-tab-update">New Orders(1)</h3>
 
-          {% for order in pending_orders %}
           <div class="order">
-            <div id="myModal" class="modal">
-              <div class="modal-content">
-                <span class="close">&times;</span>
-                <p>Orders for Order No. {{ order.token_number }}</p>
-                {% for item in order.items.all %}
-                  <p>{{ item.product.name }} x {{ item.quantity }}</p>
-                {% endfor %}
-                <div class="wrap-item">
-                  <button class="prepare-order-btn" data-order-id="{{ order.id }}">Prepare Order</button>
-                </div>
-              </div>
-            </div>
 
             <div class="wrap-item">
-              <h3 id="order-id">{{ order.id }}</h3>
+              <h3 id="order-id">878656</h3>
               <p>View Order</p>
             </div>
 
             <div class="wrap-item">
               <div class="wrap-flex">
                 <img class="main-icon" src="{% static 'restaurant/images/crypto.png' %}">
-                <h3 id="token-no">{{ order.token_number }}</h3>
+                <h3 id="token-no">123121</h3>
               </div>
             </div>
-
             <div class="wrap-item">
               <div class="wrap-flex">
                 <img class="main-icon" src="{% static 'restaurant/images/human.png' %}">
                 <div class="wrap-item">
-                  {% if order.rider %}
-                    <h3 id="rider">{{ order.rider.get_full_name }}</h3>
-                    <p id="rider-mobile-number">{{ order.rider.phone }}</p>
-                  {% else %}
-                    <h3 id="rider">Not Assigned</h3>
-                    <p id="rider-mobile-number">N/A</p>
-                  {% endif %}
+                  <h3 id="rider">Bill</h3>
+                  <p id="rider-mobile-number">09768889765</p>
                 </div>
               </div>
             </div>
 
             <div class="customer-address-container">
-              <h3 id="Customer">{{ order.customer.get_full_name }}</h3>
-              <p class="customer-address">{{ order.customer.customer.address }}</p>
+              <h3 id="Customer">John Doe</h3>
+              <p class="customer-address">387 New Estate Street, New Yorkssss</p>
             </div>
 
             <div class="wrap-item">
               <h3 id="rider-arrival">00:30:00</h3>
-              <p id="timestamp">{{ order.created_at|date:"h:i A" }}</p>
+              <p id="timestamp">02:30 PM</p>
             </div>
 
             <div class="wrap-item">
-              <h3 id="sub-total">&#8369; {{ order.total_amount }}</h3>
+              <h3 id="sub-total">&#8369; 25.08</h3>
               <p id="payment-status">Paid</p>
             </div>
 
@@ -188,10 +167,16 @@
               <button id="view-order">View</button>
             </div>
           </div>
-          {% endfor %}
 
+          <div id="myModal" class="modal">
 
+            <!-- Modal content -->
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <p>Some text in the Modal..</p>
+            </div>
           
+          </div>
         </div>
 
         <div class="orders-container">
@@ -320,32 +305,6 @@
         modal.style.display = "none";
       }
     }
-
-    document.querySelectorAll('.prepare-order-btn').forEach(button => {
-      button.addEventListener('click', function () {
-        const orderId = this.dataset.orderId;
-
-        fetch("{% url 'prepare_order' %}", {
-          method: 'POST',
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            'order_id': orderId
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('Order is now being prepared!');
-            location.reload(); // or update UI dynamically
-          } else {
-            alert(data.message || 'Failed to update order.');
-          }
-        });
-      });
-    });
     </script>
 
 

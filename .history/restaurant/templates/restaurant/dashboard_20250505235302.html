@@ -17,7 +17,8 @@
   <header class="header">
 
     <div class="logo-container">
-      <img class="logo-img" src="{{ restaurant.profile_picture.url }}" alt="Profile Picture">
+      <img class="logo-img" src="{% if restaurant and restaurant.profile_picture %}{{ restaurant.profile_picture.url }}{% else %}{% static 'restaurant/images/default-logo.png' %}{% endif %}">
+      <img src="{{ restaurant.profile_picture.url }}" alt="Profile Picture">
       <h1>Blooper</h1>
     </div>
 

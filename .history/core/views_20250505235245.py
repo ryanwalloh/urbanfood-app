@@ -14,7 +14,7 @@ from users.models import User
 import logging
 from restaurant.models import Restaurant
 from orders.models import Order, OrderLine
-
+from restaurant.models import RestaurantProfile
 
 def landing_page(request):
     return render(request, 'core/landing_page.html')

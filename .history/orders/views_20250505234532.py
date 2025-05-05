@@ -2,9 +2,6 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Order, OrderLine
 from .serializers import OrderSerializer, OrderLineSerializer
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
