@@ -1,0 +1,10 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('<int:restaurant_id>/', views.restaurant_detail, name='restaurant_detail'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('order/<int:order_id>/accept/', views.accept_order, name='accept_order'),
+    path('order/<int:order_id>/reject/', views.reject_order, name='reject_order'),
+   \
+]
