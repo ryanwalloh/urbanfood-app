@@ -384,58 +384,64 @@ include 'personal-details.php';
  
 
   function initMap() {
-  
     const defaultLocation = { lat: 8.001106, lng: 124.284823 };
 
-   
     const map = new google.maps.Map(document.querySelector('.map-cover2'), {
         center: defaultLocation,
         zoom: 15,
     });
+
     const map2 = new google.maps.Map(document.querySelector('.map-cover'), {
         center: defaultLocation,
         zoom: 15,
     });
 
-   
-    const marker = new google.maps.Marker({
-        position: defaultLocation,
-        map: map,
-        draggable: true, 
-        title: "Drag me to update your location",
-    });
-
-   
     const geocoder = new google.maps.Geocoder();
 
+    const markerElement = document.createElement("div");
+    markerElement.className = "custom-marker"; // You can style this in CSS
 
+    // Create the advanced marker
+    const marker = new google.maps.marker.AdvancedMarkerElement({
+        map: map,
+        position: defaultLocation,
+        content: markerElement,
+        title: "Drag me to update your location",
+        gmpDraggable: true,
+    });
+
+    // Handle dragend
+    marker.addListener('dragend', (event) => {
+        const latlng = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng(),
+        };
+        updateAddressFromLatLng(latlng);
+    });
+
+    // Handle map click
+    map.addListener('click', function (event) {
+        marker.position = event.latLng;
+        updateAddressFromLatLng(event.latLng.toJSON());
+    });
+
+    // Geocoder function
     function updateAddressFromLatLng(latlng) {
         geocoder.geocode({ location: latlng }, function (results, status) {
             if (status === "OK" && results[0]) {
-               
                 const address = results[0].formatted_address;
-                document.querySelector('input[name="street-house-number"]').value = address;
+                const input = document.querySelector('input[name="street-house-number"]');
+                if (input) input.value = address;
             } else {
                 console.error("Geocoder failed due to: " + status);
             }
         });
     }
 
-    
-    marker.addListener('dragend', function () {
-        const position = marker.getPosition();
-        updateAddressFromLatLng(position.toJSON());
-    });
-
- 
-    map.addListener('click', function (event) {
-        marker.setPosition(event.latLng);
-        updateAddressFromLatLng(event.latLng.toJSON());
-    });
-
-
+    // Get address on load
     updateAddressFromLatLng(defaultLocation);
 }
+
 
 
 document.getElementById('edit').addEventListener('click', function () {
@@ -493,36 +499,11 @@ document.getElementById('close').addEventListener('mouseout', function() {
     
 });
 
-document.getElementById("place-order").addEventListener("click", function () {
-
-
-
-        const street = document.querySelector("#street").value.trim();
-        const addressDetails = document.querySelector("input[name='address-details']").value.trim();
-        const note = document.querySelector("input[name='note']").value.trim();
-        const addressLabel = document.querySelector("input[name='imageRadio']:checked");
-
-       
-        const firstName = document.querySelector("#first-name").value.trim();
-        const lastName = document.querySelector("#last-name").value.trim();
-        const phoneNumber = document.querySelector("input[name='number']").value.trim();
-
- 
-        const paymentMethod = document.querySelector("input[name='payment_method']:checked");
-
-     
-        if (!street || !addressDetails || !note || !addressLabel) {
-            alert("Please complete your delivery address details.");
-        } else if (!firstName || !lastName || !phoneNumber) {
-            alert("Please complete your personal details.");
-        } else if (!paymentMethod) {
-            alert("Please select a payment method.");
-        } else {
-
-            document.querySelector(".submit").closest("form").submit();
-        }
-    });
 
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ&callback=initMap" async defer></script>
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ&callback=initMap&libraries=marker">
+</script>
