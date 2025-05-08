@@ -1,0 +1,78 @@
+{% extends 'components/rider_dashboard_base.html' %}
+
+{% load static %}
+
+
+
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+{% include 'layout/rider/navbar.html' %}
+
+<div class="main-container">
+    <div class="header-container">
+        <div class="header-img-container">
+            <img class="header-img" src="{% static 'icons/header.png' %}" alt="Header">
+        </div>
+        <div class="header-data">
+            <div class="level1">
+                <button id="level" disabled>Soti Delivery</button>
+            </div>
+            <div class="name">
+                <h2>Partner {{ user.first_name }}</h2>
+            </div>
+
+            <div class="earnings">
+                <h3>Your Earnings</h3>
+                <h1>₱<span id="totalEarnings">{{ total_earnings }}</span></h1>
+            </div>
+        </div>
+
+        <div class="status-container">
+            <div class="wrap-left">
+                <h1>Status: <span id="status">{{ rider.is_available|yesno:"Online,Offline" }}</span></h1>
+                <p id="statusMessage">
+                    {{ rider.is_available|yesno:"Open to any delivery,Turn on status to receive Delivery Assignments" }}
+                </p>
+            </div>
+            <div class="wrap-right">
+                <img class="on" src="{% static 'icons/' %}{{ rider.is_available|yesno:'online,offline' }}.png" id="toggleStatus" alt="Toggle Status">
+            </div>
+        </div>
+
+        <div id="order-cta" class="order-cta-container">
+            <div class="cta-orders">
+                <div class="order-bag-container">
+                    <img id="orderBag" class="orderBag" src="{% static 'icons/delivery-bag.png' %}" alt="Delivery Bag">
+                </div>
+                <div class="order-cta-details" id="ctaDetails">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('toggleStatus').addEventListener('click', function() {
+        fetch("{% url 'rider:toggle_status' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('status').innerText = data.new_status;
+            document.getElementById('toggleStatus').src = "{% static 'icons/' %}" + data.status_image;
+        });
+    });
+</script>
+    
+
+{% endblock %}

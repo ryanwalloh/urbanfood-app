@@ -1,0 +1,308 @@
+
+
+@media (max-width: 768px) {
+    .main-order-container {
+        width: 100%;
+        height: auto;
+        /* border: 1px solid red; */
+        font-family: "Noto Sans", serif;
+        
+    }
+
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;  /* Position the nav at the bottom */
+        top: 0;        /* Stick the nav to the bottom */
+        width: 100%;      /* Ensure the nav stretches across the full width */
+        background-color: #fff; /* Optional: add a background color */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Optional: add shadow */
+        z-index: 1000;    /* Ensure the nav is above other content */
+        padding: 20px ;  /* Adjust padding as necessary */
+        height: 60px;
+        
+    }
+
+    #back-to-main {
+        cursor: pointer;
+    }
+
+    .invincible {
+        width: 70px;
+        opacity: 0;
+    }
+
+    .header-container h1 {
+        font-weight: 300;
+    }
+
+    .icon-container {
+        /* background-color: red; */
+        width: 40px;
+        display: flex;
+        align-items: center;
+    }
+
+    .orders-container {
+        margin-top: 100px;
+        /* border: 1px solid red; */
+        /* padding: 40px 30px 40px 30px; */
+    }
+
+    .order-list {
+        /* border: 1px solid red; */
+        /* width: 100%; */
+        /* background-color: red; */
+        padding: 40px 30px 40px 30px;
+    }
+
+    .order {
+        /* border: 1px solid red; */
+        margin-bottom: 20px;
+  
+    }
+
+    .initial-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        line-height: 20px;
+        width: auto;
+        padding: 10px 10px 10px 30px;
+        /* border: 1px solid red; */
+    }
+
+    .initial-details2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: center;
+        /* border: 1px solid #ccc; */
+        border-radius: 5px;
+        line-height: 20px;
+        width: auto;
+        padding: 40px 30px 0px 30px;
+        margin-bottom: 0px;
+       
+    }
+
+    #nav-dp {
+        border: 1px solid  #45BA73;
+    }
+
+    .wrap-nav {
+        display: flex;
+        align-items: center;
+        border: 1px solid rgb(190, 80, 80);
+        padding: 0px 15px 0px 10px;
+        border-radius: 20px;
+        height: 35px;
+        justify-content: space-evenly;
+    }
+
+    .invincible2 {
+        border: 1px solid red;
+        margin-right: 50px;
+        opacity: 0;
+    }
+    .wrap-nav1 {
+        display: flex;
+        align-items: center;
+        /* border: 1px solid red; */
+        background-color: #45BA73;
+        color: white;
+        padding: 0px 15px 0px 10px;
+        border-radius: 20px;
+        height: 35px;
+       
+    }
+    .wrap-nav p, .wrap-nav1 p{
+        font-size: smaller;
+    }
+
+   
+
+    .drop-down {
+        display: none;
+        flex-direction: column;
+        padding: 20px 10px 20px 10px;
+
+    }
+
+    .your-location, .pickup-point, .drop-point {
+        display: flex;
+        align-items: center;
+    }
+
+    .drop-point {
+        margin-bottom: 20px;
+    }
+
+
+    .marker-icon {
+        width: 25px;
+        height: 25px;
+        margin-right: 10px;
+    }
+
+    .line-break-design {
+        display: flex;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .square {
+        display: flex;
+        flex-direction: column;
+        justify-content: left;
+        align-items: left;
+        gap: 5px;
+        padding-right: 20px;
+        padding-left: 10px;
+    }
+
+    .square1, .square2, .square3 {
+        width: 5px;
+        height: 5px;
+        
+        background-color: #ccc;
+    }
+
+    .horizontal-line {
+        width: 90%;
+        height: 1px;
+        background-color: #ccc;
+       
+    }
+    .horizontal-line2 {
+        width: 100vw;
+        position: relative;
+        right: 20px;
+        height: 1px;
+        background-color: #ccc;
+       
+    }
+
+ 
+
+    .view-details {
+        cursor: pointer;
+        border: none;
+        background-color: white;
+
+    }
+
+    .amount-summary {
+        /* border: 1px solid red; */
+        width: 90vw;
+        position: relative;
+        right: 20px;
+        /* padding-left: 0px; */
+    }
+
+    .amount-summary p{
+        color: #727272;
+        
+    }
+
+    .wrap-inline {
+        display: flex;
+        justify-content: space-between;
+        /* border-top: 1px solid #ccc; */
+        /* border-bottom: 1px solid #ccc; */
+        align-items: center;
+        padding: 0px 20px 0px 10px;
+    }
+    .wrap-inline h1{
+        font-size: 2rem;
+        font-weight: 400;
+        color: #111111;
+    }
+    .wrap-inline2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        /* border: 1px solid #ccc; */
+        padding: 0px 0px 0px 0px;
+      
+    }
+    .wrap-inline2 h1{
+        font-size: 1.8rem;
+        font-weight: 400;
+        color: #111111;
+    }
+    .wrap-inline3 {
+        display: flex;
+        justify-content: space-between;
+        border: 1px solid #ccc;
+        padding: 0px 20px 0px 20px;
+        background-color: white;
+    }
+    .wrap-inline3 h1{
+        font-size: larger;
+        color: #111111;
+    }
+
+    .wrap-column {
+        display: flex;
+        flex-direction: column;
+        line-height: 0px;
+    }
+    .wrap-column2 {
+        display: flex;
+        flex-direction: column;
+        line-height: 0px;
+        padding: 10px 20px 10px 10px;
+        /* border-top: 1px solid #ccc; */
+    }
+    .wrap-column2 h1{
+        font-weight: 500;
+        color: #111111;
+    }
+
+    .vertical-line {
+        width: 1px;
+        height: 100px;
+        background-color: #ccc;
+    }
+
+    .wrap-block {
+        background-color: whitesmoke;
+        width: 100vw;
+        position: relative;
+        right: 30px;
+        padding: 0px 140px 40px 0px;
+    }
+
+    .shrink {
+        /* border: 1px solid red; */
+        padding: 0px 40px 0px 40px;
+    }
+
+    .custom-accept-order-button {
+        background-color: #45BA73;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 40px;
+        cursor: pointer;
+    
+    }
+    .custom-accept-order-button p{
+        color: white;
+        font-weight: 500;
+    }
+
+    .rider-icon {
+        width: 30px;
+        margin-right: 20px;
+    }
+
+
+
+   
+}
