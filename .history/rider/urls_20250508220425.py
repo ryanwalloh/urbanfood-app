@@ -8,8 +8,4 @@ urlpatterns = [
     path('toggle-status/', views.toggle_status, name='toggle_status'),
     path('rider/orders/count/', views.get_available_orders, name='get_order_count'),
     path('orders/', views.orders_view, name='orders'),
-    path('fetch-orders/', views.fetch_orders, name='fetch-orders'),
-    path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('update-order-status/', views.update_order_status, name='update_order_status'),
-    path('orders/deliver/', views.deliver, name='deliver'),
 ]

@@ -86,8 +86,6 @@
         });
     });
 
-    const ordersUrl = "{% url 'rider:orders' %}";
-
     function updateOrderCount() {
         fetch("{% url 'rider:get_order_count' %}")
             .then(response => response.json())

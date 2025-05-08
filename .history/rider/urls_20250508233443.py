@@ -10,6 +10,5 @@ urlpatterns = [
     path('orders/', views.orders_view, name='orders'),
     path('fetch-orders/', views.fetch_orders, name='fetch-orders'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('update-order-status/', views.update_order_status, name='update_order_status'),
-    path('orders/deliver/', views.deliver, name='deliver'),
+     path('update-order-status/', views.update_order_status, name='update_order_status'),
 ]

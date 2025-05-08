@@ -268,7 +268,7 @@ function acceptOrder(orderId) {
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     // Get CSRF token
-    const csrftoken = document.getElementById('csrf-token').value; 
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     xhr.setRequestHeader('X-CSRFToken', csrftoken);
 
     xhr.onreadystatechange = function () {
@@ -278,7 +278,7 @@ function acceptOrder(orderId) {
 
                 if (response.success) {
                     console.log('Order status updated successfully.');
-                    window.location.href = `/rider/orders/deliver/?order_id=${orderId}`;
+                    window.location.href = `deliver.html?order_id=${orderId}`;
                 } else {
                     console.error('Failed:', response.message);
                 }

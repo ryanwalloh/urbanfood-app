@@ -278,7 +278,7 @@ function acceptOrder(orderId) {
 
                 if (response.success) {
                     console.log('Order status updated successfully.');
-                    window.location.href = `/rider/orders/deliver/?order_id=${orderId}`;
+                    window.location.href = `orders/deliver/?order_id=${orderId}`;
                 } else {
                     console.error('Failed:', response.message);
                 }

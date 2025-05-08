@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
 @require_POST
 @login_required
@@ -54,7 +53,7 @@ def get_available_orders(request):
 @csrf_exempt
 def fetch_orders(request):
     if request.method == 'POST':
-        orders = Order.objects.filter(rider__isnull=True)
+         orders = Order.objects.filter(rider__isnull=True)
 
         order_list = []
         for order in orders:
@@ -94,32 +93,3 @@ def orders_view(request):
 
 def dashboard_view(request):
     return render(request, 'rider/dashboard.html')
-
-@csrf_exempt  # Optional: Only if not sending CSRF token in JS
-def update_order_status(request):
-    if request.method == 'POST':
-        if not request.user.is_authenticated or request.user.role != 'rider':
-            return JsonResponse({'success': False, 'message': 'Unauthorized: Only riders can accept orders.'})
-        
-        order_id = request.POST.get('order_id')
-        status = request.POST.get('status')
-
-        try:
-            order = Order.objects.get(id=order_id)
-
-            if order.rider is not None:
-                return JsonResponse({'success': False, 'message': 'Order already assigned.'})
-
-            order.status = status
-            order.rider = request.user  # Assumes the rider is logged in
-            order.save()
-
-            return JsonResponse({'success': True, 'message': f'Order status updated to {status}.'})
-        except Order.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Order not found.'})
-    return JsonResponse({'success': False, 'message': 'Invalid request method.'})
-
-def deliver(request):
-    # You can pass the order_id or any other necessary data to the template
-    order_id = request.GET.get('order_id')
-    return render(request, 'rider/deliver.html', {'order_id': order_id})

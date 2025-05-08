@@ -14,11 +14,9 @@
 {% include 'layout/rider/navbar.html' %}
 
 <div class="main-order-container">
-    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
     <div class="header-container">
         <div class="icon-container">
-            <img id="back-to-main" class="back" src="{% static 'icons/back.svg' %}" data-url="{% url 'rider:dashboard' %}">
-
+            <img id="back-to-main" class="back" src="{% static 'icons/back.svg' %}">
         </div>
         <h1>Orders</h1>
         <div class="invincible">
@@ -47,8 +45,8 @@
             <div class="order">
                 <div class="initial-details">
                     <p>Order #{order_id}</p>
-                    <p>Pickup Point: {restaurant.barangay}</p>
-                    <p>Drop Point: {customer.address.barangay}</p>
+                    <p>Pickup Point: {barangay}</p>
+                    <p>Drop Point: {barangay}</p>
                     <p id="view-details">View Details</p>
                 </div>
                
@@ -88,7 +86,7 @@
                     <div class="amount-summary">
                         <div class="wrap-column2">
                             <p>Total Amount: </p>
-                            <h1>&#8369;{{ total_amount|floatformat:2 }}</h1>
+                            <h1>&#8369;{{ total|floatformat:2 }}</h1>
                         </div>
                         
                         <div class="wrap-inline">
@@ -131,13 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderList = document.getElementById('order-list');
 
     // Fetch orders from the server
-    fetch("{% url 'rider:fetch-orders' %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            }
-        })
+    fetch('fetch-orders.php')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
@@ -159,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                            
                             <div id="drop-down-${order.order_id}" class="drop-down" style="display:none;">
                                 <div class="your-location">
-                                    <img class="marker-icon" src="{% static 'icons/starting-point.png' %}">
+                                    <img class="marker-icon" src="icons/starting-point.png">
                                     <p>Your location</p>
                                 </div>
 
@@ -173,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
 
                                 <div class="pickup-point">
-                                    <img class="marker-icon" src="{% static 'icons/pickup-point.png' %}">
-                                    <p>${order.restaurant.name}</p>
+                                    <img class="marker-icon" src="icons/pickup-point.png">
+                                    <p>${order.restaurant_name}</p>
                                 </div>
 
                                 <div class="line-break-design">
@@ -187,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
 
                                 <div class="drop-point">
-                                    <img class="marker-icon" src="{% static 'icons/drop-point.png' %}">
-                                    <p>${order.customer_barangay}</p> 
+                                    <img class="marker-icon" src="icons/drop-point.png">
+                                    <p>${order.customer_street}</p> 
                                 </div>
                                 <div class="amount-summary">
                                 <div class="horizontal-line2"></div>
@@ -218,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             </div>
                                             
                                             <div class="custom-accept-order-button" onclick="acceptOrder(${order.order_id})">
-                                                <img class="rider-icon" src="{% static 'icons/rider.png' %}">
+                                                <img class="rider-icon" src="icons/rider.png">
                                                 <p>Accept Delivery</p>
                                             </div>
                                         </div>
@@ -256,41 +248,46 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('back-to-main').addEventListener('click', function() {
-    const redirectUrl = this.getAttribute('data-url');
-    window.location.href = redirectUrl;
-});
-
+    window.location.href = 'rider.php';
+})
+// Accept order function
 function acceptOrder(orderId) {
     console.log(`Order #${orderId} accepted.`);
 
+    // Perform an AJAX request to update the order status to 'assigned'
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '{% url "rider:update_order_status" %}', true);
+    xhr.open('POST', 'update-order-status.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-    // Get CSRF token
-    const csrftoken = document.getElementById('csrf-token').value; 
-    xhr.setRequestHeader('X-CSRFToken', csrftoken);
 
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
+                const responseText = xhr.responseText.trim();
 
-                if (response.success) {
+                // Log the server's response to the console
+                console.log('Response from server:', responseText);
+
+                // Check if the response indicates success (e.g., 'Order status updated to assigned.')
+                if (responseText.includes('Order status updated to')) {
                     console.log('Order status updated successfully.');
-                    window.location.href = `/rider/orders/deliver/?order_id=${orderId}`;
+                    // Now redirect to the deliver page only if the update was successful
+                    window.location.href = `deliver.php?order_id=${orderId}`;
                 } else {
-                    console.error('Failed:', response.message);
+                    // If the response does not indicate success, log the error
+                    console.error('Failed to update order status:', responseText);
                 }
             } else {
-                console.error('AJAX error:', xhr.status);
+                console.error('AJAX request failed with status:', xhr.status);
             }
         }
     };
 
+    // Send the request with order_id and status as parameters
     xhr.send(`order_id=${orderId}&status=assigned`);
-}
 
+    // Debugging: Check if the request is being sent correctly
+    console.log(`Sending request to update order ${orderId} to status 'assigned'`);
+}
 
 
 

@@ -122,4 +122,4 @@ def update_order_status(request):
 def deliver(request):
     # You can pass the order_id or any other necessary data to the template
     order_id = request.GET.get('order_id')
-    return render(request, 'rider/deliver.html', {'order_id': order_id})
+    return render(request, 'rider/deliver.html')

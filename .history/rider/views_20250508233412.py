@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 import json
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 
 @require_POST
 @login_required
@@ -98,9 +97,6 @@ def dashboard_view(request):
 @csrf_exempt  # Optional: Only if not sending CSRF token in JS
 def update_order_status(request):
     if request.method == 'POST':
-        if not request.user.is_authenticated or request.user.role != 'rider':
-            return JsonResponse({'success': False, 'message': 'Unauthorized: Only riders can accept orders.'})
-        
         order_id = request.POST.get('order_id')
         status = request.POST.get('status')
 
@@ -118,8 +114,3 @@ def update_order_status(request):
         except Order.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Order not found.'})
     return JsonResponse({'success': False, 'message': 'Invalid request method.'})
-
-def deliver(request):
-    # You can pass the order_id or any other necessary data to the template
-    order_id = request.GET.get('order_id')
-    return render(request, 'rider/deliver.html', {'order_id': order_id})

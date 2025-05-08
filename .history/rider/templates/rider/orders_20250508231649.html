@@ -14,11 +14,9 @@
 {% include 'layout/rider/navbar.html' %}
 
 <div class="main-order-container">
-    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
     <div class="header-container">
         <div class="icon-container">
-            <img id="back-to-main" class="back" src="{% static 'icons/back.svg' %}" data-url="{% url 'rider:dashboard' %}">
-
+            <img id="back-to-main"  class="back" src="{% static 'icons/back.svg' %}">
         </div>
         <h1>Orders</h1>
         <div class="invincible">
@@ -188,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 <div class="drop-point">
                                     <img class="marker-icon" src="{% static 'icons/drop-point.png' %}">
-                                    <p>${order.customer_barangay}</p> 
+                                    <p>${order.customer_street}</p> 
                                 </div>
                                 <div class="amount-summary">
                                 <div class="horizontal-line2"></div>
@@ -256,40 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('back-to-main').addEventListener('click', function() {
-    const redirectUrl = this.getAttribute('data-url');
-    window.location.href = redirectUrl;
-});
+    window.location.href = '/rider/dashboard.html';
+})
 
-function acceptOrder(orderId) {
-    console.log(`Order #${orderId} accepted.`);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '{% url "rider:update_order_status" %}', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-    // Get CSRF token
-    const csrftoken = document.getElementById('csrf-token').value; 
-    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-
-                if (response.success) {
-                    console.log('Order status updated successfully.');
-                    window.location.href = `/rider/orders/deliver/?order_id=${orderId}`;
-                } else {
-                    console.error('Failed:', response.message);
-                }
-            } else {
-                console.error('AJAX error:', xhr.status);
-            }
-        }
-    };
-
-    xhr.send(`order_id=${orderId}&status=assigned`);
-}
 
 
 
