@@ -125,7 +125,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sotidelivery@gmail.com'
 EMAIL_HOST_PASSWORD = 'naolpjuuhuxchqsb'
 DEFAULT_FROM_EMAIL = 'sotidelivery@gmail.com'
-# SITE_URL = 'http://127.0.0.1:8000'
+SITE_URL = 'http://127.0.0.1:8000'  # Replace with your actual domain in production
 SITE_URL = 'https://your-app-name.onrender.com'  # Use your Render production URL here
 
 
