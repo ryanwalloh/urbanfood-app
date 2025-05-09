@@ -9,10 +9,12 @@ cryptography==44.0.3
 Django==5.1.7
 django-cors-headers==4.7.0
 djangorestframework==3.16.0
+gunicorn==23.0.0
 hyperlink==21.0.0
 idna==3.10
 incremental==24.7.2
 msgpack==1.1.0
+packaging==25.0
 pillow==11.2.1
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
