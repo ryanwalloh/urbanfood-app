@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'soti-delivery.onrender.com',  # Add your Render domain here
-   
+   If you have a custom domain (optional)
 ]
 
 
