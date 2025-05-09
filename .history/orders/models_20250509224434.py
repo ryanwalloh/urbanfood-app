@@ -10,7 +10,7 @@ import uuid
 
 
 def generate_unique_token():
-    return str(uuid.uuid4())[:6]  # or any logic that doesn't hit the database
+    return str(uuid.uuid4())[:8]  # or any logic that doesn't hit the database
 
 
 

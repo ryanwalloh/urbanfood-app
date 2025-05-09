@@ -19,7 +19,7 @@ import logging
 def vendor_list(request):
     restaurants = Restaurant.objects.all()
     return render(request, 'customer/vendor_list.html', {'restaurants': restaurants})
-  
+return render(request, 'customer/vendor_list.html', {'restaurants': restaurants})
 
 # View to handle the checkout page
 @login_required
