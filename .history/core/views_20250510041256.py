@@ -18,12 +18,11 @@ from rider.models import Rider
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate
-from django.utils.timezone import now
 
 
 def landing_page(request):
     return render(request, 'core/landing_page.html', {
-        'timestamp': now().timestamp()
+        
     })
 
 # Set up logger

@@ -199,7 +199,7 @@
                 <span id="closeModalButton" onclick="closeModal()" style="cursor:pointer;">&times;</span> 
             </div>
         </div>
-        <form class="registerForm" id="registerAccount" method="POST">
+        <form id="registerForm" id="register_account" method="POST">
             {% csrf_token %}
             <div class="register-account-container">
                 <h1>Let's get you started</h1>
@@ -208,7 +208,7 @@
             </div>
             <div class="register-input-container">
                 <div class="firstname-lastname">
-                    <input type="hidden" name="email" id="registerEmail" value=""> 
+                    <input type="hidden" name="email" id="register-email" value=""> 
                     <input type="text" name="first-name" required placeholder="First Name">
                     <input type="text" name="last-name" required placeholder="Last Name">
                 </div>
@@ -278,6 +278,6 @@
 
 
     
-<script src="{% static 'core/js/index.js' %}?v={{ timestamp }}"></script>
+<script src="{% static 'core/js/index.js' %}"></script>
 </body>
 </html>
