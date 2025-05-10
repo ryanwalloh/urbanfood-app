@@ -236,21 +236,28 @@
                 <span onclick="closeModal()" style="cursor:pointer;">&times;</span> 
             </div>
         </div>
-        <form class="registerForm" method="POST">
+        <form class="registerForm" id="registerAccount" method="POST">
             {% csrf_token %}
             <div class="register-account-container">
                 <img class="registerimg" src="{% static 'icons/newpass.png' %}" alt="SotiDelivery">
                 <h1>Let's get you started</h1>
-                <p class="here"> </p>
+                <p class="here" </p>
                 <div id="error-message2" style="color: red;"></div> 
             </div>
             <div class="register-input-container">
-               
-                <button id="customer">Customer</button>
-                <button type="rider">Customer</button>
-                <button type="restaurant">Customer</button>
+                <div class="firstname-lastname">
+                    <input type="hidden" name="email" id="registerEmail" value=""> 
+                    <input type="text" name="first-name" id="first-name" required placeholder="First Name">
+                    <input type="text" name="last-name" id="last-name" required placeholder="Last Name">
+                </div>
+                <input type="password" name="password" id="passwordRegister" required placeholder="Password">
+                <button type="submit">Create Account</button>
             </div>
-            
+             <div id="register-response-message">
+                <p class="register-modalMessage" id="registerMessage" >We Will send you a <span class="highlight">Magic Link </span>for secure login upon <span class="highlight">Successful Registration</span></p>
+                <p id="registerloadingIndicator" style="display: none;">Processing...</p>
+                
+            </div>
         </form>
     </div>
 </div>

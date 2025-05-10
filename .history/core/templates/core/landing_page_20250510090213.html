@@ -236,7 +236,7 @@
                 <span onclick="closeModal()" style="cursor:pointer;">&times;</span> 
             </div>
         </div>
-        <form class="registerForm" method="POST">
+        <form class="registerForm" id="registerAccount" method="POST">
             {% csrf_token %}
             <div class="register-account-container">
                 <img class="registerimg" src="{% static 'icons/newpass.png' %}" alt="SotiDelivery">
@@ -245,10 +245,13 @@
                 <div id="error-message2" style="color: red;"></div> 
             </div>
             <div class="register-input-container">
-               
-                <button id="customer">Customer</button>
-                <button type="rider">Customer</button>
-                <button type="restaurant">Customer</button>
+                <div class="firstname-lastname">
+                    <input type="hidden" name="email" id="registerEmail" value=""> 
+                    <input type="text" name="first-name" id="first-name" required placeholder="First Name">
+                    <input type="text" name="last-name" id="last-name" required placeholder="Last Name">
+                </div>
+             
+                <button type="submit">Create Account</button>
             </div>
             
         </form>

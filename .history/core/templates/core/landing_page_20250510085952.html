@@ -106,7 +106,7 @@
             <p>Sign up or login to Continue</p>
         </div>
         <button id="log-in">Log in</button>
-        <button id="sign-up" onclick="signUp()">Sign up</button>
+        <button id="sign-up" onclick="closeModal()">Sign up</button>
         <p class="term-condition" id="term-condition">
             By signing up, you agree to our 
             <span class="highlight">Terms and Conditions</span> and 
@@ -221,36 +221,6 @@
                 <p id="registerloadingIndicator" style="display: none;">Processing...</p>
                 
             </div>
-        </form>
-    </div>
-</div>
-
-
-<div id="signUp-Modal">
-    <div class="signUp-modal-content"> 
-        <div class="action-container">
-            <div class="back-button-container">
-                <span class="back-button">&larr;</span>
-            </div>
-            <div class="close-button-container">
-                <span onclick="closeModal()" style="cursor:pointer;">&times;</span> 
-            </div>
-        </div>
-        <form class="registerForm" method="POST">
-            {% csrf_token %}
-            <div class="register-account-container">
-                <img class="registerimg" src="{% static 'icons/newpass.png' %}" alt="SotiDelivery">
-                <h1>Let's get you started</h1>
-                <p class="here"> </p>
-                <div id="error-message2" style="color: red;"></div> 
-            </div>
-            <div class="register-input-container">
-               
-                <button id="customer">Customer</button>
-                <button type="rider">Customer</button>
-                <button type="restaurant">Customer</button>
-            </div>
-            
         </form>
     </div>
 </div>

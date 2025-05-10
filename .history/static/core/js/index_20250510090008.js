@@ -36,9 +36,7 @@ function rider(){
 }
 
 
-function signUp() {
-    
-}
+function signUp
 
 
 document.getElementById('be-a-rider').addEventListener('click', rider);
