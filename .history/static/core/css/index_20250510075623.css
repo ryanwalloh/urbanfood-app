@@ -728,14 +728,13 @@ input[name="last-name"] {
 #registerloadingIndicator {
     display: none;  /* Initially hidden */
     font-size: 14px;
-    color: #2c786c;
-    margin-top: 80px;
- 
+    color: #888;
+    margin-top: 10px;
 }
 
 #response-message {
     /* border: 1px solid red; */
-    margin-top: 35px;
+    margin-top: 85px;
     justify-content: left;
     text-align: left;
     align-items: left;

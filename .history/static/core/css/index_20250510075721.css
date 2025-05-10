@@ -729,8 +729,7 @@ input[name="last-name"] {
     display: none;  /* Initially hidden */
     font-size: 14px;
     color: #2c786c;
-    margin-top: 80px;
- 
+    margin-top: 10px;
 }
 
 #response-message {

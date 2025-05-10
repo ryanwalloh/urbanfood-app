@@ -19,7 +19,6 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate
 from django.utils.timezone import now
-from django.contrib.auth.hashers import make_password
 
 
 def landing_page(request):
@@ -170,6 +169,7 @@ def login_by_password(request):
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
+@csrf_exempt  # Optional if using CSRF token properly
 def register_account(request):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
@@ -184,33 +184,16 @@ def register_account(request):
                 return JsonResponse({'error': 'Email already registered'}, status=400)
 
             user = get_user_model().objects.create(
-                username=email,
+                username=email,  # Django requires username unless overridden
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
                 role=role,
-                password=make_password(password)
+                password=make_password(password)  # Hash the password
             )
 
-            # ✅ Send magic link after successful registration
-            token = uuid.uuid4()
-            expires_at = timezone.now() + timedelta(minutes=15)
-
-            magic_link = MagicLink.objects.create(user=user, token=token, expires_at=expires_at)
-
-            magic_link_url = f"{settings.SITE_URL}/magic-link-login/{token}/"
-            send_mail(
-                'Your Magic Link for Login',
-                f'Click the following link to log in: {magic_link_url}',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
-            )
-
-            return JsonResponse({
-                'success': True,
-                'message': 'Registered successfully! Magic link has been sent to your email.'
-            })
+            # Optionally: Send magic link here instead of requiring login
+            return JsonResponse({'message': 'Registered successfully'})
 
         except Exception as e:
             print(f'Error during registration: {e}')

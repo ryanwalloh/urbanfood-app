@@ -730,7 +730,7 @@ input[name="last-name"] {
     font-size: 14px;
     color: #2c786c;
     margin-top: 80px;
- 
+    background-color: red;
 }
 
 #response-message {

@@ -164,52 +164,33 @@ document.getElementById('registerAccount').addEventListener('submit', function(e
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('passwordRegister').value;
-    const firstName = document.getElementById('first-name').value;
-    const lastName = document.getElementById('last-name').value;
-    const role = 'customer';  // ✅ Fixed: Remove semicolon inside the string
+    const firstName= document.getElementById('first-name').value;
+    const lastName= document.getElementById('last-name').value;
+    const role = 'customer;'
 
-    const registerloadingIndicator = document.getElementById('registerloadingIndicator');
-
-    const messageElement2 = document.getElementById('registerMessage'); // ✅ Needed for response
-
-    document.getElementById('register-response-message').style.display = 'block';
-    messageElement2.style.display = 'none';
-    registerloadingIndicator.style.display = 'block';
+    const loadingIndicator = document.getElementById('passwordloadingIndicator');
 
     fetch('/registerAccount/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRFToken': csrftoken  // ✅ Make sure `csrftoken` is defined globally
+            'X-CSRFToken': csrftoken
         },
-        body: JSON.stringify({
-            email: email,
-            password: password,
-            first_name: firstName,
-            last_name: lastName,
-            role: role
-        })
+        body: JSON.stringify({ email: email, password: password, firstName: firstName, lastName: lastName, role: role })
     })
     .then(response => response.json())
     .then(data => {
-        registerloadingIndicator.style.display = 'none';
-        if (data.success) {
-            console.log(messageElement2);
-            
-            document.getElementById('register-response-message').style.display = 'block';
-            messageElement2.style.display = 'block';
-            messageElement2.innerHTML = 'Successful Registration!<br>Check your email to securely log in.';
-            messageElement2.style.color = '#2c786c';
-            console.log("success");
+        if (data.message) {
+            messageElement.innerHTML = 'Successful Registration<br>Click the link we sent you to securely log in.';
+            messageElement.style.color = '#2c786c';
+            loginPassword.style.display = 'block';
         } else {
-            messageElement2.innerText = data.error || '❌ Registration failed';
+            document.getElementById('passwordMessage').innerText = data.error || 'Registration failed';
         }
     })
     .catch(error => {
-        loadingIndicator.style.display = 'none';
         console.error('Error:', error);
-        messageElement2.innerText = '❌ An error occurred. Please try again.';
+        document.getElementById('passwordMessage').innerText = 'An error occurred. Please try again.';
     });
 });
-

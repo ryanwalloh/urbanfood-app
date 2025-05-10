@@ -144,13 +144,6 @@ button:hover {
     margin-top: 20%;
     transform: rotate(10deg);
 }
-.registerimg {
-    width: 7vw;
-    display: flex;
-    margin-top: 10%;
-    margin-bottom: 5%;
-    transform: rotate(7deg);
-}
 
 .passwordimg {
     width: 4vw;
@@ -177,14 +170,11 @@ button:hover {
 .registerForm {
     display: block;
     position: relative;
-    top: -120px;
+    top: -80px;
     margin: 0;
     padding: 0;
     width: 100%;
-    z-index: 1;
-
-
-
+    z-index: 10;
 
 }
 
@@ -341,7 +331,7 @@ input {
     background-color: white;
     display: grid;
     flex-direction: column;
-    height: 53%;
+    height: 50%;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -725,13 +715,6 @@ input[name="last-name"] {
     color: #888;
     margin-top: 10px;
 }
-#registerloadingIndicator {
-    display: none;  /* Initially hidden */
-    font-size: 14px;
-    color: #2c786c;
-    margin-top: 80px;
- 
-}
 
 #response-message {
     /* border: 1px solid red; */
@@ -749,19 +732,7 @@ input[name="last-name"] {
     text-align: left;
     align-items: left;
     font-size: 14px;
-
     
-}
-#register-response-message {
-    /* border: 1px solid red; */
-    margin-top: 90px;
-    justify-content: left;
-    text-align: left;
-    align-items: left;
-    font-size: 14px;
-    z-index: 10;
-
-    color: #111111;
 }
 
 #loginPassword {

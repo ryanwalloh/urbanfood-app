@@ -170,10 +170,9 @@ document.getElementById('registerAccount').addEventListener('submit', function(e
 
     const registerloadingIndicator = document.getElementById('registerloadingIndicator');
 
-    const messageElement2 = document.getElementById('registerMessage'); // ✅ Needed for response
+    const messageElement = document.getElementById('registerMessage'); // ✅ Needed for response
 
     document.getElementById('register-response-message').style.display = 'block';
-    messageElement2.style.display = 'none';
     registerloadingIndicator.style.display = 'block';
 
     fetch('/registerAccount/', {
@@ -195,10 +194,8 @@ document.getElementById('registerAccount').addEventListener('submit', function(e
     .then(data => {
         registerloadingIndicator.style.display = 'none';
         if (data.success) {
-            console.log(messageElement2);
             
             document.getElementById('register-response-message').style.display = 'block';
-            messageElement2.style.display = 'block';
             messageElement2.innerHTML = 'Successful Registration!<br>Check your email to securely log in.';
             messageElement2.style.color = '#2c786c';
             console.log("success");
