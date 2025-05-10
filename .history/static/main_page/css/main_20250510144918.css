@@ -153,15 +153,14 @@
     border-radius: 20px;
     margin: 52px 0px 0px;
     margin-bottom: 500px;
-
+    border: 1px solid red;
     padding-bottom: 200px;
-   
 }
 
 .vendor-container {
-    column-count: 3;
-    column-gap: 20px;
-
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 .vendor-list-box-container h1 {
@@ -171,13 +170,14 @@
 }
 
 .vendor-card-container {
-    display: inline-block;
-    width: 100%;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  
     border: 1px solid silver;
     border-radius: 20px;
+    width: 332px;
     height: 275px;
-    cursor: pointer;
+  
 }
 
 .img-container {
@@ -196,7 +196,6 @@
 
 .details-container {
     margin-left: 20px;
- 
 }
 
 .details-container h1 {

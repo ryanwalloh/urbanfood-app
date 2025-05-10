@@ -177,7 +177,7 @@
     border: 1px solid silver;
     border-radius: 20px;
     height: 275px;
-    cursor: pointer;
+  
 }
 
 .img-container {
@@ -196,7 +196,7 @@
 
 .details-container {
     margin-left: 20px;
- 
+    border: 1px solid red;
 }
 
 .details-container h1 {

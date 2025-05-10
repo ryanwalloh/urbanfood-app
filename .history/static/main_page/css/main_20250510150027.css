@@ -153,9 +153,10 @@
     border-radius: 20px;
     margin: 52px 0px 0px;
     margin-bottom: 500px;
-
+    border: 1px solid red;
     padding-bottom: 200px;
-   
+    grid-template-columns: repeat(3, 1fr);
+    display: flex;
 }
 
 .vendor-container {
@@ -177,7 +178,7 @@
     border: 1px solid silver;
     border-radius: 20px;
     height: 275px;
-    cursor: pointer;
+  
 }
 
 .img-container {
@@ -196,7 +197,7 @@
 
 .details-container {
     margin-left: 20px;
- 
+    border: 1px solid red;
 }
 
 .details-container h1 {
