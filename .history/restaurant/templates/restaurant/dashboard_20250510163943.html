@@ -114,11 +114,11 @@
 
     <div class="main-container">
 
-      <div id="addProductModal" style="display: none;">
-        <div class="add-product-modal-content">
+      <div class="addProductModal" style="display: none;">
+        <div class="modal-content">
             <span id="close2">&times;</span>
 
-            <form class="addProductForm" action="{% url 'restaurant:add_product' %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url 'restaurant:add_product' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <label for="name">Name:</label>
                 <input type="text" name="name" required><br>
@@ -135,7 +135,7 @@
                 <button type="submit">Add Product</button>
             </form>
         </div>
-      </div>
+    </div>
 
       <div class="main-tab-container">
         <div class="main-tab"><h2>Order No.</h2></div>
@@ -396,7 +396,7 @@
     document.addEventListener("DOMContentLoaded", function () {
 
       document.getElementById('addProduct').addEventListener('click', function () {
-        document.getElementById('addProductModal').style.display = 'block';
+          document.getElementById('addProductModal').style.display = 'block';
       });
 
       document.getElementById('close2').addEventListener('click', function() {

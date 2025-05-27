@@ -113,30 +113,6 @@
     </aside>
 
     <div class="main-container">
-
-      <div id="addProductModal" style="display: none;">
-        <div class="add-product-modal-content">
-            <span id="close2">&times;</span>
-
-            <form class="addProductForm" action="{% url 'restaurant:add_product' %}" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <label for="name">Name:</label>
-                <input type="text" name="name" required><br>
-
-                <label for="description">Description:</label>
-                <textarea name="description"></textarea><br>
-
-                <label for="price">Price:</label>
-                <input type="number" step="0.01" name="price" required><br>
-
-                <label for="product_picture">Product Picture:</label>
-                <input type="file" name="product_picture"><br>
-
-                <button type="submit">Add Product</button>
-            </form>
-        </div>
-      </div>
-
       <div class="main-tab-container">
         <div class="main-tab"><h2>Order No.</h2></div>
         <div id="token-tab" class="main-tab"><h2>Token No.</h2></div>
@@ -395,13 +371,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-      document.getElementById('addProduct').addEventListener('click', function () {
-        document.getElementById('addProductModal').style.display = 'block';
-      });
-
-      document.getElementById('close2').addEventListener('click', function() {
-        document.getElementById('addProductModal').style.display = 'none';
-      });
+      document.getElementById('addProduct').addEventListener('click', function( ))
 
       function attachModalEventListeners() {
         document.querySelectorAll(".view-order").forEach(button => {

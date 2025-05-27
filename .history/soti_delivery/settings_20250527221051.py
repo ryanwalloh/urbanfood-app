@@ -127,13 +127,7 @@ EMAIL_HOST_USER = 'sotidelivery@gmail.com'
 EMAIL_HOST_PASSWORD = 'naolpjuuhuxchqsb'
 DEFAULT_FROM_EMAIL = 'sotidelivery@gmail.com'
 # SITE_URL = 'http://127.0.0.1:8000'
-ENVIRONMENT = env('DJANGO_ENV', default='development')
-
-if ENVIRONMENT == 'production':
-    SITE_URL = 'https://your-production-domain.com'  # Replace with your real production URL (e.g., soti.delivery)
-else:
-    SITE_URL = 'http://127.0.0.1:8000'
-
+SITE_URL = 'https://soti-delivery.onrender.com'  # Use your Render production URL here
 
 
 

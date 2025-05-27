@@ -472,10 +472,6 @@ aside {
     
 }
 
-.order-content-container {
-    border: 1px solid red;
-}
-
   /* Modal Content */
   .modal-content {
     display: block;
@@ -505,8 +501,7 @@ aside {
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.4);
-    border: 1px solid red;
-}
+  }
 
   .add-product-modal-content {
     display: block;
@@ -519,11 +514,6 @@ aside {
     padding: 20px;
     border: 1px solid #888;
     width: 25%;
-    border: 1px solid red;
-  }
-
-  .addProductForm input{
-    border: 1px solid red;
   }
 
 
@@ -545,7 +535,6 @@ aside {
     float: right;
     font-size: 28px;
     font-weight: bold;
-    border: 1px solid red;
   }
   
   .close:hover,

@@ -12,8 +12,6 @@ from django.http import JsonResponse
 from .serializers import OrderSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from menu.forms import ProductForm
-from menu.models import Product
 
 def cart_view(request):
     session_cart = request.session.get('cart', {})

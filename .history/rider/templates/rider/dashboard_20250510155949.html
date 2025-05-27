@@ -29,7 +29,7 @@
 
             <div class="earnings">
                 <h3>Your Earnings</h3>
-                <h1>₱0.0<span id="totalEarnings">{{ total_earnings }}</span></h1>
+                <h1>₱<span id="totalEarnings">{{ total_earnings }}</span></h1>
             </div>
         </div>
 
@@ -56,7 +56,10 @@
                 </div>
             </div>
         </div>
- 
+
+        <div class="recentTransactions">
+            <h1>Recent Transactions</h1>
+        </div>
     </div>
 </div>
 
@@ -145,6 +148,7 @@
     // Call it once on page load
     updateOrderCount();
 
+    // Optional: refresh every 30 seconds
     setInterval(updateOrderCount, 30000);
 
     

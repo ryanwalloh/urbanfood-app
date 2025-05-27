@@ -13,11 +13,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import environ
-
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
@@ -33,6 +32,7 @@ SECRET_KEY = 'django-insecure-io4r+_--mb)41ndk38gy$r%#-84u8&-0_e3+*wrxl3l#@7rc6e
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'soti-delivery.onrender.com', 
     'localhost',
     '127.0.0.1', 
    
@@ -127,13 +127,7 @@ EMAIL_HOST_USER = 'sotidelivery@gmail.com'
 EMAIL_HOST_PASSWORD = 'naolpjuuhuxchqsb'
 DEFAULT_FROM_EMAIL = 'sotidelivery@gmail.com'
 # SITE_URL = 'http://127.0.0.1:8000'
-ENVIRONMENT = env('DJANGO_ENV', default='development')
-
-if ENVIRONMENT == 'production':
-    SITE_URL = 'https://your-production-domain.com'  # Replace with your real production URL (e.g., soti.delivery)
-else:
-    SITE_URL = 'http://127.0.0.1:8000'
-
+SITE_URL = 'https://soti-delivery.onrender.com'  # Use your Render production URL here
 
 
 
@@ -162,7 +156,7 @@ LOGGING = {
 
 
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres://postgres:password@localhost:5432/soti_delivery_db')
+    'default': env.db('DATABASE_URL', default='postgres://postgres:postgres@localhost:5432/soti_delivery_db')
 }
 
 print(env('DATABASE_URL'))

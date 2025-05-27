@@ -21,7 +21,7 @@ def add_to_cart_json(request):
         data = json.loads(request.body)
         product_id = data['product_id']
         product = get_object_or_404(Product, id=product_id)
-        restaurant = product.restaurant 
+        restaurant = product.restaurant  # Assumes Product has a ForeignKey to Restaurant
 
      
         cart_item, created = CartItem.objects.get_or_create(
@@ -35,7 +35,7 @@ def add_to_cart_json(request):
             cart_item.quantity += 1
             cart_item.save()
 
-      
+        # Fetch all cart items for that user & restaurant
         cart_items = CartItem.objects.filter(user=request.user, restaurant=restaurant).select_related('product')
 
         cart_data = [{

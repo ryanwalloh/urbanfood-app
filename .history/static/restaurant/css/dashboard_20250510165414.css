@@ -472,10 +472,6 @@ aside {
     
 }
 
-.order-content-container {
-    border: 1px solid red;
-}
-
   /* Modal Content */
   .modal-content {
     display: block;
@@ -545,7 +541,6 @@ aside {
     float: right;
     font-size: 28px;
     font-weight: bold;
-    border: 1px solid red;
   }
   
   .close:hover,
