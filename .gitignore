@@ -1,32 +1,32 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+
+# SQLite database
 *.sqlite3
-
-# Django stuff
 db.sqlite3
-# /media/
-/staticfiles/
 
-# Environments
+# Django static and media files
+/staticfiles/
+/media/
+
+# Environment files and folders
 .env
+*.env
 venv/
 env/
-*.env
 
-# VSCode and IDEs
+# Logs
+*.log
+
+# IDE and editor settings
 .vscode/
 .idea/
-
-# Other
-*.log
-*.pot
-*.pyc
-*.pyo
 *.swp
-*.DS_Store
-"env/" 
-"*.pyc" 
-"db.sqlite3" 
-"*.log" 
-"staticfiles/" 
+
+# macOS
+.DS_Store
