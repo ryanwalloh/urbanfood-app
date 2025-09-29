@@ -34,9 +34,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
+    '172.20.10.5',
     '127.0.0.1',
-    '192.168.254.103',  # Previous IP address
-    '192.168.254.111',  # Current host IP address
+    '192.168.254.103',  # Your computer's IP address
     '10.0.2.2',  # Android emulator
 ]
 

@@ -13,12 +13,10 @@ import {
 } from 'react-native';
 import { Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import * as Location from 'expo-location';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { apiService } from './services/api';
 
 const { width, height } = Dimensions.get('window');
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ';
 
 // Independent LoginForm component with its own state
 const LoginForm = ({ onLoginSuccess, onCreateAccount }) => {
@@ -323,38 +321,21 @@ const LoginPage = () => (
     const DEFAULT_LAT = localAddr.latitude || 14.5995; // Manila fallback
     const DEFAULT_LNG = localAddr.longitude || 120.9842;
 
-    const reverseGeocode = useCallback(async (lat, lng) => {
-      try {
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        let inferred = '';
-        if (data?.plus_code?.global_code) {
-          inferred = data.plus_code.global_code; // e.g., 7FG8V4WC+W2
-        } else if (data?.results?.[0]?.formatted_address) {
-          inferred = data.results[0].formatted_address;
-        }
-        setLocalAddr((prev) => ({ ...prev, street: inferred || prev.street, latitude: lat, longitude: lng }));
-      } catch (e) {
-        // Silent fallback; keep user-entered street
-      }
-    }, []);
-
     const useMyLocation = async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        const { getCurrentPositionAsync, requestForegroundPermissionsAsync } = await import('expo-location');
+        const { status } = await requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission denied', 'Location permission is required.');
           return;
         }
-        const pos = await Location.getCurrentPositionAsync({ accuracy: 3 });
+        const pos = await getCurrentPositionAsync({ accuracy: 3 });
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         setLocalAddr({ ...localAddr, latitude: lat, longitude: lng });
         // Recenter map
         const region = { latitude: lat, longitude: lng, latitudeDelta: 0.01, longitudeDelta: 0.01 };
         mapRef.current?.animateToRegion(region, 500);
-        reverseGeocode(lat, lng);
       } catch (e) {
         Alert.alert('Error', 'Unable to fetch location.');
       }
@@ -379,18 +360,7 @@ const LoginPage = () => (
         if (res.success) {
           setCurrentPage('onboarding1');
         } else {
-          const msg = (res.error || res.message || '').toString();
-          if (/email already registered/i.test(msg)) {
-            // Try to sign in with the provided credentials; proceed if valid
-            const loginRes = await apiService.login(regData.email, regData.password);
-            if (loginRes?.success) {
-              setCurrentPage('onboarding1');
-            } else {
-              Alert.alert('Account exists', 'That email is already registered. Please enter the correct password on the Login page.');
-            }
-          } else {
-            Alert.alert('Registration failed', msg || 'Please try again.');
-          }
+          Alert.alert('Registration failed', res.error || res.message);
         }
       } catch (e) {
         Alert.alert('Error', e.message);
@@ -401,42 +371,16 @@ const LoginPage = () => (
 
     return (
       <View style={styles.createContainer}>
-        <View style={styles.headerRow}>
-          <Image source={require('./assets/sotilogo.png')} style={styles.headerLogoSmall} resizeMode="contain" />
-          <Text style={styles.headerTitle}>Set your address</Text>
+        <View style={styles.loginLogoContainer}>
+          <Image source={require('./assets/sotilogo.png')} style={styles.loginLogo} resizeMode="contain" />
         </View>
-        <MapView
-          ref={mapRef}
-          provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-          style={styles.map}
-          initialRegion={{
-            latitude: DEFAULT_LAT,
-            longitude: DEFAULT_LNG,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-          onPress={(e) => {
-            const { latitude, longitude } = e.nativeEvent.coordinate;
-            setLocalAddr({ ...localAddr, latitude, longitude });
-            mapRef.current?.animateToRegion({ latitude, longitude, latitudeDelta: 0.01, longitudeDelta: 0.01 }, 300);
-            reverseGeocode(latitude, longitude);
-          }}
-        >
-          <Marker
-            draggable
-            coordinate={{
-              latitude: localAddr.latitude || DEFAULT_LAT,
-              longitude: localAddr.longitude || DEFAULT_LNG,
-            }}
-            onDragEnd={(e) => {
-              const { latitude, longitude } = e.nativeEvent.coordinate;
-              setLocalAddr({ ...localAddr, latitude, longitude });
-              reverseGeocode(latitude, longitude);
-            }}
-          />
-        </MapView>
+        <View style={styles.welcomeContainer}>
+          <Text style={styles.welcomeTitle}>Set your address</Text>
+        </View>
         <View style={styles.formContainer}>
-          <TouchableOpacity style={styles.secondaryButton} onPress={useMyLocation}><Text style={styles.secondaryButtonText}>Use my current location</Text></TouchableOpacity>
+          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Street" placeholderTextColor="#999" value={localAddr.street} onChangeText={(t)=>setLocalAddr({...localAddr, street:t})} /></View>
+          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Barangay" placeholderTextColor="#999" value={localAddr.barangay} onChangeText={(t)=>setLocalAddr({...localAddr, barangay:t})} /></View>
+          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Note (optional)" placeholderTextColor="#999" value={localAddr.note} onChangeText={(t)=>setLocalAddr({...localAddr, note:t})} /></View>
           <View style={{ flexDirection:'row', justifyContent:'space-between', marginBottom:16 }}>
             {['home','work','partner','other'].map(l=> (
               <TouchableOpacity key={l} onPress={()=>setLocalAddr({...localAddr, label:l})} style={[styles.labelPill, localAddr.label===l && styles.labelPillActive]}>
@@ -444,9 +388,34 @@ const LoginPage = () => (
               </TouchableOpacity>
             ))}
           </View>
-          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Street" placeholderTextColor="#999" value={localAddr.street} onChangeText={(t)=>setLocalAddr({...localAddr, street:t})} /></View>
-          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Barangay" placeholderTextColor="#999" value={localAddr.barangay} onChangeText={(t)=>setLocalAddr({...localAddr, barangay:t})} /></View>
-          <View style={styles.inputContainer}><TextInput style={styles.input} placeholder="Note (optional)" placeholderTextColor="#999" value={localAddr.note} onChangeText={(t)=>setLocalAddr({...localAddr, note:t})} /></View>
+          <TouchableOpacity style={styles.secondaryButton} onPress={useMyLocation}><Text style={styles.secondaryButtonText}>Use my current location</Text></TouchableOpacity>
+          <MapView
+            ref={mapRef}
+            provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
+            style={styles.map}
+            initialRegion={{
+              latitude: DEFAULT_LAT,
+              longitude: DEFAULT_LNG,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+          >
+            <Marker
+              draggable
+              coordinate={{
+                latitude: localAddr.latitude || DEFAULT_LAT,
+                longitude: localAddr.longitude || DEFAULT_LNG,
+              }}
+              onDragEnd={(e) => {
+                const { latitude, longitude } = e.nativeEvent.coordinate;
+                setLocalAddr({ ...localAddr, latitude, longitude });
+              }}
+            />
+          </MapView>
+          {/* Map placeholder: real map can be added with react-native-maps; using simple coords display here */}
+          {localAddr.latitude && localAddr.longitude ? (
+            <Text style={{ marginVertical:12, color:'#333' }}>Lat: {localAddr.latitude.toFixed(5)}, Lng: {localAddr.longitude.toFixed(5)}</Text>
+          ) : null}
           <TouchableOpacity style={styles.loginButton} onPress={submitRegistration} disabled={isSubmitting}>
             <Text style={styles.loginButtonText}>{isSubmitting ? 'Submitting...' : 'Submit'}</Text>
           </TouchableOpacity>
@@ -455,63 +424,17 @@ const LoginPage = () => (
     );
   };
 
-  // Onboarding Pages
   const CustomerOnboardingPage1 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <View style={{ width: 60 }} />
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
+    <View style={styles.createContainer}>
+      <View style={styles.loginLogoContainer}>
+        <Image source={require('./assets/sotilogo.png')} style={styles.loginLogo} resizeMode="contain" />
       </View>
-      <Image source={require('./assets/onboarding1.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Order Your Favorites</Text>
-      <Text style={styles.onbText}>Find the best restaurants and choose{"\n"}your most favourite meals to tempt your{ "\n" }taste buds.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-        <View style={styles.onbDot} />
-        <View style={styles.onbDot} />
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeTitle}>Welcome!</Text>
+        <Text style={styles.loginTitle}>Onboarding will continue here.</Text>
       </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('onboarding2')}>
-        <Text style={styles.onbNextText}>Next</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const CustomerOnboardingPage2 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <TouchableOpacity onPress={()=> setCurrentPage('onboarding1')}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
-      </View>
-      <Image source={require('./assets/onboarding2.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Best Chefs in Lake City</Text>
-      <Text style={styles.onbText}>Food quality is the core of food, which{"\n"}famishes your cravings by our best chefs{"\n"}in the lake city.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={styles.onbDot} />
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-        <View style={styles.onbDot} />
-      </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('onboarding3')}>
-        <Text style={styles.onbNextText}>Next</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const CustomerOnboardingPage3 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <TouchableOpacity onPress={()=> setCurrentPage('onboarding2')}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
-      </View>
-      <Image source={require('./assets/onboarding3.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Delivery at Door-Step</Text>
-      <Text style={styles.onbText}>The Food you Love{"\n"}Delivered with Care.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={styles.onbDot} />
-        <View style={styles.onbDot} />
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-      </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('main')}>
-        <Text style={styles.onbNextText}>GET STARTED</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={()=> setCurrentPage('login')}>
+        <Text style={styles.loginButtonText}>Back to Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -523,8 +446,6 @@ const LoginPage = () => (
       {currentPage === 'create1' && <CreateAccount1 />}
       {currentPage === 'create2' && <CreateAccount2 />}
       {currentPage === 'onboarding1' && <CustomerOnboardingPage1 />}
-      {currentPage === 'onboarding2' && <CustomerOnboardingPage2 />}
-      {currentPage === 'onboarding3' && <CustomerOnboardingPage3 />}
       {currentPage === 'main' && <MainPage user={user} onLogout={handleLogout} />}
       <StatusBar style="auto" />
     </View>
@@ -712,21 +633,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingTop: 60,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  headerLogoSmall: {
-    width: 36,
-    height: 36,
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   labelPill: {
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -756,13 +662,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#007AFF',
     fontWeight: '600',
-  },
-  map: {
-    width: '100%',
-    height: 220,
-    borderRadius: 12,
-    marginBottom: 12,
-    overflow: 'hidden',
   },
   
   // Main Page Styles
@@ -821,81 +720,6 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Onboarding styles
-  onbContainer: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  onbTopBar: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  onbSkip: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  onbBack: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  onbImage: {
-    width: '100%',
-    height: 260,
-    marginBottom: 24,
-  },
-  onbTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  onbText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  onbProgressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    gap: 8,
-  },
-  onbDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E0E0E0',
-    marginHorizontal: 4,
-  },
-  onbDotActive: {
-    width: 20,
-    backgroundColor: '#007AFF',
-  },
-  onbNextBtn: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    width: '100%',
-    alignItems: 'center',
-  },
-  onbNextText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

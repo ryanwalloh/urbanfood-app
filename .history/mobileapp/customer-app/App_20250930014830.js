@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import * as Location from 'expo-location';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { apiService } from './services/api';
 
@@ -342,12 +341,13 @@ const LoginPage = () => (
 
     const useMyLocation = async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        const { getCurrentPositionAsync, requestForegroundPermissionsAsync } = await import('expo-location');
+        const { status } = await requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission denied', 'Location permission is required.');
           return;
         }
-        const pos = await Location.getCurrentPositionAsync({ accuracy: 3 });
+        const pos = await getCurrentPositionAsync({ accuracy: 3 });
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         setLocalAddr({ ...localAddr, latitude: lat, longitude: lng });
@@ -379,18 +379,7 @@ const LoginPage = () => (
         if (res.success) {
           setCurrentPage('onboarding1');
         } else {
-          const msg = (res.error || res.message || '').toString();
-          if (/email already registered/i.test(msg)) {
-            // Try to sign in with the provided credentials; proceed if valid
-            const loginRes = await apiService.login(regData.email, regData.password);
-            if (loginRes?.success) {
-              setCurrentPage('onboarding1');
-            } else {
-              Alert.alert('Account exists', 'That email is already registered. Please enter the correct password on the Login page.');
-            }
-          } else {
-            Alert.alert('Registration failed', msg || 'Please try again.');
-          }
+          Alert.alert('Registration failed', res.error || res.message);
         }
       } catch (e) {
         Alert.alert('Error', e.message);
@@ -455,63 +444,17 @@ const LoginPage = () => (
     );
   };
 
-  // Onboarding Pages
   const CustomerOnboardingPage1 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <View style={{ width: 60 }} />
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
+    <View style={styles.createContainer}>
+      <View style={styles.loginLogoContainer}>
+        <Image source={require('./assets/sotilogo.png')} style={styles.loginLogo} resizeMode="contain" />
       </View>
-      <Image source={require('./assets/onboarding1.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Order Your Favorites</Text>
-      <Text style={styles.onbText}>Find the best restaurants and choose{"\n"}your most favourite meals to tempt your{ "\n" }taste buds.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-        <View style={styles.onbDot} />
-        <View style={styles.onbDot} />
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeTitle}>Welcome!</Text>
+        <Text style={styles.loginTitle}>Onboarding will continue here.</Text>
       </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('onboarding2')}>
-        <Text style={styles.onbNextText}>Next</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const CustomerOnboardingPage2 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <TouchableOpacity onPress={()=> setCurrentPage('onboarding1')}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
-      </View>
-      <Image source={require('./assets/onboarding2.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Best Chefs in Lake City</Text>
-      <Text style={styles.onbText}>Food quality is the core of food, which{"\n"}famishes your cravings by our best chefs{"\n"}in the lake city.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={styles.onbDot} />
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-        <View style={styles.onbDot} />
-      </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('onboarding3')}>
-        <Text style={styles.onbNextText}>Next</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const CustomerOnboardingPage3 = () => (
-    <View style={styles.onbContainer}>
-      <View style={styles.onbTopBar}>
-        <TouchableOpacity onPress={()=> setCurrentPage('onboarding2')}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
-      </View>
-      <Image source={require('./assets/onboarding3.png')} style={styles.onbImage} resizeMode="contain" />
-      <Text style={styles.onbTitle}>Delivery at Door-Step</Text>
-      <Text style={styles.onbText}>The Food you Love{"\n"}Delivered with Care.</Text>
-      <View style={styles.onbProgressRow}>
-        <View style={styles.onbDot} />
-        <View style={styles.onbDot} />
-        <View style={[styles.onbDot, styles.onbDotActive]} />
-      </View>
-      <TouchableOpacity style={styles.onbNextBtn} onPress={()=> setCurrentPage('main')}>
-        <Text style={styles.onbNextText}>GET STARTED</Text>
+      <TouchableOpacity style={styles.loginButton} onPress={()=> setCurrentPage('login')}>
+        <Text style={styles.loginButtonText}>Back to Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -523,8 +466,6 @@ const LoginPage = () => (
       {currentPage === 'create1' && <CreateAccount1 />}
       {currentPage === 'create2' && <CreateAccount2 />}
       {currentPage === 'onboarding1' && <CustomerOnboardingPage1 />}
-      {currentPage === 'onboarding2' && <CustomerOnboardingPage2 />}
-      {currentPage === 'onboarding3' && <CustomerOnboardingPage3 />}
       {currentPage === 'main' && <MainPage user={user} onLogout={handleLogout} />}
       <StatusBar style="auto" />
     </View>
@@ -712,21 +653,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingTop: 60,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  headerLogoSmall: {
-    width: 36,
-    height: 36,
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   labelPill: {
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -821,81 +747,6 @@ const styles = StyleSheet.create({
   },
   logoutButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  // Onboarding styles
-  onbContainer: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  onbTopBar: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  onbSkip: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  onbBack: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  onbImage: {
-    width: '100%',
-    height: 260,
-    marginBottom: 24,
-  },
-  onbTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  onbText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  onbProgressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-    gap: 8,
-  },
-  onbDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#E0E0E0',
-    marginHorizontal: 4,
-  },
-  onbDotActive: {
-    width: 20,
-    backgroundColor: '#007AFF',
-  },
-  onbNextBtn: {
-    backgroundColor: '#007AFF',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    width: '100%',
-    alignItems: 'center',
-  },
-  onbNextText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

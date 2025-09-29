@@ -65,8 +65,8 @@ api.interceptors.response.use(
   }
 );
 
-// Cache the working URL to avoid repeated testing (null to force detection on first call)
-let cachedWorkingUrl = null;
+// Cache the working URL to avoid repeated testing
+let cachedWorkingUrl = 'http://192.168.254.103:8000'; // Set the known working URL as default
 
 // Test multiple URLs to find the working one
 const testMultipleUrls = async () => {
@@ -80,8 +80,7 @@ const testMultipleUrls = async () => {
     'http://10.0.2.2:8000',  // Android emulator
     'http://127.0.0.1:8000',  // iOS simulator
     'http://localhost:8000',  // Alternative localhost
-    'http://192.168.254.111:8000',  // Detected current host IP
-    'http://192.168.254.103:8000',  // Previous host IP
+    'http://192.168.254.103:8000',  // Your computer's IP address
   ];
   
   for (const url of urls) {
@@ -231,46 +230,31 @@ export const apiService = {
     }
   },
 
-  // Register new account (with optional address fields)
-  register: async ({ username, email, password, firstName, lastName, role = 'customer', street, barangay, note, label }) => {
+  // Register new account
+  register: async (email, password, firstName, lastName, role = 'customer') => {
     try {
-      // Use cached URL or find working URL
-      let workingUrl = cachedWorkingUrl;
-      if (!workingUrl) {
-        workingUrl = await testMultipleUrls();
-        if (!workingUrl) {
-          return { success: false, error: 'No working URL found', message: 'Cannot reach Django server!' };
-        }
-      }
-
-      const registerApi = axios.create({
-        baseURL: workingUrl,
-        timeout: 10000,
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      const payload = {
-        username: username,
+      const response = await api.post('/registerAccount/', {
         email: email,
         password: password,
         first_name: firstName,
         last_name: lastName,
         role: role,
-        // Optional address fields (backend handles defaults)
-        street: street,
-        barangay: barangay,
-        note: note,
-        label: label,
-      };
-
-      const response = await registerApi.post('/registerAccount/', payload, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      }, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
       });
-      return { success: true, data: response.data, message: 'Registration successful!' };
+      return {
+        success: true,
+        data: response.data,
+        message: 'Registration successful!'
+      };
     } catch (error) {
-      // Clear cache on failure so URL re-checks next time
-      cachedWorkingUrl = null;
-      return { success: false, error: error.response?.data?.error || error.message, message: 'Registration failed!' };
+      return {
+        success: false,
+        error: error.response?.data?.error || error.message,
+        message: 'Registration failed!'
+      };
     }
   },
 

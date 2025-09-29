@@ -65,8 +65,8 @@ api.interceptors.response.use(
   }
 );
 
-// Cache the working URL to avoid repeated testing (null to force detection on first call)
-let cachedWorkingUrl = null;
+// Cache the working URL to avoid repeated testing
+let cachedWorkingUrl = 'http://192.168.254.103:8000'; // Set the known working URL as default
 
 // Test multiple URLs to find the working one
 const testMultipleUrls = async () => {
@@ -80,8 +80,7 @@ const testMultipleUrls = async () => {
     'http://10.0.2.2:8000',  // Android emulator
     'http://127.0.0.1:8000',  // iOS simulator
     'http://localhost:8000',  // Alternative localhost
-    'http://192.168.254.111:8000',  // Detected current host IP
-    'http://192.168.254.103:8000',  // Previous host IP
+    'http://192.168.254.103:8000',  // Your computer's IP address
   ];
   
   for (const url of urls) {

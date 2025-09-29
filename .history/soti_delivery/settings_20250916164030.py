@@ -33,10 +33,10 @@ SECRET_KEY = 'django-insecure-io4r+_--mb)41ndk38gy$r%#-84u8&-0_e3+*wrxl3l#@7rc6e
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '172.20.10.5
     'localhost',
     '127.0.0.1',
-    '192.168.254.103',  # Previous IP address
-    '192.168.254.111',  # Current host IP address
+    '192.168.254.103',  # Your computer's IP address
     '10.0.2.2',  # Android emulator
 ]
 

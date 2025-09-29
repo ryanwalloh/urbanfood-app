@@ -206,14 +206,9 @@ def login_by_password(request):
 
 @csrf_exempt
 def register_account(request):
-    # Accept any POST (mobile clients or browsers) regardless of X-Requested-With header
-    if request.method == 'POST':
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         try:
-            # Safely parse JSON body or fall back to form-encoded
-            try:
-                data = json.loads(request.body or b"{}")
-            except Exception:
-                data = request.POST.dict()
+            data = json.loads(request.body)
             email = data.get('email')
             password = data.get('password')
             username = data.get('username') or email
