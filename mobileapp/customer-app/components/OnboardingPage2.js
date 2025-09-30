@@ -1,0 +1,104 @@
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+
+const OnboardingPage2 = ({ onBack, onNext }) => (
+  <View style={styles.onbContainer}>
+    <View style={styles.onbTopBar}>
+      <TouchableOpacity onPress={onBack}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
+      <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
+    </View>
+    <Image source={require('../assets/onboarding2.png')} style={styles.onbImage} resizeMode="contain" />
+    <Text style={styles.onbTitle}>Best Chefs in Lake City</Text>
+    <Text style={styles.onbText}>Food quality is the core of food, which{"\n"}famishes your cravings by our best chefs{"\n"}in the lake city.</Text>
+    <View style={styles.onbProgressRow}>
+      <View style={styles.onbDot} />
+      <View style={[styles.onbDot, styles.onbDotActive]} />
+      <View style={styles.onbDot} />
+    </View>
+    <TouchableOpacity style={styles.onbNextBtn} onPress={onNext}>
+      <Text style={styles.onbNextText}>Next</Text>
+    </TouchableOpacity>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  onbContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    paddingTop: 60,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  onbTopBar: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  onbSkip: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  onbBack: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  onbImage: {
+    width: '100%',
+    height: 260,
+    marginBottom: 24,
+  },
+  onbTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 0,
+  },
+  onbText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginTop: -68,
+    marginBottom: 12,
+  },
+  onbProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    gap: 8,
+  },
+  onbDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E0E0E0',
+    marginHorizontal: 4,
+  },
+  onbDotActive: {
+    width: 20,
+    backgroundColor: '#007AFF',
+  },
+  onbNextBtn: {
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  onbNextText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
+
+export default OnboardingPage2;

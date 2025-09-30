@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+{% load static %}
+
+<div id="main-container" class="main-container">
+
+    <div class="checkout-container">
+        <div class="fillup-container">
+            <div class="address-container">
+                <div class="space-between">
+                    <h1>Delivery address</h1>
+                    <h3 id="edit-address" onclick="change()">Change</h3>
+                </div>
+               
+                <div id="address-wrap-container" class="address-wrap-container">
+                    <div class="map-wrap-container">
+                        <div class="map-cover"></div>
+                        <div class="info">
+                            <div class="wrapper1">
+                                <img class="marker" src="{% static 'icons/marker.svg' %}">
+                                <p class="street">{{ customer_address.street }}</p>
+                            </div>
+                            <div class="wrapper">
+                                <p id="edit" class="edit">Edit</p>
+                            </div>  
+                        </div>
+                        <hr>
+                    </div>
+                    <div class="address-form-container">
+                        <h1>We're missing your street <span class="slash">/</span> House Number</h1>
+                        <form method="POST" action="{% url 'checkout' %}">
+                            {% csrf_token %}
+                          
+                            <div class="input-container">
+                                <div class="form-group">
+                                    {{ address_form.street }}
+                                    <label for="street" class="floating-label">Street</label>
+                                </div>
+                                <div class="form-group">
+                                    {{ address_form.barangay }}
+                                    <label for="address-details" class="floating-label">barangay</label>
+                                </div>
+                                <div class="form-group">
+                                    {{ address_form.note }}
+                                    <label for="note" class="floating-label">Note to rider e.g. &#8212; building, landmark</label>
+                                </div>
+                            </div>
+
+                            <div class="radio-wrapper-container">
+                                <h1>Add a Label</h1>                        
+                                <div class="radio-wrapper">
+                                    <div class="radio-option" onclick="selectImage('option1')">
+                                        <input type="radio" id="option1" name="label" value="home" {% if customer_address.label == 'home' %}checked{% endif %} required>
+                                        <img src="{% static 'icons/home.svg' %}" alt="Home">
+                                        <p>Home</p>
+                                    </div>
+                                    <div class="radio-option" onclick="selectImage('option2')">
+                                        <input type="radio" id="option2" name="label" value="work" {% if customer_address.label == 'work' %}checked{% endif %} required>
+                                        <img src="{% static 'icons/work.svg' %}">
+                                        <p>Work</p>
+                                    </div>
+                                    <div class="radio-option" onclick="selectImage('option3')">
+                                        <input type="radio" id="option3" name="label" value="partner" {% if customer_address.label == 'partner' %}checked{% endif %} required>
+                                        <img src="{% static 'icons/partner.svg' %}">
+                                        <p>Partner</p>
+                                    </div>
+                                    <div class="radio-option" onclick="selectImage('option4')">
+                                        <input type="radio" id="option4" name="label" value="other" {% if customer_address.label == 'other' %}checked{% endif %} required>
+                                        <img src="{% static 'icons/other.svg' %}">
+                                        <p>Other</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="submit" type="submit" name="address-submit">SUBMIT</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="saved-address-container" class="saved-address-container">
+                    <div class="label-container">
+                        <img id="address-label" class="address-label" src="{% static 'icons/home.svg' %}" alt="Address Label">  <!-- Default image -->
+                        <p id="label">{{ customer_address.label }}</p>
+                    </div>
+                    <div class="address-details-container">
+                        <p id="street-details">{{ customer_address.street }}</p>
+                        <p id="address-details">{{ customer_address.barangay }}</p>
+                        <div class="form-group">
+                            <input id="note" type="text" name="note" value="{{ customer_address.note }}" required>
+                            <label for="note" class="floating-label">Note to rider e.g. &#8212; building, landmark</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="personal-details-container">
+                <div class="space-between">
+                    <h1>Personal Details</h1>
+                    <h3 id="edit-details" onclick="edit()">Edit</h3>
+                </div>
+                <div id="personal-details-wrap-container">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            {{ personal_form.email }}
+                            <label for="email" class="floating-label">Email</label>
+                        </div>
+
+                        <div class="align-container">
+                            <div class="form-group">
+                                {{ personal_form.first_name }}
+                                <label for="first_name" class="floating-label">First name</label>
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ personal_form.last_name }}
+                                <label for="last_name" class="floating-label">Last name</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ personal_form.phone }}
+                            <label for="phone" class="floating-label">Mobile Number</label>
+                        </div>
+                        
+                        <button class="submit" type="submit">SUBMIT</button>
+                    </form>
+                    
+                </div>
+                <div id="update-details-container" class="update-details-container">
+                    <div class="update-details">
+                        <p id="first-last-name" class="bold-text">{{ user.first_name }} {{ user.last_name }}</p>
+                        <p id="updated-email">{{ user.email }}</p>
+                        <p id="updated-phone">{{ user.profile.phone_number }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-container">
+                <h1>Payment</h1>
+                <form method="POST" action="{% url 'finalize_order' %}">
+                    {% csrf_token %}
+                    
+
+                    <div class="form-group">
+                        <label class="floating-label"></label>
+                        <ul class="filter-options">
+                            <li>
+                                <label>
+                                    <div class="wrapper4">
+                                        <div class="wrapper5">
+                                            <input id="maya" type="radio" name="payment_method" value="maya" required>
+                                            <img class="payment-icon" src="{% static 'icons/maya.svg' %}">
+                                            <p>Maya</p>
+                                        </div>
+                                        <div class="wrapper3">
+                                            <p class="instruction-container">You will be redirected to GCash after checkout...</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input id="card" type="radio" name="payment_method" value="credit" required>
+                                    <img class="payment-icon" src="{% static 'icons/credit.svg' %}">
+                                    <p>Credit / Debit Card</p>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input id="bank" type="radio" name="payment_method" value="bank" required>
+                                    <img class="payment-icon" src="{% static 'icons/bank.svg' %}">
+                                    <p>Link bank account</p>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input id="cod" type="radio" name="payment_method" value="COD" required checked>
+                                    <img class="payment-icon" src="{% static 'icons/cod.svg' %}">
+                                    <p>Cash On Delivery</p>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                
+                    <!-- Submit Button -->
+                    <div class="form-group">
+                        <button class="submit" type="submit" name="payment-submit">CHECKOUT</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+
+        <div class="order-summary-container">
+            <div class="order-summary">
+                <h1>Your order from</h1>
+                <p class="order-from">{{ restaurant.name }} - {{ restaurant.address }}</p>
+        
+                <div id="item-summary" class="items-summary">
+                    {% for item in cart_items %}
+                        <div class="total-summary">
+                            <p>{{ item.quantity }} x {{ item.product.name }}</p>
+                            <p>&#8369;{{ item.product.price|floatformat:2 }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+        
+                <hr style="margin-bottom: 10px; margin-top: 30px; width: 100%; height: 1px; border: none; border-bottom: 1px solid #ccc;">
+        
+                <div class="total-summary">
+                    <p>Subtotal</p>
+                    <p id="sub-total">&#8369;{{ subtotal|floatformat:2 }}</p>
+                </div>
+                <div class="total-summary">
+                    <p>Standard delivery</p>
+                    <p>&#8369;39</p>
+                </div>
+                <div class="total-summary">
+                    <p>Small order fee</p>
+                    <p>&#8369;29</p>
+                </div>
+                <div id="total-summary" class="total-summary">
+                    <p id="total-summary-p" class="total">Total</p>
+                    <p class="total" id="total">
+                        &#8369;{{ total|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-container" class="modal-container">
+        <div class="map-modal-container">
+            <div class="map-modal">
+                <div class="cta">
+                    <div class="left">
+                        <img class="marker" src="{% static 'icons/marker.svg' %}">
+                        <h1>What's your exact location?</h1>
+                    </div>
+                    <div class="right">
+                        <img id="close" class="close" src="{% static 'icons/close.svg' %}">
+                    </div>
+                
+                </div>
+                <p>Providing your location enables more accurate 
+                    search and delivery ETA, seamless order tracking 
+                    and personalised recommendations.
+                </p>
+                <div class="form-group">
+                    <input type="text" name="street-house-number" placeholder="">
+                    <label for="street-house-number" class="location-label">Enter your street and house number</label>
+                </div>
+            
+                <div class="map-cover2">
+
+                </div>
+                <hr class="hr-button">
+                <button id="submit-address" type="submit">SUBMIT</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.getElementById('cod').addEventListener('click', function() {
+        document.getElementById('cod-instruction').style.display = 'flex';
+    });
+    document.getElementById('maya').addEventListener('click', function() {
+        document.getElementById('cod-instruction').style.display = 'none';
+    });
+    document.getElementById('card').addEventListener('click', function() {
+        document.getElementById('cod-instruction').style.display = 'none';
+    });
+    document.getElementById('bank').addEventListener('click', function() {
+        document.getElementById('cod-instruction').style.display = 'none';
+    });
+
+    function change() {
+        document.getElementById('address-wrap-container').style.display = 'block';
+        document.getElementById('saved-address-container').style.display = 'none';
+        document.getElementById('edit-address').style.display = "none";
+    }
+    function edit() {
+        console.log('clicked')
+        document.getElementById('personal-details-wrap-container').style.display = 'block';
+        document.getElementById('update-details-container').style.display = 'none';
+        document.getElementById('edit-details').style.display = "none";
+    }
+
+    document.querySelector('.address-form-container form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent form from submitting normally
+
+        const formData = new FormData(this);
+
+        // Send the form data to Django view using fetch
+        fetch('/customer/save_address/', {  // Adjust the URL to match your Django URL pattern
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value  // CSRF protection
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide and display appropriate containers
+                document.getElementById('address-wrap-container').style.display = 'none';
+                document.getElementById('saved-address-container').style.display = 'flex';
+
+             
+                document.getElementById('edit-address').style.display = "flex";
+
+                 // Update label and corresponding image
+                const label = formData.get('label');
+                document.getElementById('label').textContent = label;
+
+                // Update the image based on selected label
+                const labelImage = document.getElementById('address-label');
+                if (label === 'home') {
+                    labelImage.src = '/static/icons/home.svg';
+                } else if (label === 'work') {
+                    labelImage.src = '/static/icons/work.svg';
+                } else if (label === 'partner') {
+                    labelImage.src = '/static/icons/partner.svg';
+                } else {
+                    labelImage.src = '/static/icons/other.svg';
+                }
+
+            } else {
+                alert(data.message); // Show any error message from Django backend
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+
+    document.querySelector('.personal-details-container form').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent form from submitting normally
+
+        const formData = new FormData(this);
+
+        fetch('/customer/update_personal_details/', {  // Adjust the URL to match your Django URL pattern
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value  // CSRF protection
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('personal-details-wrap-container').style.display = 'none';
+                document.getElementById('update-details-container').style.display = 'flex';
+
+                // Update UI with new personal details
+                const firstName = formData.get('first_name'); // not 'first-name'
+                const lastName = formData.get('last_name');   // not 'last-name'
+                document.getElementById('first-last-name').textContent = `${firstName} ${lastName}`;
+                document.getElementById('updated-email').textContent = formData.get('email');
+                document.getElementById('updated-phone').textContent = formData.get('phone'); // not 'number'
+
+                document.getElementById('edit-details').style.display = "flex";
+            } else {
+                alert(data.message); // Show any error message from Django backend
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function selectImage(id) {
+        const options = document.querySelectorAll('.radio-option');
+        options.forEach(option => {
+            option.classList.remove('selected');
+        });
+
+        const selectedOption = document.querySelector(`#${id}`).closest('.radio-option');
+        selectedOption.classList.add('selected');
+
+        const radioButton = document.getElementById(id);
+        radioButton.checked = true;
+    }
+
+    // Google Maps setup
+    let overviewMap = null;
+    let modalMap = null;
+    let modalMarker = null;
+    let geocoder = null;
+    let autocomplete = null;
+    let modalMapInitialized = false;
+
+    function initMap() {
+        const defaultLocation = { lat: 8.001106, lng: 124.284823 };
+
+        // Initialize the small overview map visible on the page
+        const overviewEl = document.querySelector('.map-cover');
+        if (overviewEl) {
+            overviewMap = new google.maps.Map(overviewEl, {
+                center: defaultLocation,
+                zoom: 15,
+                disableDefaultUI: true
+            });
+            // Optional: show a non-draggable marker indicating current saved address
+            new google.maps.Marker({ position: defaultLocation, map: overviewMap });
+        }
+
+        // Prepare geocoder for later use
+        geocoder = new google.maps.Geocoder();
+    }
+
+    function initModalMap() {
+        if (modalMapInitialized) {
+            // Ensure map renders correctly after container becomes visible
+            google.maps.event.trigger(modalMap, 'resize');
+            if (modalMarker) {
+                modalMap.setCenter(modalMarker.getPosition());
+            }
+            return;
+        }
+
+        const defaultLocation = { lat: 8.001106, lng: 124.284823 };
+        const modalEl = document.querySelector('.map-cover2');
+        if (!modalEl) return;
+
+        modalMap = new google.maps.Map(modalEl, {
+            center: defaultLocation,
+            zoom: 15,
+        });
+
+        modalMarker = new google.maps.Marker({
+            position: defaultLocation,
+            map: modalMap,
+            draggable: true,
+            title: 'Drag me to update your location',
+        });
+
+        // Update the street address when the Google Map marker is dragged or clicked
+        function updateAddressFromLatLng(latlng) {
+            if (!geocoder) geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latlng }, function (results, status) {
+                if (status === 'OK' && results[0]) {
+                    const address = results[0].formatted_address;
+                    document.querySelector('input[name="street-house-number"]').value = address;
+                } else {
+                    console.error('Geocoder failed due to: ' + status);
+                }
+            });
+        }
+
+        modalMarker.addListener('dragend', function () {
+            const position = modalMarker.getPosition();
+            updateAddressFromLatLng(position.toJSON());
+        });
+
+        modalMap.addListener('click', function (event) {
+            modalMarker.setPosition(event.latLng);
+            updateAddressFromLatLng(event.latLng.toJSON());
+        });
+
+        // Places Autocomplete on the address input
+        const input = document.querySelector('input[name="street-house-number"]');
+        if (input) {
+            autocomplete = new google.maps.places.Autocomplete(input, {
+                fields: ['formatted_address', 'geometry', 'name'],
+            });
+            autocomplete.addListener('place_changed', function () {
+                const place = autocomplete.getPlace();
+                if (!place || !place.geometry || !place.geometry.location) {
+                    return;
+                }
+                const loc = place.geometry.location;
+                modalMarker.setPosition(loc);
+                modalMap.setCenter(loc);
+                modalMap.setZoom(17);
+                input.value = place.formatted_address || place.name;
+            });
+        }
+
+        // Initialize the input with the default location
+        updateAddressFromLatLng(defaultLocation);
+
+        modalMapInitialized = true;
+    }
+
+    // Current location functionality
+    function getCurrentLocation() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by this browser.');
+            return;
+        }
+
+        const locationBtn = document.getElementById('use-current-location');
+        const originalText = locationBtn.innerHTML;
+        locationBtn.innerHTML = '<img src="/static/icons/location.svg" alt="Location" class="location-icon"> Getting location...';
+        locationBtn.disabled = true;
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // Update the map and marker
+                if (modalMap && modalMarker) {
+                    modalMarker.setPosition(userLocation);
+                    modalMap.setCenter(userLocation);
+                    modalMap.setZoom(17);
+                }
+
+                // Update the address input using reverse geocoding
+                if (geocoder) {
+                    geocoder.geocode({ location: userLocation }, function (results, status) {
+                        if (status === 'OK' && results[0]) {
+                            const address = results[0].formatted_address;
+                            document.querySelector('input[name="street-house-number"]').value = address;
+                        } else {
+                            console.error('Geocoder failed due to: ' + status);
+                            document.querySelector('input[name="street-house-number"]').value = 
+                                `Lat: ${userLocation.lat.toFixed(6)}, Lng: ${userLocation.lng.toFixed(6)}`;
+                        }
+                    });
+                }
+
+                // Reset button
+                locationBtn.innerHTML = originalText;
+                locationBtn.disabled = false;
+            },
+            function(error) {
+                let errorMessage = 'Unable to retrieve your location. ';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Please allow location access and try again.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Location information is unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Location request timed out.';
+                        break;
+                    default:
+                        errorMessage += 'An unknown error occurred.';
+                        break;
+                }
+                alert(errorMessage);
+                
+                // Reset button
+                locationBtn.innerHTML = originalText;
+                locationBtn.disabled = false;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
+    }
+
+    // Add event listener for current location button
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLocationBtn = document.getElementById('use-current-location');
+        if (currentLocationBtn) {
+            currentLocationBtn.addEventListener('click', getCurrentLocation);
+        }
+    });
+
+    document.getElementById('edit').addEventListener('click', function () {
+        document.getElementById('modal-container').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        // Initialize or refresh the modal map once the modal is visible
+        if (window.google && window.google.maps) {
+            initModalMap();
+        }
+    });
+
+    document.getElementById('submit-address').addEventListener('click', function () {
+        const selectedAddress = document.querySelector('input[name="street-house-number"]').value;
+        document.querySelector('.street').textContent = selectedAddress; 
+        document.getElementById('street').value = selectedAddress; // Hide the modal
+        document.getElementById('modal-container').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    });
+
+    let activeIcon = null;
+
+    function toggleIcon(icon) {
+        if (activeIcon && activeIcon !== icon) {
+            activeIcon.src = activeIcon.getAttribute("data-default");
+        }
+
+        icon.src = icon.getAttribute("data-active");
+        activeIcon = icon;
+    }
+
+    document.getElementById('close').setAttribute("data-default", "{% static 'icons/close.svg' %}");
+    document.getElementById('close').setAttribute("data-active", "{% static 'icons/close2.svg' %}");
+
+    document.getElementById('close').addEventListener('click', function() {
+        console.log('clicked');
+        document.getElementById('modal-container').style.display = 'none'; // Hide the modal
+        document.body.style.overflow = 'auto';
+    });
+
+    document.getElementById('close').addEventListener('mouseover', function() {
+        toggleIcon(this);
+        console.log('hover');
+    });
+
+    document.getElementById('close').addEventListener('mouseout', function() {
+        if (activeIcon === this) {
+            this.src = this.getAttribute("data-default");
+            activeIcon = null;  
+        }
+        console.log('hover');
+    });
+
+    
+
+</script>
+
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ&callback=initMap&libraries=places">
+</script>
+
