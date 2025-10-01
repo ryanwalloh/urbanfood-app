@@ -161,7 +161,6 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
         restaurant={restaurant}
         cartItems={items}
         user={user}
-        address={userAddress}
         onBack={handleBackFromOrderTracking}
       />
     );

@@ -118,12 +118,6 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
     try {
       console.log('🛒 Placing order...');
       
-      // Fetch user address first
-      const addressResult = await apiService.getUserAddress(user);
-      if (addressResult.success) {
-        setUserAddress(addressResult.address);
-      }
-      
       const result = await apiService.placeOrder({
         user_id: user.id,
         restaurant_id: restaurant.id,
@@ -161,7 +155,6 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
         restaurant={restaurant}
         cartItems={items}
         user={user}
-        address={userAddress}
         onBack={handleBackFromOrderTracking}
       />
     );

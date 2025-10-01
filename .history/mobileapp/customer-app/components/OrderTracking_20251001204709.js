@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { apiService } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -90,44 +89,6 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
     }
   };
 
-  // Get status-based content
-  const getStatusContent = () => {
-    switch (currentStatus) {
-      case 'preparing':
-        return {
-          image: require('../assets/preparing.png'),
-          subtitle1: 'Estimated delivery time',
-          title1: '15-25 mins',
-          subtitle2: 'Preparing your food. Your rider will pick it up once it\'s ready.',
-          activeBar: 1, // Second bar
-        };
-      case 'ready':
-        return {
-          image: require('../assets/ready.png'),
-          subtitle1: 'Cooked With Love',
-          title1: 'Order Ready',
-          subtitle2: 'Waiting for your rider to pick up the order',
-          activeBar: 2, // Third bar
-        };
-      default: // pending
-        return {
-          image: require('../assets/pending.png'),
-          subtitle1: 'Chef is reviewing the ingredients needed',
-          title1: 'Shopping for Ingredients',
-          subtitle2: (
-            <>
-              <Text style={styles.funFactBold}>Fun Fact:</Text> Did you know that{' '}
-              <Text style={styles.highlightedText}>Soti Delivery</Text> is the First major tech breakthrough in Marawi, 
-              empowering local restaurants, riders, and the community toward a new era of innovation?
-            </>
-          ),
-          activeBar: 0, // First bar
-        };
-    }
-  };
-
-  const statusContent = getStatusContent();
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -148,108 +109,50 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
         {/* Image Graphic Container */}
         <View style={styles.imageContainer}>
           <Image 
-            source={statusContent.image} 
+            source={require('../assets/pending.png')} 
             style={styles.statusImage}
             resizeMode="contain"
           />
         </View>
 
         {/* Subtitle 1 */}
-        <Text style={styles.subtitle1}>{statusContent.subtitle1}</Text>
+        <Text style={styles.subtitle1}>Chef is reviewing the ingredients needed</Text>
 
         {/* Title 1 */}
-        <Text style={styles.title1}>{statusContent.title1}</Text>
+        <Text style={styles.title1}>Shopping for Ingredients</Text>
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
-          {/* Bar 1 */}
+          {/* First bar with animation */}
           <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 0 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 0 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
+            <View style={styles.progressBar} />
+            <Animated.View
+              style={[
+                styles.progressBarActive,
+                {
+                  transform: [
+                    {
+                      translateX: progressAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-100, 100],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
           </View>
-          
-          {/* Bar 2 */}
-          <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 1 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 1 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
-          </View>
-          
-          {/* Bar 3 */}
-          <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 2 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 2 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
-          </View>
-          
-          {/* Bar 4 */}
-          <View style={[
-            styles.progressBar,
-            statusContent.activeBar > 3 && styles.progressBarFilled
-          ]} />
+          {/* Other bars (grey) */}
+          <View style={styles.progressBar} />
+          <View style={styles.progressBar} />
+          <View style={styles.progressBar} />
         </View>
 
-        {/* Subtitle 2 */}
-        <Text style={[
-          styles.subtitle2,
-          currentStatus === 'pending' && styles.subtitle2Justified
-        ]}>
-          {statusContent.subtitle2}
+        {/* Subtitle 2 - Fun Fact */}
+        <Text style={styles.subtitle2}>
+          <Text style={styles.funFactBold}>Fun Fact:</Text> Did you know that{' '}
+          <Text style={styles.highlightedText}>Soti Delivery</Text> is the First major tech breakthrough in Marawi, 
+          empowering local restaurants, riders, and the community toward a new era of innovation?
         </Text>
 
         {/* Order Details Container */}
@@ -420,34 +323,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
   },
-  progressBarFilled: {
-    backgroundColor: '#F43332',
-  },
   progressBarActive: {
     position: 'absolute',
     width: 60,
     height: 4,
     backgroundColor: '#F43332',
     borderRadius: 2,
-    opacity: 0.6,
     shadowColor: '#F43332',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.8,
     shadowRadius: 4,
   },
   subtitle2: {
     fontSize: 12,
     color: '#999999',
-    textAlign: 'center',
+    textAlign: 'justify',
     paddingHorizontal: 30,
     lineHeight: 15,
     marginBottom: 30,
     fontStyle: 'italic',
-  },
-  subtitle2Justified: {
-    textAlign: 'justify',
-    alignSelf: 'center',
-    maxWidth: width - 60,
   },
   funFactBold: {
     fontWeight: 'bold',

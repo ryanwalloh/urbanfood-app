@@ -245,12 +245,7 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
         </View>
 
         {/* Subtitle 2 */}
-        <Text style={[
-          styles.subtitle2,
-          currentStatus === 'pending' && styles.subtitle2Justified
-        ]}>
-          {statusContent.subtitle2}
-        </Text>
+        <Text style={styles.subtitle2}>{statusContent.subtitle2}</Text>
 
         {/* Order Details Container */}
         <View style={styles.orderDetailsContainer}>
@@ -429,25 +424,19 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#F43332',
     borderRadius: 2,
-    opacity: 0.6,
     shadowColor: '#F43332',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.8,
     shadowRadius: 4,
   },
   subtitle2: {
     fontSize: 12,
     color: '#999999',
-    textAlign: 'center',
+    textAlign: 'justify',
     paddingHorizontal: 30,
     lineHeight: 15,
     marginBottom: 30,
     fontStyle: 'italic',
-  },
-  subtitle2Justified: {
-    textAlign: 'justify',
-    alignSelf: 'center',
-    maxWidth: width - 60,
   },
   funFactBold: {
     fontWeight: 'bold',

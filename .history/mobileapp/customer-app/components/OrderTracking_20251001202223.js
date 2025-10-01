@@ -1,34 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Animated } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { apiService } from '../services/api';
 
 const { width } = Dimensions.get('window');
 
-const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBack, address }) => {
+const OrderTracking = ({ order, restaurant, cartItems, user, onBack, address }) => {
   const [showDetails, setShowDetails] = useState(false);
-  const [order, setOrder] = useState(initialOrder);
-  const [currentStatus, setCurrentStatus] = useState(initialOrder?.status || 'pending');
   const progressAnimation = useRef(new Animated.Value(0)).current;
-  const scrollViewRef = useRef(null);
 
-  // Poll for order status updates every 5 seconds
-  useEffect(() => {
-    if (!order?.id) return;
-
-    const pollInterval = setInterval(async () => {
-      const result = await apiService.getOrderStatus(order.id);
-      if (result.success && result.order.status !== currentStatus) {
-        console.log('📊 Status changed:', currentStatus, '→', result.order.status);
-        setCurrentStatus(result.order.status);
-        setOrder(result.order);
-      }
-    }, 5000);
-
-    return () => clearInterval(pollInterval);
-  }, [order?.id, currentStatus]);
-
-  // Animate the progress bar based on status
+  // Animate the first progress bar
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
@@ -78,56 +58,6 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
     </Svg>
   );
 
-  // Handle view details toggle with scroll
-  const handleViewDetailsToggle = () => {
-    setShowDetails(!showDetails);
-    
-    // If expanding, scroll to bottom after a short delay
-    if (!showDetails) {
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  };
-
-  // Get status-based content
-  const getStatusContent = () => {
-    switch (currentStatus) {
-      case 'preparing':
-        return {
-          image: require('../assets/preparing.png'),
-          subtitle1: 'Estimated delivery time',
-          title1: '15-25 mins',
-          subtitle2: 'Preparing your food. Your rider will pick it up once it\'s ready.',
-          activeBar: 1, // Second bar
-        };
-      case 'ready':
-        return {
-          image: require('../assets/ready.png'),
-          subtitle1: 'Cooked With Love',
-          title1: 'Order Ready',
-          subtitle2: 'Waiting for your rider to pick up the order',
-          activeBar: 2, // Third bar
-        };
-      default: // pending
-        return {
-          image: require('../assets/pending.png'),
-          subtitle1: 'Chef is reviewing the ingredients needed',
-          title1: 'Shopping for Ingredients',
-          subtitle2: (
-            <>
-              <Text style={styles.funFactBold}>Fun Fact:</Text> Did you know that{' '}
-              <Text style={styles.highlightedText}>Soti Delivery</Text> is the First major tech breakthrough in Marawi, 
-              empowering local restaurants, riders, and the community toward a new era of innovation?
-            </>
-          ),
-          activeBar: 0, // First bar
-        };
-    }
-  };
-
-  const statusContent = getStatusContent();
-
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -140,116 +70,53 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
         </View>
       </View>
 
-      <ScrollView 
-        ref={scrollViewRef}
-        style={styles.content} 
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Image Graphic Container */}
         <View style={styles.imageContainer}>
           <Image 
-            source={statusContent.image} 
+            source={require('../assets/pending.png')} 
             style={styles.statusImage}
             resizeMode="contain"
           />
         </View>
 
         {/* Subtitle 1 */}
-        <Text style={styles.subtitle1}>{statusContent.subtitle1}</Text>
+        <Text style={styles.subtitle1}>Chef is reviewing the ingredients needed</Text>
 
         {/* Title 1 */}
-        <Text style={styles.title1}>{statusContent.title1}</Text>
+        <Text style={styles.title1}>Shopping for Ingredients</Text>
 
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
-          {/* Bar 1 */}
+          {/* First bar with animation */}
           <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 0 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 0 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
+            <View style={styles.progressBar} />
+            <Animated.View
+              style={[
+                styles.progressBarActive,
+                {
+                  transform: [
+                    {
+                      translateX: progressAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-100, 100],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
           </View>
-          
-          {/* Bar 2 */}
-          <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 1 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 1 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
-          </View>
-          
-          {/* Bar 3 */}
-          <View style={styles.progressBarWrapper}>
-            <View style={[
-              styles.progressBar, 
-              statusContent.activeBar > 2 && styles.progressBarFilled
-            ]} />
-            {statusContent.activeBar === 2 && (
-              <Animated.View
-                style={[
-                  styles.progressBarActive,
-                  {
-                    transform: [
-                      {
-                        translateX: progressAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [-100, 100],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              />
-            )}
-          </View>
-          
-          {/* Bar 4 */}
-          <View style={[
-            styles.progressBar,
-            statusContent.activeBar > 3 && styles.progressBarFilled
-          ]} />
+          {/* Other bars (grey) */}
+          <View style={styles.progressBar} />
+          <View style={styles.progressBar} />
+          <View style={styles.progressBar} />
         </View>
 
-        {/* Subtitle 2 */}
-        <Text style={[
-          styles.subtitle2,
-          currentStatus === 'pending' && styles.subtitle2Justified
-        ]}>
-          {statusContent.subtitle2}
+        {/* Subtitle 2 - Fun Fact */}
+        <Text style={styles.subtitle2}>
+          Fun Fact: Did you know that Soti Delivery is the First major tech breakthrough in Marawi, 
+          empowering local restaurants, riders, and the community toward a new era of innovation?
         </Text>
 
         {/* Order Details Container */}
@@ -269,24 +136,24 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
           </View>
 
           {/* Delivery Address */}
-          <View style={styles.detailRowNoBorder}>
+          <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Delivery address</Text>
             <Text style={styles.detailValue}>{address?.street || 'Not set'}</Text>
           </View>
 
+          {/* Separator */}
+          <View style={styles.separator} />
+
           {/* Total */}
-          <View style={styles.totalRowNoBorder}>
+          <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total (incl. fees and tax)</Text>
             <Text style={styles.totalValue}>₱{order?.total_amount || '0.00'}</Text>
           </View>
 
-          {/* Separator before View Details */}
-          <View style={styles.separator} />
-
           {/* View Details Toggle */}
           <TouchableOpacity 
             style={styles.viewDetailsButton} 
-            onPress={handleViewDetailsToggle}
+            onPress={() => setShowDetails(!showDetails)}
           >
             <Text style={styles.viewDetailsText}>View details ({orderLineCount})</Text>
             <ChevronIcon isUp={showDetails} />
@@ -294,24 +161,21 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
 
           {/* Expandable Details */}
           {showDetails && (
-            <View style={styles.expandedDetails}>
-              {/* Separator after View Details */}
-              <View style={styles.separator} />
-
+            <>
               {/* Subtotal */}
-              <View style={styles.detailRowExpanded}>
+              <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Subtotal</Text>
                 <Text style={styles.detailValue}>₱{subtotal.toFixed(2)}</Text>
               </View>
 
               {/* Delivery Fee */}
-              <View style={styles.detailRowExpanded}>
+              <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Delivery fee</Text>
                 <Text style={styles.detailValue}>₱{deliveryFee.toFixed(2)}</Text>
               </View>
 
               {/* Platform Fee */}
-              <View style={styles.detailRowExpanded}>
+              <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Platform fee</Text>
                 <Text style={styles.detailValue}>₱{platformFee.toFixed(2)}</Text>
               </View>
@@ -320,7 +184,7 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
               <View style={styles.separator} />
 
               {/* Total (repeated in expanded view) */}
-              <View style={styles.totalRowExpanded}>
+              <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total (incl. fees and tax)</Text>
                 <Text style={styles.totalValue}>₱{order?.total_amount || '0.00'}</Text>
               </View>
@@ -334,7 +198,7 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
                 <Text style={styles.paymentMethod}>COD</Text>
                 <Text style={styles.paymentAmount}>₱{order?.total_amount || '0.00'}</Text>
               </View>
-            </View>
+            </>
           )}
         </View>
       </ScrollView>
@@ -360,7 +224,7 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   closeButton: {
     width: 40,
@@ -369,7 +233,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333333',
   },
@@ -378,7 +242,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 30,
   },
   statusImage: {
     width: 200,
@@ -389,7 +253,7 @@ const styles = StyleSheet.create({
     color: '#666666',
     textAlign: 'center',
     paddingHorizontal: 40,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   title1: {
     fontSize: 24,
@@ -404,15 +268,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 40,
-    marginBottom: 14,
-  },
-  progressBarWrapper: {
-    flex: 1,
-    height: 4,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 2,
-    overflow: 'hidden',
-    position: 'relative',
+    marginBottom: 24,
   },
   progressBar: {
     flex: 1,
@@ -420,41 +276,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
   },
-  progressBarFilled: {
-    backgroundColor: '#F43332',
-  },
-  progressBarActive: {
-    position: 'absolute',
-    width: 60,
-    height: 4,
-    backgroundColor: '#F43332',
-    borderRadius: 2,
-    opacity: 0.6,
-    shadowColor: '#F43332',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-  },
   subtitle2: {
     fontSize: 12,
     color: '#999999',
     textAlign: 'center',
     paddingHorizontal: 30,
-    lineHeight: 15,
+    lineHeight: 18,
     marginBottom: 30,
     fontStyle: 'italic',
-  },
-  subtitle2Justified: {
-    textAlign: 'justify',
-    alignSelf: 'center',
-    maxWidth: width - 60,
-  },
-  funFactBold: {
-    fontWeight: 'bold',
-    color: '#F43332',
-  },
-  highlightedText: {
-    color: '#F43332',
   },
   orderDetailsContainer: {
     backgroundColor: '#FFFFFF',
@@ -476,11 +305,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
-  detailRowNoBorder: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
   detailLabel: {
     fontSize: 14,
     color: '#666666',
@@ -498,11 +322,6 @@ const styles = StyleSheet.create({
     marginVertical: 12,
   },
   totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
-  totalRowNoBorder: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 12,
@@ -527,23 +346,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#F43332',
     fontWeight: '600',
-  },
-  expandedDetails: {
-    backgroundColor: '#F8F8F8',
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
-    marginBottom: -20,
-    paddingBottom: 20,
-  },
-  detailRowExpanded: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
-  totalRowExpanded: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
   },
   paidWithLabel: {
     fontSize: 14,

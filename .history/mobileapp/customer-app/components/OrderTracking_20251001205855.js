@@ -429,10 +429,9 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#F43332',
     borderRadius: 2,
-    opacity: 0.6,
     shadowColor: '#F43332',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.8,
     shadowRadius: 4,
   },
   subtitle2: {
