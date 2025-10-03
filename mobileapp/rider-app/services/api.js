@@ -273,6 +273,59 @@ export const apiService = {
     }
   },
 
+  // POST /rider/fetch-orders/ to get available orders for riders
+  getRiderOrders: async () => {
+    try {
+      console.log('📦 Fetching available orders for rider...');
+      
+      const baseURL = await findWorkingUrl();
+      const url = baseURL + '/rider/fetch-orders/';
+      
+      console.log('🌐 Using working URL for orders:', baseURL);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include', // Include cookies for authentication
+        timeout: 10000
+      });
+
+      console.log('📡 Orders response status:', res.status);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.log('❌ Orders response error text:', errorText);
+        return {
+          success: false,
+          error: `HTTP ${res.status}: ${errorText}`,
+          orders: []
+        };
+      }
+
+      const data = await res.json().catch((jsonError) => {
+        console.log('❌ Orders JSON parsing error:', jsonError);
+        return { 
+          success: false, 
+          error: 'Invalid JSON response',
+          orders: []
+        };
+      });
+      
+      console.log('✅ Rider orders response:', data);
+      return data;
+    } catch (error) {
+      console.log('❌ Get rider orders error:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Network error',
+        orders: []
+      };
+    }
+  },
+
   // POST /logout/ to logout and clear session
   logout: async () => {
     try {
@@ -316,6 +369,120 @@ export const apiService = {
       return data;
     } catch (error) {
       console.log('❌ Logout error:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Network error' 
+      };
+    }
+  },
+
+  // Accept order (assign rider to order)
+  acceptOrder: async (orderId) => {
+    try {
+      console.log('✅ Accepting order:', orderId);
+      
+      const baseURL = await findWorkingUrl();
+      const url = baseURL + '/rider/update-order-status/';
+      
+      console.log('🌐 Using working URL for accept order:', baseURL);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+        body: `order_id=${orderId}&status=otw`,
+        timeout: 10000
+      });
+
+      console.log('📡 Accept order response status:', res.status);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.log('❌ Accept order response error text:', errorText);
+        return {
+          success: false,
+          error: `HTTP ${res.status}: ${errorText}`
+        };
+      }
+
+      const data = await res.json().catch((jsonError) => {
+        console.log('❌ Accept order JSON parsing error:', jsonError);
+        return { 
+          success: false, 
+          error: 'Invalid JSON response'
+        };
+      });
+      
+      console.log('✅ Accept order response:', data);
+      return data;
+    } catch (error) {
+      console.log('❌ Accept order error:', error);
+      return { 
+        success: false, 
+        error: error.message || 'Network error' 
+      };
+    }
+  },
+
+  // Get order details
+  getOrderDetails: async (orderId) => {
+    try {
+      console.log('📋 Fetching order details for:', orderId);
+      
+      const baseURL = await findWorkingUrl();
+      const url = baseURL + '/rider/fetch-order-details/';
+      
+      console.log('🌐 Using working URL for order details:', baseURL);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ order_id: orderId }),
+        timeout: 10000
+      });
+
+      console.log('📡 Order details response status:', res.status);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.log('❌ Order details response error text:', errorText);
+        return {
+          success: false,
+          error: `HTTP ${res.status}: ${errorText}`
+        };
+      }
+
+      const data = await res.json().catch((jsonError) => {
+        console.log('❌ Order details JSON parsing error:', jsonError);
+        return { 
+          success: false, 
+          error: 'Invalid JSON response'
+        };
+      });
+      
+      // Check if the response contains an error
+      if (data.error) {
+        console.log('❌ Order details API error:', data.error);
+        return {
+          success: false,
+          error: data.error
+        };
+      }
+      
+      console.log('✅ Order details response:', data);
+      return {
+        success: true,
+        ...data
+      };
+    } catch (error) {
+      console.log('❌ Get order details error:', error);
       return { 
         success: false, 
         error: error.message || 'Network error' 

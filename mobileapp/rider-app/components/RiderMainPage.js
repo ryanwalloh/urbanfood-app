@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { weatherService } from '../services/weatherService';
 import { apiService } from '../services/api';
 import Profile from './Profile';
+import Orders from './Orders';
 
 const { width } = Dimensions.get('window');
 
@@ -348,6 +349,16 @@ const RiderMainPage = ({ onLogout }) => {
     setActiveNav('home');
   };
 
+  const handleNavigateToOrders = () => {
+    setCurrentScreen('orders');
+    setActiveNav('orders');
+  };
+
+  const handleBackFromOrders = () => {
+    setCurrentScreen('main');
+    setActiveNav('home');
+  };
+
   // Robust sync function to ensure frontend-backend consistency
   const syncWithBackend = async () => {
     try {
@@ -652,6 +663,15 @@ const RiderMainPage = ({ onLogout }) => {
     );
   }
 
+  // Show Orders screen when currentScreen is 'orders'
+  if (currentScreen === 'orders') {
+    return (
+      <Orders 
+        onBack={handleBackFromOrders}
+      />
+    );
+  }
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -777,7 +797,7 @@ const RiderMainPage = ({ onLogout }) => {
               <Text style={styles.ordersTitle}>
                 {ordersCount} {ordersCount === 1 ? 'delivery order' : 'delivery orders'} found!
               </Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleNavigateToOrders}>
                 <Text style={styles.viewOrdersText}>View details</Text>
               </TouchableOpacity>
             </View>
@@ -832,7 +852,7 @@ const RiderMainPage = ({ onLogout }) => {
         
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => setActiveNav('orders')}
+          onPress={handleNavigateToOrders}
         >
           <View style={[styles.navIconContainer, activeNav === 'orders' && styles.navIconActive]}>
             <Image source={require('../assets/orders.png')} style={styles.navIcon} resizeMode="contain" />
