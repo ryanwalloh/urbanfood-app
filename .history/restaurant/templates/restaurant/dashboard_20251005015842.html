@@ -1,0 +1,941 @@
+{% extends 'components/restaurant_dashboard_base.html' %}
+
+{% load static %}
+
+
+
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+
+{% block content %}
+
+
+
+  <header class="header">
+
+    <div class="logo-container">
+      <img class="logo-img" src="{{ restaurant.profile_picture.url }}" alt="Profile Picture">
+      <h1>{{ restaurant.name }}</h1>
+    </div>
+
+    <div class="header-elements">
+
+      <div class="element-icon-container" id="menu-book">
+        <img id="menu-book-img" class="element-icon" src="{% static 'restaurant/images/menu.svg' %}">
+        <p>Menu Book</p>
+      </div>
+      <div class="element-icon-container">
+        <img class="element-icon" src="{% static 'restaurant/images/bell.svg' %}">
+      </div>
+      <div class="element-icon-container">
+        <img class="element-icon" src="{% static 'restaurant/images/settings.svg' %}">
+      </div>
+      <div class="element-icon-container" id="user-container">
+        <img class="element-icon" src="{% static 'restaurant/images/white-user.png' %}">
+      </div>
+
+    </div>
+
+  </header>  
+
+  <div class="toolbar">
+    <div class="toolbar-sort">
+      <h3>All</h3>
+      <img id="caret-down" src="{% static 'restaurant/images/caret-down.svg' %}">
+    </div>
+
+    <form action="" method="GET" class="search-form">
+      <img class="search" src="{% static 'storefront/images/icons/search.svg' %}">
+      <input type="text" name="search_query" placeholder="Enter token number or order ID to search" class="search-input">
+    </form>
+
+    <div class="tool-icon-container">
+
+      <div class="tool-icon-wrap">
+        <img class="tool-icon" src="{% static 'restaurant/images/refresh.svg' %}">
+        <h3>Refresh</h3>
+      </div>
+
+      <div class="tool-icon-wrap">
+        <img class="tool-icon" src="{% static 'restaurant/images/report.svg' %}">
+        <h3>Report</h3>
+      </div>
+
+      <div class="tool-icon-wrap">
+        <h3>Online</h3>
+        <img id="toggle-icon" class="tool-icon" src="{% static 'restaurant/images/online.png' %}">
+        
+      </div>
+
+    </div>
+    
+  </div>
+
+  <main>
+    <aside>
+      <div class="aside-container">
+        <div class="aside-element-container">
+          <div id="aside-element-1" class="aside-element">
+            <img class="aside-icon" src="{% static 'restaurant/images/orders.svg' %}">
+            <div class="aside-items">
+              <h3>All Orders</h3>
+              <p>Number of Orders</p>
+            </div>
+           
+          </div>
+          <div class="aside-element">
+            <img class="aside-icon" src="{% static 'restaurant/images/menu2.svg' %}">
+            <div class="aside-items">
+              <h3>Menu</h3>
+              <p>Number of Products</p>
+            </div>
+            
+          </div>
+          <div class="aside-element">
+            <img class="aside-icon" src="{% static 'restaurant/images/clock.svg' %}">
+            <div class="aside-items">
+              <h3>Order History</h3>
+            </div>
+          </div>
+        </div>
+       
+
+        <div class="quick-add-container">
+          <div class="quick-add-image-container">
+            <img class="quick-add-image" src="{% static 'restaurant/images/waiting.png' %}">
+          </div>
+          <button id="addProduct" class="add-button"> <span class="plus">+</span> Add Product</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-container">
+
+      <div id="addProductModal" style="display: none;">
+        <div class="add-product-modal-content">
+            <span id="close2">&times;</span>
+
+            <form class="addProductForm" action="{% url 'restaurant:add_product' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="name">Name:</label>
+                <input type="text" name="name" required><br>
+
+                <label for="description">Description:</label>
+                <textarea name="description"></textarea><br>
+
+                <label for="price">Price:</label>
+                <input type="number" step="0.01" name="price" required><br>
+
+                <label for="product_picture">Product Picture:</label>
+                <input type="file" name="product_picture"><br>
+
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+      </div>
+
+      <div class="main-tab-container">
+        <div class="main-tab"><h2>Order No.</h2></div>
+        <div id="token-tab" class="main-tab"><h2>Token No.</h2></div>
+        <div id="rider-tab" class="main-tab"><h2>Rider</h2></div>
+        <div id="order-by-tab" class="main-tab"><h2>Ordered By</h2></div>
+        <div id="duration-tab" class="main-tab"><h2>Duration</h2></div>
+        <div id="amount-tab" class="main-tab"><h2>Amount</h2></div>
+        <div id="action-tab" class="main-tab"><h2>Action</h2></div>
+      </div>
+
+      <div class="main-tab-values">
+        <div class="orders-container">
+          <h3 class="main-tab-update">New Orders({{ pending_orders|length }})</h3>
+
+          <div class="pending-orders-container">
+            {% for order in pending_orders %}
+            <div class="order">
+              <div id="modal-{{ order.id }}" class="modal">
+                <div class="modal-content order-details-modal">
+                  <div class="modal-header">
+                    <h2>Order Details - #{{ order.token_number }}</h2>
+                    <span class="close" data-modal-id="modal-{{ order.id }}">&times;</span>
+                  </div>
+                  
+                  <div class="modal-body">
+                    <!-- Left Column -->
+                    <div class="modal-left-column">
+                      <!-- Order Info Section -->
+                      <div class="order-info-section">
+                        <h3>Order Details</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Order ID</label>
+                            <span>{{ order.id }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Token Number</label>
+                            <span>{{ order.token_number }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Status</label>
+                            <span class="status-badge status-{{ order.status }}">{{ order.status|title }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Order Time</label>
+                            <span>{{ order.created_at|date:"M d, Y h:i A" }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Payment Method</label>
+                            <span>{{ order.payment_method }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Customer Info Section -->
+                      <div class="customer-info-section">
+                        <h3>Customer Information</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Name</label>
+                            <span>{{ order.customer.get_full_name }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Phone</label>
+                            <span>{{ order.customer.customer.phone }}</span>
+                          </div>
+                          <div class="info-item full-width">
+                            <label>Address</label>
+                            <span>{{ order.customer.address.street }}, {{ order.customer.address.barangay }}</span>
+                          </div>
+                          {% if order.customer.address.note %}
+                          <div class="info-item full-width">
+                            <label>Delivery Note</label>
+                            <span>{{ order.customer.address.note }}</span>
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Rider Info Section -->
+                      <div class="rider-info-section">
+                        <h3>Delivery Information</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Rider</label>
+                            <span>{% if order.rider %}{{ order.rider.get_full_name }}{% else %}Not Assigned{% endif %}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Rider Phone</label>
+                            <span>{% if order.rider %}{{ order.rider.phone }}{% else %}N/A{% endif %}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="modal-right-column">
+                      <!-- Order Items Section -->
+                      <div class="order-items-section">
+                        <h3>Order Items</h3>
+                        <div class="items-table">
+                          <div class="table-header">
+                            <div class="col-item">Item</div>
+                            <div class="col-price">Price</div>
+                            <div class="col-qty">Qty</div>
+                            <div class="col-total">Subtotal</div>
+                          </div>
+                          {% for item in order.items.all %}
+                          <div class="table-row">
+                            <div class="col-item">
+                              <div class="item-details">
+                                <div class="item-name">{{ item.product.name }}</div>
+                              </div>
+                            </div>
+                            <div class="col-price">₱{{ item.product.price }}</div>
+                            <div class="col-qty">{{ item.quantity }}</div>
+                            <div class="col-total">₱{{ item.subtotal }}</div>
+                          </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+
+                      <!-- Order Summary Section -->
+                      <div class="order-summary-section">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                          <span>Subtotal:</span>
+                          <span>₱{{ order.total_amount|floatformat:2 }}</span>
+                        </div>
+                        {% if order.rider_fee > 0 %}
+                        <div class="summary-row">
+                          <span>Delivery Fee:</span>
+                          <span>₱{{ order.rider_fee }}</span>
+                        </div>
+                        {% endif %}
+                        {% if order.small_order_fee > 0 %}
+                        <div class="summary-row">
+                          <span>Small Order Fee:</span>
+                          <span>₱{{ order.small_order_fee }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="summary-row total">
+                          <span>Total Amount:</span>
+                          <span>₱{{ order.total_amount|floatformat:2 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="prepare-order-btn" data-order-id="{{ order.id }}">Prepare Order</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wrap-item">
+                <h3 id="order-id">{{ order.id }}</h3>
+                <p>View Order</p>
+              </div>
+
+              <div class="wrap-item">
+                <div class="wrap-flex">
+                  <img class="main-icon" src="{% static 'restaurant/images/crypto.png' %}">
+                  <h3 id="token-no">{{ order.token_number }}</h3>
+                </div>
+              </div>
+
+              <div class="wrap-item">
+                <div class="wrap-flex">
+                  <img class="main-icon" src="{% static 'restaurant/images/human.png' %}">
+                  <div class="wrap-item">
+                    {% if order.rider %}
+                      <h3 id="rider">{{ order.rider.get_full_name }}</h3>
+                      <p id="rider-mobile-number">{{ order.rider.phone }}</p>
+                    {% else %}
+                      <h3 id="rider">Not Assigned</h3>
+                      <p id="rider-mobile-number">N/A</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            
+            
+            
+
+              <div class="customer-address-container">
+                <h3 id="Customer">{{ order.customer.get_full_name }}</h3>
+                <p class="customer-address">{{ order.customer.address.barangay }}</p>
+              </div>
+
+              <div class="wrap-item">
+                <h3 id="rider-arrival">00:30:00</h3>
+                <p class="timestamp">{{ order.created_at|date:"h:i A" }}</p>
+              </div>
+
+              <div class="wrap-item">
+                <h3 id="sub-total">&#8369; {{ order.total_amount }}</h3>
+                <p id="payment-status">Paid</p>
+              </div>
+
+              <div class="wrap-item">
+                <button class="view-order" data-modal-id="modal-{{ order.id }}">View</button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+        </div>
+
+        <div class="orders-container">
+          <h3 class="main-tab-update">Preparing({{ preparing_orders|length }})</h3>
+
+          <div class="preparing-orders-container">
+            {% for order in preparing_orders %}
+            <div class="order">
+              <div id="modal-{{ order.id }}" class="modal">
+                <div class="modal-content order-details-modal">
+                  <div class="modal-header">
+                    <h2>Order Details - #{{ order.token_number }}</h2>
+                    <span class="close" data-modal-id="modal-{{ order.id }}">&times;</span>
+                  </div>
+                  
+                  <div class="modal-body">
+                    <!-- Left Column -->
+                    <div class="modal-left-column">
+                      <!-- Order Info Section -->
+                      <div class="order-info-section">
+                        <h3>Order Details</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Order ID</label>
+                            <span>{{ order.id }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Token Number</label>
+                            <span>{{ order.token_number }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Status</label>
+                            <span class="status-badge status-{{ order.status }}">{{ order.status|title }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Order Time</label>
+                            <span>{{ order.created_at|date:"M d, Y h:i A" }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Payment Method</label>
+                            <span>{{ order.payment_method }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Customer Info Section -->
+                      <div class="customer-info-section">
+                        <h3>Customer Information</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Name</label>
+                            <span>{{ order.customer.get_full_name }}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Phone</label>
+                            <span>{{ order.customer.customer.phone }}</span>
+                          </div>
+                          <div class="info-item full-width">
+                            <label>Address</label>
+                            <span>{{ order.customer.address.street }}, {{ order.customer.address.barangay }}</span>
+                          </div>
+                          {% if order.customer.address.note %}
+                          <div class="info-item full-width">
+                            <label>Delivery Note</label>
+                            <span>{{ order.customer.address.note }}</span>
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Rider Info Section -->
+                      <div class="rider-info-section">
+                        <h3>Delivery Information</h3>
+                        <div class="info-row">
+                          <div class="info-item">
+                            <label>Rider</label>
+                            <span>{% if order.rider %}{{ order.rider.get_full_name }}{% else %}Not Assigned{% endif %}</span>
+                          </div>
+                          <div class="info-item">
+                            <label>Rider Phone</label>
+                            <span>{% if order.rider %}{{ order.rider.phone }}{% else %}N/A{% endif %}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="modal-right-column">
+                      <!-- Order Items Section -->
+                      <div class="order-items-section">
+                        <h3>Order Items</h3>
+                        <div class="items-table">
+                          <div class="table-header">
+                            <div class="col-item">Item</div>
+                            <div class="col-price">Price</div>
+                            <div class="col-qty">Qty</div>
+                            <div class="col-total">Subtotal</div>
+                          </div>
+                          {% for item in order.items.all %}
+                          <div class="table-row">
+                            <div class="col-item">
+                              <div class="item-details">
+                                <div class="item-name">{{ item.product.name }}</div>
+                              </div>
+                            </div>
+                            <div class="col-price">₱{{ item.product.price }}</div>
+                            <div class="col-qty">{{ item.quantity }}</div>
+                            <div class="col-total">₱{{ item.subtotal }}</div>
+                          </div>
+                          {% endfor %}
+                        </div>
+                      </div>
+
+                      <!-- Order Summary Section -->
+                      <div class="order-summary-section">
+                        <h3>Order Summary</h3>
+                        <div class="summary-row">
+                          <span>Subtotal:</span>
+                          <span>₱{{ order.total_amount|floatformat:2 }}</span>
+                        </div>
+                        {% if order.rider_fee > 0 %}
+                        <div class="summary-row">
+                          <span>Delivery Fee:</span>
+                          <span>₱{{ order.rider_fee }}</span>
+                        </div>
+                        {% endif %}
+                        {% if order.small_order_fee > 0 %}
+                        <div class="summary-row">
+                          <span>Small Order Fee:</span>
+                          <span>₱{{ order.small_order_fee }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="summary-row total">
+                          <span>Total Amount:</span>
+                          <span>₱{{ order.total_amount|floatformat:2 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="ready-order-btn" data-order-id="{{ order.id }}">Mark as Ready</button>
+                  </div>
+                </div>
+              </div>
+              <div class="wrap-item">
+                <h3 class="order-id">{{ order.id }}</h3>
+                <button id="custom-button" class="view-order" data-modal-id="modal-{{ order.id }}">View Order</button>
+              </div>
+
+              <div class="wrap-item">
+                <div class="wrap-flex">
+                  <img class="main-icon" src="{% static 'restaurant/images/crypto.png' %}">
+                  <h3 class="token-no">{{ order.token_number }}</h3>
+                </div>
+              </div>
+
+              <div class="wrap-item">
+                <div class="wrap-flex">
+                  <img class="main-icon" src="{% static 'restaurant/images/human.png' %}">
+                  <div class="wrap-item">
+                    {% if order.rider %}
+                      <h3 class="rider">{{ order.rider.get_full_name }}</h3>
+                      <p class="rider-mobile-number">{{ order.rider.phone }}</p>
+                    {% else %}
+                      <h3 class="rider">Not Assigned</h3>
+                      <p class="rider-mobile-number">N/A</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="customer-address-container">
+                <h3 class="customer">{{ order.customer.get_full_name }}</h3>
+                <p class="customer-address">{{ order.customer.address.barangay }}</p>
+              </div>
+
+              <div class="wrap-item">
+                <h3 class="rider-arrival">00:30:00</h3>
+                <p class="timestamp">{{ order.created_at|date:"h:i A" }}</p>
+              </div>
+
+              <div class="wrap-item">
+                <h3 class="sub-total">&#8369; {{ order.total_amount }}</h3>
+                <p class="payment-status">Paid</p>
+              </div>
+
+              <div class="wrap-item">
+                <button class="ready-order-btn" data-order-id="{{ order.id }}">Ready</button>
+              </div>
+            </div>
+          {% endfor %}
+          </div>
+          
+        </div>
+
+
+        <div class="orders-container">
+          <h3 class="main-tab-update">Ready Orders({{ ready_orders|length }})</h3>
+
+          {% for order in ready_orders %}
+          <div class="order">
+            <div class="wrap-item">
+              <h3 class="order-id">{{ order.id }}</h3>
+              <p>View Order</p>
+            </div>
+
+            <div class="wrap-item">
+              <div class="wrap-flex">
+                <img class="main-icon" src="{% static 'restaurant/images/crypto.png' %}">
+                <h3 class="token-no">{{ order.token_number }}</h3>
+              </div>
+            </div>
+
+            <div class="wrap-item">
+              <div class="wrap-flex">
+                <img class="main-icon" src="{% static 'restaurant/images/human.png' %}">
+                <div class="wrap-item">
+                  {% if order.rider %}
+                    <h3 class="rider">{{ order.rider.get_full_name }}</h3>
+                    <p class="rider-mobile-number">{{ order.rider.phone }}</p>
+                  {% else %}
+                    <h3 class="rider">Not Assigned</h3>
+                    <p class="rider-mobile-number">N/A</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="customer-address-container">
+              <h3 class="customer">{{ order.customer.get_full_name }}</h3>
+              <p class="customer-address">{{ order.customer.address.barangay }}</p>
+            </div>
+
+            <div class="wrap-item">
+              <h3 class="rider-arrival">00:30:00</h3>
+              <p class="timestamp">{{ order.created_at|date:"h:i A" }}</p>
+            </div>
+
+            <div class="wrap-item">
+              <h3 class="sub-total">&#8369; {{ order.total_amount }}</h3>
+              <p class="payment-status">Paid</p>
+            </div>
+
+            <div class="wrap-item">
+              <button class="arrived-order-btn" data-order-id="{{ order.id }}">Arrived</button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      document.getElementById('addProduct').addEventListener('click', function () {
+        document.getElementById('addProductModal').style.display = 'block';
+      });
+
+      document.getElementById('close2').addEventListener('click', function() {
+        document.getElementById('addProductModal').style.display = 'none';
+      });
+
+      // Global variable to track modal state
+      let modalOpen = false;
+
+      function attachModalEventListeners() {
+        document.querySelectorAll(".view-order").forEach(button => {
+          button.addEventListener("click", function () {
+            const modalId = this.getAttribute("data-modal-id");
+            const modal = document.getElementById(modalId);
+            if (modal) {
+              modal.style.display = "block";
+              modalOpen = true; // Track that a modal is open
+            }
+          });
+        });
+
+        document.querySelectorAll(".modal .close").forEach(span => {
+          span.addEventListener("click", function () {
+            const modalId = this.getAttribute("data-modal-id");
+            const modal = document.getElementById(modalId);
+            if (modal) {
+              modal.style.display = "none";
+              modalOpen = false; // Track that no modal is open
+            }
+          });
+        });
+      }
+      
+      attachModalEventListeners();
+      attachPrepareOrderListeners();
+
+      // Close modal on outside click (run once on page load)
+      window.addEventListener("click", function (event) {
+        if (event.target.classList.contains("modal")) {
+          event.target.style.display = "none";
+          modalOpen = false; // Track that no modal is open
+        }
+      });
+
+ 
+
+      function fetchPendingOrders() {
+        fetch("{% url 'restaurant:get_pending_orders' %}")
+            .then(response => response.json())
+            .then(data => {
+                // Only update if no modals are open
+                if (!modalOpen) {
+                    const container = document.querySelector('.pending-orders-container');
+                    container.innerHTML = ''; // Clear old orders
+
+                    document.querySelector('.main-tab-update').innerText = `New Orders(${data.orders.length})`;
+                    
+                    function formatTime(isoString) {
+                        const date = new Date(isoString);
+                        let hours = date.getHours();
+                        const minutes = date.getMinutes();
+                        const ampm = hours >= 12 ? 'pm' : 'am';
+
+                        hours = hours % 12;
+                        hours = hours ? hours : 12; // Convert 0 to 12
+                        const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+
+                        return `${hours}:${minutesStr} ${ampm}`;
+                    }
+                    data.orders.forEach(order => {
+                        const div = document.createElement('div');
+                        div.classList.add('order');
+
+                        const formattedTime = formatTime(order.created_at);
+                        const barangay = order.customer_address?.barangay || 'No address';
+
+                        div.innerHTML = `
+                            <div id="modal-${order.id}" class="modal">
+                              <div class="modal-content order-details-modal">
+                                <div class="modal-header">
+                                  <h2>Order Details - #${order.token_number}</h2>
+                                  <span class="close" data-modal-id="modal-${order.id}">&times;</span>
+                                </div>
+                                
+                                <div class="modal-body">
+                                  <!-- Left Column -->
+                                  <div class="modal-left-column">
+                                    <!-- Order Info Section -->
+                                    <div class="order-info-section">
+                                      <h3>Order Details</h3>
+                                      <div class="info-row">
+                                        <div class="info-item">
+                                          <label>Order ID</label>
+                                          <span>${order.id}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Token Number</label>
+                                          <span>${order.token_number}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Status</label>
+                                          <span class="status-badge status-${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Order Time</label>
+                                          <span>${new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Payment Method</label>
+                                          <span>COD</span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <!-- Customer Info Section -->
+                                    <div class="customer-info-section">
+                                      <h3>Customer Information</h3>
+                                      <div class="info-row">
+                                        <div class="info-item">
+                                          <label>Name</label>
+                                          <span>${order.customer_name}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Phone</label>
+                                          <span>${order.customer_phone || 'N/A'}</span>
+                                        </div>
+                                        <div class="info-item full-width">
+                                          <label>Address</label>
+                                          <span>${order.customer_address?.street || ''}, ${order.customer_address?.barangay || 'No address'}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <!-- Rider Info Section -->
+                                    <div class="rider-info-section">
+                                      <h3>Delivery Information</h3>
+                                      <div class="info-row">
+                                        <div class="info-item">
+                                          <label>Rider</label>
+                                          <span>${order.rider_name || 'Not Assigned'}</span>
+                                        </div>
+                                        <div class="info-item">
+                                          <label>Rider Phone</label>
+                                          <span>${order.rider_phone || 'N/A'}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <!-- Right Column -->
+                                  <div class="modal-right-column">
+                                    <!-- Order Items Section -->
+                                    <div class="order-items-section">
+                                      <h3>Order Items</h3>
+                                      <div class="items-table">
+                                        <div class="table-header">
+                                          <div class="col-item">Item</div>
+                                          <div class="col-price">Price</div>
+                                          <div class="col-qty">Qty</div>
+                                          <div class="col-total">Subtotal</div>
+                                        </div>
+                                        ${order.items.map(item => `
+                                          <div class="table-row">
+                                            <div class="col-item">
+                                              <div class="item-details">
+                                                <div class="item-name">${item.product.name}</div>
+                                              </div>
+                                            </div>
+                                            <div class="col-price">₱${item.product.price}</div>
+                                            <div class="col-qty">${item.quantity}</div>
+                                            <div class="col-total">₱${item.subtotal}</div>
+                                          </div>
+                                        `).join('')}
+                                      </div>
+                                    </div>
+
+                                    <!-- Order Summary Section -->
+                                    <div class="order-summary-section">
+                                      <h3>Order Summary</h3>
+                                      <div class="summary-row">
+                                        <span>Subtotal:</span>
+                                        <span>₱${parseFloat(order.total_amount).toFixed(2)}</span>
+                                      </div>
+                                      <div class="summary-row total">
+                                        <span>Total Amount:</span>
+                                        <span>₱${parseFloat(order.total_amount).toFixed(2)}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                  <button class="prepare-order-btn" data-order-id="${order.id}">Prepare Order</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="wrap-item">
+                                <h3 id="order-id">${order.id}</h3>
+                                <p>View Order</p>
+                            </div>
+                            <div class="wrap-item">
+                                <div class="wrap-flex">
+                                    <img class="main-icon" src="{% static 'restaurant/images/crypto.png' %}">
+                                    <h3 id="token-no">${order.token_number}</h3>
+                                </div>
+                            </div>
+                            <div class="wrap-item">
+                                <div class="wrap-flex">
+                                    <img class="main-icon" src="{% static 'restaurant/images/human.png' %}">
+                                    <div class="wrap-item">
+                                        {% if order.rider_name != 'Not Assigned' %}
+                                            <h3 id="rider">{{ order.rider_name }}</h3>
+                                            <p id="rider-mobile-number">{{ order.rider.phone }}</p>
+                                        {% else %}
+                                            <h3 id="rider">Not Assigned</h3>
+                                            <p id="rider-mobile-number">N/A</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="customer-address-container">
+                                <h3 id="Customer">${order.customer_name}</h3>
+                                <p class="customer-address">${barangay}</p>
+                            </div>
+                            <div class="wrap-item">
+                                <h3 id="rider-arrival">00:30:00</h3>
+                                <p id="timestamp">${formattedTime}</p>
+                            </div>
+                            <div class="wrap-item">
+                                <h3 id="sub-total">&#8369; ${order.total_amount}</h3>
+                                <p id="payment-status">Paid</p>
+                            </div>
+                            <div class="wrap-item">
+                                <button class="view-order" data-modal-id="modal-${order.id}">View</button>
+                            </div>
+                        `;
+
+                        container.appendChild(div);
+                    });
+
+                    attachModalEventListeners();
+                    attachPrepareOrderListeners();
+                    modalOpen = false; // Reset modal state after DOM refresh
+                } else {
+                    // Just update the count without refreshing the DOM
+                    document.querySelector('.main-tab-update').innerText = `New Orders(${data.orders.length})`;
+                }
+                
+                
+            })
+            .catch(error => console.error('Error fetching orders:', error));
+      }
+
+      // Poll every 10 seconds
+      setInterval(fetchPendingOrders, 10000);
+
+  
+   
+      function attachPrepareOrderListeners() {
+        document.querySelectorAll('.prepare-order-btn').forEach(button => {
+          button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+
+            fetch("{% url 'prepare_order' %}", {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({ 'order_id': orderId })
+            })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.success ? 'Order is now being prepared!' : (data.message || 'Failed to update order.'));
+              if (data.success) location.reload();
+            });
+          });
+        });
+      }
+  
+        document.querySelectorAll('.arrived-order-btn').forEach(button => {
+          button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+  
+            fetch("{% url 'mark_order_arrived' %}", {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({ 'order_id': orderId })
+            })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.success ? 'Order marked as delivered!' : (data.message || 'Failed to update order.'));
+              if (data.success) location.reload();
+            });
+          });
+        });
+  
+        document.querySelectorAll('.ready-order-btn').forEach(button => {
+          button.addEventListener('click', function () {
+            const orderId = this.dataset.orderId;
+  
+            fetch("{% url 'mark_order_ready' %}", {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({ 'order_id': orderId })
+            })
+            .then(response => response.json())
+            .then(data => {
+              alert(data.success ? 'Order is now ready for pickup!' : (data.message || 'Failed to update order.'));
+              if (data.success) location.reload();
+            });
+          });
+        });
+   
+  
+      
+  
+    
+    });
+  </script>
+  
+
+
+
+
+
+
+{% endblock %}

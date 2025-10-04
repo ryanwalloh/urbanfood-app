@@ -1,9 +1,0 @@
-body {
-    margin: 20px;
-    padding: 20%;
-    background-color: red;
-}
-
-h1 {
-    counter-reset: re;
-}

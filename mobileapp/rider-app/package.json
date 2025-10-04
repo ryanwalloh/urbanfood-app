@@ -9,9 +9,17 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.901.0",
+    "@aws-sdk/s3-request-presigner": "^3.901.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "54.0.12",
+    "expo-camera": "^17.0.8",
+    "expo-constants": "^18.0.9",
+    "expo-file-system": "^19.0.16",
+    "expo-image-picker": "^17.0.8",
     "expo-location": "~19.0.7",
+    "expo-media-library": "^18.2.0",
+    "expo-permissions": "^14.4.0",
     "expo-status-bar": "~3.0.8",
     "react": "19.1.0",
     "react-native": "0.81.4",
