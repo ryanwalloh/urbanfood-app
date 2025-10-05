@@ -1,0 +1,86 @@
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
+from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+import json
+from .models import RiderLocation
+from .serializers import RiderLocationSerializer
+
+class RiderLocationViewSet(viewsets.ModelViewSet):
+    queryset = RiderLocation.objects.all()
+    serializer_class = RiderLocationSerializer
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_rider_location(request):
+    """
+    Update or create rider location when accepting an order
+    """
+    try:
+        rider = request.user
+        
+        # Check if user is a rider
+        if rider.role != 'rider':
+            return JsonResponse({
+                'success': False,
+                'error': 'Only riders can update location'
+            }, status=403)
+        
+        # Get latitude and longitude from request
+        if request.content_type == 'application/json':
+            data = request.data
+        else:
+            # Handle form data
+            data = request.POST
+        
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        
+        if not latitude or not longitude:
+            return JsonResponse({
+                'success': False,
+                'error': 'Latitude and longitude are required'
+            }, status=400)
+        
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        except (ValueError, TypeError):
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid latitude or longitude format'
+            }, status=400)
+        
+        # Update or create rider location
+        rider_location, created = RiderLocation.objects.update_or_create(
+            rider=rider,
+            defaults={
+                'latitude': latitude,
+                'longitude': longitude
+            }
+        )
+        
+        action = 'created' if created else 'updated'
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Rider location {action} successfully',
+            'rider_location': {
+                'rider_id': rider.id,
+                'latitude': rider_location.latitude,
+                'longitude': rider_location.longitude,
+                'updated_at': rider_location.updated_at.isoformat()
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Failed to update rider location: {str(e)}'
+        }, status=500)
