@@ -22,6 +22,7 @@ import * as FileSystem from 'expo-file-system';
 // Using backend presigned URLs; no direct S3 client needed on device
 import { apiService } from '../services/api';
 import { locationTracker } from '../services/locationTracking';
+import API_CONFIG from '../config/apiConfig';
 
 const { width, height } = Dimensions.get('window');
 
@@ -119,17 +120,9 @@ const OrderTracking = ({ orderId, onBack }) => {
   const [showImagePreviewModal, setShowImagePreviewModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // AWS S3 Configuration
-  const AWS_CONFIG = {
-    accessKeyId: 'AKIA5RA7TEOC2ZAU5MG2',
-    secretAccessKey: 'QF/s9jHf5EGYkbx7SnLodzFgQCHaeYmvYV0V1Gzd',
-    region: 'ap-southeast-2',
-    bucket: 'pharmago-user-uploads'
-  };
-
-  // Cloudinary Configuration (replace cloud name)
-  const CLOUDINARY_CLOUD_NAME = 'dwqrkobq1';
-  const CLOUDINARY_UPLOAD_PRESET = 'capstone_file_uploads';
+  // Cloudinary Configuration from centralized config
+  const CLOUDINARY_CLOUD_NAME = API_CONFIG.CLOUDINARY_CLOUD_NAME;
+  const CLOUDINARY_UPLOAD_PRESET = API_CONFIG.CLOUDINARY_UPLOAD_PRESET;
 
   // Handle proof of delivery camera
   const handleProofOfDelivery = async () => {
@@ -692,7 +685,7 @@ const OrderTracking = ({ orderId, onBack }) => {
         const restaurantQuery = buildRestaurantAddress(orderData);
         console.log('🧭 Geocoding restaurant with query:', restaurantQuery);
         const restaurantResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(restaurantQuery)}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(restaurantQuery)}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
         );
         const restaurantData = await restaurantResponse.json();
         
@@ -715,7 +708,7 @@ const OrderTracking = ({ orderId, onBack }) => {
         const customerQuery = buildCustomerAddress(orderData);
         console.log('🧭 Geocoding customer with query:', customerQuery);
         const customerResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(customerQuery)}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(customerQuery)}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
         );
         const customerData = await customerResponse.json();
         
@@ -743,7 +736,7 @@ const OrderTracking = ({ orderId, onBack }) => {
       // Clear any existing route to avoid showing stale polylines while recalculating
       setRouteCoordinates([]);
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${encodeURIComponent(destinationAddress)}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${encodeURIComponent(destinationAddress)}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
       );
       
       const data = await response.json();
@@ -768,7 +761,7 @@ const OrderTracking = ({ orderId, onBack }) => {
         // Fallback: Try to geocode the destination address directly
         try {
           const geocodeResponse = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destinationAddress)}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destinationAddress)}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
           );
           const geocodeData = await geocodeResponse.json();
           
@@ -805,7 +798,7 @@ const OrderTracking = ({ orderId, onBack }) => {
       // Fallback: Try to geocode the destination address directly
       try {
         const geocodeResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destinationAddress)}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destinationAddress)}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
         );
         const geocodeData = await geocodeResponse.json();
         
@@ -844,7 +837,7 @@ const OrderTracking = ({ orderId, onBack }) => {
       // Clear any existing route to avoid showing stale polylines while recalculating
       setRouteCoordinates([]);
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${destination.latitude},${destination.longitude}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${destination.latitude},${destination.longitude}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
       );
 
       const data = await response.json();
