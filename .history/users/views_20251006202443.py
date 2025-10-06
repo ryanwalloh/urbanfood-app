@@ -1,0 +1,311 @@
+import json
+import logging
+from django.http import JsonResponse
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.utils import timezone
+from django.contrib.auth import authenticate, login
+from django.db import transaction
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import User, SMSVerification
+from .serializers import UserSerializer
+from .sms_service import sms_service
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def send_verification_code(request):
+    """
+    Send SMS verification code to rider's phone number
+    """
+    try:
+        data = json.loads(request.body)
+        phone_number = data.get('phone_number')
+
+        if not phone_number:
+            return JsonResponse({
+                'success': False,
+                'error': 'Phone number is required'
+            }, status=400)
+
+        # Check if phone number already exists
+        if User.objects.filter(phone_number=phone_number).exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'Phone number already registered'
+            }, status=400)
+
+        # Create verification code (no user data stored yet)
+        verification = SMSVerification.objects.create(
+            phone_number=phone_number
+        )
+
+        # Send SMS (with email fallback)
+        if sms_service.is_configured():
+            # Get email from request data for fallback
+            email = data.get('email')
+            success = sms_service.send_verification_code(phone_number, verification.code, email)
+            if not success:
+                error_detail = sms_service.last_error or 'Failed to send verification code'
+                # In development, allow proceeding and log the code for manual testing
+                if getattr(settings, 'DEBUG', False):
+                    logger.warning(f"SMS/Email send failed (DEBUG). Using fallback. To: {phone_number}, Code: {verification.code}, Error: {error_detail}")
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Verification code generated (debug fallback).',
+                        'verification_id': verification.id,
+                        'twilio_error': error_detail,
+                        'debug_fallback': True,
+                    })
+                return JsonResponse({
+                    'success': False,
+                    'error': error_detail
+                }, status=500)
+        else:
+            # For development/testing - log the code
+            logger.info(f"DEVELOPMENT: SMS code for {phone_number} is: {verification.code}")
+            # Still return success for testing
+
+        # Verification code sent successfully
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Verification code sent successfully',
+            'verification_id': verification.id
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error in send_verification_code: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Internal server error'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def verify_sms_code(request):
+    """
+    Verify SMS code and create rider account
+    """
+    try:
+        data = json.loads(request.body)
+        verification_id = data.get('verification_id')
+        code = data.get('code')
+        
+        # User data from mobile app
+        user_data = data.get('user_data', {})
+
+        if not verification_id or not code:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing verification ID or code'
+            }, status=400)
+
+        try:
+            verification = SMSVerification.objects.get(id=verification_id)
+        except SMSVerification.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid verification ID'
+            }, status=400)
+
+        # Check if verification can still be attempted
+        if not verification.can_attempt_verification():
+            if verification.is_expired():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Verification code has expired'
+                }, status=400)
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Too many verification attempts'
+                }, status=400)
+
+        # Increment attempts
+        verification.attempts += 1
+        verification.save()
+
+        # Verify code
+        if verification.code != code:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid verification code',
+                'attempts_remaining': 3 - verification.attempts
+            }, status=400)
+
+        # Code is correct - create user account
+        with transaction.atomic():
+            # Extract user data from request
+            email = user_data.get('email')
+            username = user_data.get('username')
+            first_name = user_data.get('firstName')
+            last_name = user_data.get('lastName')
+            password = user_data.get('password')
+            vehicle_type = user_data.get('vehicleType')
+            license_number = user_data.get('licenseNumber')
+            phone_number = verification.phone_number
+            
+            # Validate required fields
+            if not all([email, username, first_name, last_name, password, vehicle_type, license_number]):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Missing required user data'
+                }, status=400)
+            
+            # Check if user already exists (double check)
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'User with this email already exists'
+                }, status=400)
+
+            if User.objects.filter(username=username).exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Username already taken'
+                }, status=400)
+            
+            # Create user
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                phone_number=phone_number,
+                role='rider',
+                is_phone_verified=True
+            )
+
+            # Create rider profile
+            from rider.models import Rider
+            Rider.objects.create(
+                user=user,
+                vehicle_type=vehicle_type,
+                license_number=license_number,
+                phone=phone_number
+            )
+
+            # Mark verification as successful
+            verification.is_verified = True
+            verification.save()
+
+            # ✅ Authenticate the user in the session (same as login)
+            login(request, user)
+
+            logger.info(f"Rider account created successfully for {user.email}")
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Account created successfully',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'role': user.role,
+                    'phone_number': user.phone_number,
+                    'is_phone_verified': user.is_phone_verified
+                }
+            })
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error in verify_sms_code: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Internal server error'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def resend_verification_code(request):
+    """
+    Resend verification code
+    """
+    try:
+        data = json.loads(request.body)
+        verification_id = data.get('verification_id')
+
+        if not verification_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing verification ID'
+            }, status=400)
+
+        try:
+            verification = SMSVerification.objects.get(id=verification_id)
+        except SMSVerification.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid verification ID'
+            }, status=400)
+
+        # Check if verification is already verified
+        if verification.is_verified:
+            return JsonResponse({
+                'success': False,
+                'error': 'Phone number already verified'
+            }, status=400)
+
+        # Check if too many attempts
+        if verification.attempts >= 3:
+            return JsonResponse({
+                'success': False,
+                'error': 'Too many verification attempts'
+            }, status=400)
+
+        # Generate new code and extend expiry
+        verification.code = SMSVerification.generate_code()
+        verification.expires_at = timezone.now() + timezone.timedelta(minutes=5)
+        verification.attempts = 0  # Reset attempts
+        verification.save()
+
+        # Send SMS (with email fallback if available)
+        if sms_service.is_configured():
+            # Try to get email from user_data if available
+            email = verification.user_data.get('email') if verification.user_data else None
+            success = sms_service.send_verification_code(verification.phone_number, verification.code, email)
+            if not success:
+                error_detail = sms_service.last_error or 'Failed to send verification code'
+                return JsonResponse({
+                    'success': False,
+                    'error': error_detail
+                }, status=500)
+        else:
+            # For development/testing
+            logger.info(f"DEVELOPMENT: New SMS code for {verification.phone_number} is: {verification.code}")
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Verification code resent successfully'
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error in resend_verification_code: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Internal server error'
+        }, status=500)
