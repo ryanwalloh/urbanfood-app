@@ -143,6 +143,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         body: JSON.stringify({
           phone_number: phoneNumber,
           email: userData.email, // Include email for primary verification method
+          role: 'rider', // CRITICAL: Specify this is a rider registration
         }),
       });
 

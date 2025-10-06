@@ -20,6 +20,11 @@ db.sqlite3
 venv/
 env/
 
+.history/
+
+# Mobile app configuration files (contain API keys)
+mobileapp/*/config/apiConfig.js
+
 # Logs
 *.log
 

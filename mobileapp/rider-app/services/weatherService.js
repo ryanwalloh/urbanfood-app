@@ -10,10 +10,12 @@
 // FREE TIER LIMITS: 1,000 calls/day, 60 calls/minute
 // Perfect for personal/testing use!
 
-const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY_HERE';
+import API_CONFIG from '../config/apiConfig';
+
+const OPENWEATHER_API_KEY = API_CONFIG.OPENWEATHER_API_KEY;
 
 // Google API key for geocoding (location names)
-const GOOGLE_API_KEY = 'AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ';
+const GOOGLE_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 export const weatherService = {
   // Get current weather using Open-Meteo API (FREE, NO API KEY REQUIRED!)

@@ -18,6 +18,7 @@ import * as Font from 'expo-font';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from './services/api';
+import API_CONFIG from './config/apiConfig';
 import MainPage from './components/MainPage';
 import WelcomePage from './components/WelcomePage';
 import LoginPage from './components/LoginPage';
@@ -29,7 +30,7 @@ import OnboardingPage2 from './components/OnboardingPage2';
 import OnboardingPage3 from './components/OnboardingPage3';
 
 const { width, height } = Dimensions.get('window');
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ';
+const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 // Independent LoginForm component with its own state
 

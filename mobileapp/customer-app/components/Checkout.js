@@ -4,9 +4,10 @@ import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { apiService } from '../services/api';
+import API_CONFIG from '../config/apiConfig';
 
 const { width, height } = Dimensions.get('window');
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ';
+const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
   const [selectedPayment, setSelectedPayment] = useState('Cash on Delivery');

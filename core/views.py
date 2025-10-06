@@ -293,21 +293,50 @@ def register_account(request):
                 password=make_password(password)
             )
 
-            # If address details were provided, create/update Address linked to this user
-            try:
-                if street or barangay or note or label:
-                    from customer.models import Address
-                    # Provide safe defaults to satisfy model constraints
-                    address_data = {
-                        'street': street or '',
-                        'barangay': barangay or '',
-                        'note': note,
-                        'label': label or 'home',
-                    }
-                    Address.objects.update_or_create(user=user, defaults=address_data)
-            except Exception as e:
-                # Do not fail registration if address creation fails; include a warning
-                logger.warning(f"Address creation failed for {email}: {e}")
+            # Handle role-specific data creation
+            if role == 'rider':
+                # Extract rider-specific data
+                vehicle_type = data.get('vehicleType') or data.get('vehicle_type')
+                license_number = data.get('licenseNumber') or data.get('license_number')
+                phone_number = data.get('phoneNumber') or data.get('phone_number')
+                
+                # Validate required rider fields
+                if not all([vehicle_type, license_number, phone_number]):
+                    return JsonResponse({
+                        'error': 'Missing required rider information: vehicle type, license number, and phone number are required'
+                    }, status=400)
+                
+                # Create Rider model record
+                try:
+                    from rider.models import Rider
+                    Rider.objects.create(
+                        user=user,
+                        vehicle_type=vehicle_type,
+                        license_number=license_number,
+                        phone=phone_number
+                    )
+                    logger.info(f"Rider profile created for {user.email}")
+                except Exception as e:
+                    logger.error(f"Failed to create rider profile for {email}: {e}")
+                    return JsonResponse({
+                        'error': 'Failed to create rider profile'
+                    }, status=500)
+            else:
+                # Customer flow - handle address details
+                try:
+                    if street or barangay or note or label:
+                        from customer.models import Address
+                        # Provide safe defaults to satisfy model constraints
+                        address_data = {
+                            'street': street or '',
+                            'barangay': barangay or '',
+                            'note': note,
+                            'label': label or 'home',
+                        }
+                        Address.objects.update_or_create(user=user, defaults=address_data)
+                except Exception as e:
+                    # Do not fail registration if address creation fails; include a warning
+                    logger.warning(f"Address creation failed for {email}: {e}")
 
             # ✅ Send magic link after successful registration
             token = uuid.uuid4()

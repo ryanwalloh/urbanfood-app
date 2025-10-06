@@ -7,7 +7,7 @@ from django.shortcuts import render
 from orders.models import Order, OrderLine
 from customer.models import Address, Customer
 from restaurant.models import Restaurant
-from django.contrib.auth.models import User
+from users.models import User
 from django.db.models import Sum
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -168,16 +168,32 @@ def update_order_status(request):
 
 
 @csrf_exempt
-@login_required
 def recent_transactions(request):
     if request.method != 'GET':
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
 
     try:
+        # Handle authentication for both web and mobile
+        user = None
+        
+        # Check if user is authenticated via session (web)
+        if request.user.is_authenticated:
+            user = request.user
+        else:
+            # For mobile apps, check if user_id is provided in query params
+            user_id = request.GET.get('user_id')
+            if user_id:
+                try:
+                    user = User.objects.get(id=user_id, role='rider')
+                except User.DoesNotExist:
+                    return JsonResponse({'success': False, 'message': 'Invalid user ID'}, status=400)
+            else:
+                return JsonResponse({'success': False, 'message': 'Authentication required'}, status=401)
+
         # Fetch latest delivered orders for this rider
         orders = (
             Order.objects
-            .filter(rider=request.user, status='delivered')
+            .filter(rider=user, status='delivered')
             .order_by('-created_at')[:10]
         )
 

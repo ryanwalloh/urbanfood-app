@@ -79,8 +79,23 @@ export const apiService = {
   // Rider recent delivered transactions
   getRecentTransactions: async () => {
     try {
+      // Get user ID from AsyncStorage
+      const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+      const storedUser = await AsyncStorage.getItem('rider:user');
+      
+      if (!storedUser) {
+        return { success: false, error: 'User not logged in' };
+      }
+      
+      const userData = JSON.parse(storedUser);
+      const userId = userData.id;
+      
+      if (!userId) {
+        return { success: false, error: 'User ID not found' };
+      }
+      
       const baseURL = await findWorkingUrl();
-      const url = baseURL + '/rider/recent-transactions/';
+      const url = baseURL + `/rider/recent-transactions/?user_id=${userId}`;
 
       const res = await fetch(url, {
         method: 'GET',

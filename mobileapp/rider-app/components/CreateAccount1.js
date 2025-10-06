@@ -156,6 +156,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
       lastName,
       email,
       password,
+      role: 'rider', // CRITICAL: Specify this is a rider registration
     };
 
     // Save data locally

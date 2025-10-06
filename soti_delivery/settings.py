@@ -27,10 +27,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-io4r+_--mb)41ndk38gy$r%#-84u8&-0_e3+*wrxl3l#@7rc6e'
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-fallback-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG', default=True)
 
 ALLOWED_HOSTS = [
     '192.168.254.104',  # Current host IP address
@@ -130,9 +130,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'sotidelivery@gmail.com'
-EMAIL_HOST_PASSWORD = 'naolpjuuhuxchqsb'
-DEFAULT_FROM_EMAIL = 'sotidelivery@gmail.com'
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
 # SITE_URL = 'http://127.0.0.1:8000'
 ENVIRONMENT = env('DJANGO_ENV', default='development')
 
@@ -257,6 +257,9 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Twilio SMS Configuration
-TWILIO_ACCOUNT_SID = 'ACa1cf89f40a3e3cf6915a6a3499b7097b'
-TWILIO_AUTH_TOKEN = '5365bd6f58ec62a06228c2acc591f482'
-TWILIO_PHONE_NUMBER = '+16162365906'
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='+16162365906')
+
+# Google Maps API Key
+GOOGLE_MAPS_API_KEY = env('GOOGLE_MAPS_API_KEY', default='')

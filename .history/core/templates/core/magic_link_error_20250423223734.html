@@ -1,7 +1,0 @@
-{% extends "base_generic.html" %}
-
-{% block content %}
-    <h1>Magic Link Error</h1>
-    <p>{{ error }}</p>
-    <p><a href="{% url 'core:request_magic_link' %}">Request a new magic link</a></p>
-{% endblock %}

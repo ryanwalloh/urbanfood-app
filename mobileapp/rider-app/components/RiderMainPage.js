@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 12,
-    fontFamily: 'Nexa-ExtraLight',
+    fontFamily: 'Nexa-Heavy',
     color: '#F43332',
     opacity: 0.8,
     marginBottom: 4,
@@ -1341,6 +1341,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nexa-Heavy',
     color: '#F43332',
+    opacity: 0.8,
   },
   customerName: {
     fontSize: 14,

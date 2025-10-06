@@ -5,9 +5,10 @@ import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { apiService } from '../services/api';
+import API_CONFIG from '../config/apiConfig';
 
 const { width } = Dimensions.get('window');
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ';
+const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
   const [localAddr, setLocalAddr] = useState(addressData);
@@ -375,13 +376,13 @@ const styles = StyleSheet.create({
     right: 0,
     width: width,
     height: '50%',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     zIndex: 0.5,
     pointerEvents: 'none',
   },
   logoContainer: {
     position: 'absolute',
-    top: 50,
+    top: 30,
     right: 20,
     zIndex: 1,
   },
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
     paddingHorizontal: 30,
-    paddingTop: 30,
+    paddingTop: 20,
     paddingBottom: 40,
     minHeight: 500,
     zIndex: 2,

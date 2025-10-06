@@ -13,6 +13,7 @@ import {
   PanResponder,
   Animated,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -192,7 +193,8 @@ const OrderTracking = ({ orderId, onBack }) => {
 
     try {
       setIsUploading(true);
-      setShowImagePreviewModal(false);
+      // Don't close modal immediately - keep it open to show loading state
+      // setShowImagePreviewModal(false);
 
       console.log('📤 Starting upload...');
 
@@ -228,6 +230,8 @@ const OrderTracking = ({ orderId, onBack }) => {
 
       if (updateResult.success) {
         console.log('✅ Order updated successfully');
+        // Close modal and show success modal
+        setShowImagePreviewModal(false);
         setShowSuccessModal(true);
       } else {
         throw new Error(updateResult.error || 'Failed to update order');
@@ -236,6 +240,7 @@ const OrderTracking = ({ orderId, onBack }) => {
     } catch (error) {
       console.log('❌ Upload error:', error);
       Alert.alert('Upload Failed', error.message || 'Failed to upload proof of delivery');
+      // Keep modal open on error so user can retry
     } finally {
       setIsUploading(false);
     }
@@ -1266,9 +1271,14 @@ const OrderTracking = ({ orderId, onBack }) => {
               onPress={handleUploadPhoto}
               disabled={isUploading}
             >
-              <Text style={styles.uploadButtonText}>
-                {isUploading ? 'Uploading...' : 'Upload'}
-              </Text>
+              {isUploading ? (
+                <View style={styles.uploadButtonLoading}>
+                  <ActivityIndicator size="small" color="#FFFFFF" style={styles.uploadSpinner} />
+                  <Text style={styles.uploadButtonText}>Uploading...</Text>
+                </View>
+              ) : (
+                <Text style={styles.uploadButtonText}>Upload</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -1564,14 +1574,14 @@ const styles = StyleSheet.create({
   },
   floatingContainer: {
     position: 'absolute',
-    top: 35,
+    top: 40,
     left: 20,
     right: 20,
     backgroundColor: '#FFFFFF',
     opacity: 0.8,
     borderRadius: 12,
     padding: 10,
-    paddingVertical: 6,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -1594,7 +1604,7 @@ const styles = StyleSheet.create({
   },
   destinationLabel: {
     fontSize: 14,
-    fontFamily: 'Nexa-Heavy',
+
     color: '#999',
     textAlign: 'left',
     marginBottom: 0,
@@ -1673,7 +1683,7 @@ const styles = StyleSheet.create({
   },
   orderNumberValue: {
     fontSize: 18,
-    fontFamily: 'Nexa-Heavy',
+    fontFamily: 'Nexa-ExtraLight',
     color: '#1A1A1A',
   },
   
@@ -1718,6 +1728,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-Heavy',
     color: '#1A1A1A',
     marginBottom: 0,
+    opacity: 0.8,
   },
   callingCardSubtitle: {
     fontSize: 14,
@@ -1730,6 +1741,7 @@ const styles = StyleSheet.create({
   callIcon: {
     width: 24,
     height: 24,
+    opacity: 0.8,
   },
   progressGuide: {
  
@@ -1763,7 +1775,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-Heavy',
     color: '#1A1A1A',
     marginBottom: 0,
-  
+    opacity: 0.8,
   },
   
   progressSubtitle: {
@@ -1977,6 +1989,14 @@ const styles = StyleSheet.create({
   uploadButtonDisabled: {
     backgroundColor: '#CCCCCC',
   },
+  uploadButtonLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadSpinner: {
+    marginRight: 8,
+  },
   uploadButtonText: {
     fontSize: 16,
     fontFamily: 'Nexa-Heavy',
@@ -2151,7 +2171,7 @@ const styles = StyleSheet.create({
   },
   controlButtonText: {
     fontSize: 24,
-    fontFamily: 'Nexa-Heavy',
+    fontFamily: 'Nexa-ExtraLight',
     color: '#F43332',
   },
 
