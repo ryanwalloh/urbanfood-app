@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { apiService } from '../services/api';
+import API_CONFIG from '../config/apiConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -92,7 +93,7 @@ const RouteLine = ({ riderLocation, customerLocation }) => {
     const fetchRoute = async () => {
       try {
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?origin=${riderLocation.latitude},${riderLocation.longitude}&destination=${customerLocation.latitude},${customerLocation.longitude}&key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ`
+          `https://maps.googleapis.com/maps/api/directions/json?origin=${riderLocation.latitude},${riderLocation.longitude}&destination=${customerLocation.latitude},${customerLocation.longitude}&key=${API_CONFIG.GOOGLE_MAPS_API_KEY}`
         );
         
         const data = await response.json();

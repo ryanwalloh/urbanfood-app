@@ -84,7 +84,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       Animated.timing(formContainerTranslateY, {
-        toValue: -150, // Lift the form container up
+        toValue: -180, // Lift the form container up
         duration: 250,
         useNativeDriver: true,
       }).start();
