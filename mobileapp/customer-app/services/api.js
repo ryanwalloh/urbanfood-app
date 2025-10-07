@@ -1,13 +1,8 @@
 import axios from 'axios';
+import { API_CONFIG } from '../config/apiConfig';
 
-// API Base URL - Try different options based on your setup
-// Option 1: Android emulator (most common)
-const API_BASE_URL = 'http://10.0.2.2:8000';
-
-// Option 2: If above doesn't work, try these:
-// const API_BASE_URL = 'http://127.0.0.1:8000'; // iOS simulator
-// const API_BASE_URL = 'http://localhost:8000'; // Alternative localhost
-// const API_BASE_URL = 'http://192.168.1.100:8000'; // Replace with your actual IP
+// API Base URL - from central config (Railway)
+const API_BASE_URL = API_CONFIG.API_BASE_URL;
 
 console.log('🌐 Using API Base URL:', API_BASE_URL);
 
@@ -76,14 +71,7 @@ const testMultipleUrls = async () => {
     return cachedWorkingUrl;
   }
 
-  const urls = [
-    'http://192.168.254.104:8000',  // Current host IP (working URL)
-    'http://192.168.254.111:8000',  // Previous host IP
-    'http://10.0.2.2:8000',  // Android emulator
-    'http://127.0.0.1:8000',  // iOS simulator
-    'http://localhost:8000',  // Alternative localhost
-    'http://192.168.254.103:8000',  // Previous host IP
-  ];
+  const urls = [API_CONFIG.API_BASE_URL];
   
   for (const url of urls) {
     try {

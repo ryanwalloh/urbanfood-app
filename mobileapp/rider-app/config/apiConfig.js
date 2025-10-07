@@ -13,10 +13,10 @@ export const API_CONFIG = {
   CLOUDINARY_UPLOAD_PRESET: 'capstone_file_uploads',
   
   // Backend API Base URL (Railway)
-  API_BASE_URL: 'https://soti-delivery.railway.app',
+  API_BASE_URL: 'https://soti-delivery.up.railway.app',
   
   // WebSocket URL (Railway)
-  WS_BASE_URL: 'wss://soti-delivery.railway.app',
+  WS_BASE_URL: 'wss://soti-delivery.up.railway.app',
 };
 
 export default API_CONFIG;

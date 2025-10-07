@@ -142,6 +142,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
+EMAIL_TIMEOUT = 10
 # SITE_URL = 'http://127.0.0.1:8000'
 ENVIRONMENT = env('DJANGO_ENV', default='development')
 
