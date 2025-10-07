@@ -30,16 +30,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-fallback-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG', default=True)
+DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = [
-    '192.168.254.104',  # Current host IP address
-    '192.168.254.111',  # Previous host IP address
-    'localhost',
-    '127.0.0.1',
-    '192.168.254.103',  # Previous IP address
-    '10.0.2.2',  # Android emulator
-]
+# Accept hosts from env (comma-separated), fall back to local/dev hosts
+ALLOWED_HOSTS = [h.strip() for h in env('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',') if h.strip()]
 
 
 
@@ -109,11 +103,22 @@ WSGI_APPLICATION = 'soti_delivery.wsgi.application'
 ASGI_APPLICATION = 'soti_delivery.asgi.application'
 
 # Channels configuration
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+_redis_url = env('REDIS_URL', default=None)
+if _redis_url:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [_redis_url],
+            },
+        }
     }
-}
+else:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        }
+    }
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -215,8 +220,6 @@ LOGGING = {
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres://postgres:password@localhost:5432/soti_delivery_db')
 }
-
-print(env('DATABASE_URL'))
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
