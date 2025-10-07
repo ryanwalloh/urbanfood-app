@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'core',
     'rest_framework',
     'corsheaders',
+    'anymail',
     'users',
     'menu',
     'orders',
@@ -134,11 +135,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Magic Link
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# Email backend (default to Resend via Anymail; override via env if needed)
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='anymail.backends.resend.EmailBackend')
+ANYMAIL = {
+    'RESEND_API_KEY': env('RESEND_API_KEY', default=''),
+}
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
