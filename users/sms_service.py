@@ -1,4 +1,3 @@
-from twilio.rest import Client
 from django.conf import settings
 from django.core.mail import send_mail
 import logging
@@ -6,17 +5,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class SMSService:
+    """
+    Email-first verification delivery. Twilio/SMS removed.
+    Maintains the same interface so existing views keep working.
+    """
+
     def __init__(self):
-        self.account_sid = getattr(settings, 'TWILIO_ACCOUNT_SID', '')
-        self.auth_token = getattr(settings, 'TWILIO_AUTH_TOKEN', '')
-        self.from_number = getattr(settings, 'TWILIO_PHONE_NUMBER', '')
         self.last_error = None
-        
-        if self.account_sid and self.auth_token:
-            self.client = Client(self.account_sid, self.auth_token)
-        else:
-            self.client = None
-            logger.warning("Twilio credentials not configured")
 
     def normalize_phone_number(self, phone_number: str) -> str:
         """
@@ -45,17 +40,17 @@ class SMSService:
 
     def send_verification_code(self, phone_number, code, email=None):
         """
-        Send verification code via email (primary) or SMS (fallback)
-        Prioritizes email over SMS for better reliability
+        Send verification code via email only. Returns True on success.
+        If email is missing, we log and return False.
         """
-        email_success = False
-        sms_success = False
-        
-        # Try email first (primary method)
-        if email:
-            try:
-                subject = 'SOTI Delivery - Verification Code'
-                message = f"""
+        if not email:
+            self.last_error = 'Email address is required to send verification code'
+            logger.error(self.last_error)
+            return False
+
+        try:
+            subject = 'SOTI Delivery - Verification Code'
+            message = f"""
 Hello,
 
 Your SOTI Delivery verification code is: {code}
@@ -67,65 +62,30 @@ If you didn't request this code, please ignore this email.
 Best regards,
 SOTI Delivery Team
 """
-                
-                send_mail(
-                    subject,
-                    message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
-                )
-                
-                logger.info(f"Verification code sent via email to {email}")
-                email_success = True
-                self.last_error = None
-                return True
-                
-            except Exception as e:
-                logger.error(f"Failed to send verification email to {email}: {str(e)}")
-                self.last_error = f"Email failed: {str(e)}"
-                email_success = False
-        
-        # If email failed or not provided, try SMS as fallback
-        if not email_success and self.client:
-            try:
-                # Normalize phone number to E.164
-                phone_number = self.normalize_phone_number(phone_number)
 
-                message_body = f"Your SOTI Delivery verification code is: {code}. This code will expire in 5 minutes."
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
 
-                message = self.client.messages.create(
-                    body=message_body,
-                    from_=self.from_number,
-                    to=phone_number
-                )
+            logger.info(f"Verification code sent via email to {email}")
+            self.last_error = None
+            return True
 
-                logger.info(f"SMS sent successfully to {phone_number}. Message SID: {message.sid}")
-                self.last_error = None
-                sms_success = True
-                return True
-
-            except Exception as e:
-                self.last_error = str(e)
-                logger.error(f"Failed to send SMS to {phone_number}: {self.last_error}")
-                sms_success = False
-        else:
-            if not email_success:
-                logger.error("Twilio client not initialized and email failed")
-                self.last_error = "Twilio client not initialized and email failed"
-                sms_success = False
-
-        # If both email and SMS failed
-        if not email_success and not sms_success:
+        except Exception as e:
+            self.last_error = f"Email failed: {str(e)}"
+            logger.error(self.last_error)
             return False
-            
-        return True
 
     def is_configured(self):
         """
         Check if Twilio is properly configured
         """
-        return bool(self.account_sid and self.auth_token and self.from_number)
+        # Always True as we rely solely on SMTP/email
+        return True
 
 # Create a singleton instance
 sms_service = SMSService()
