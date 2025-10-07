@@ -143,9 +143,9 @@ ANYMAIL = {
 EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = env('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER', default='sotidelivery@gmail.com')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='onboarding@resend.dev')
 EMAIL_TIMEOUT = 10
 # SITE_URL = 'http://127.0.0.1:8000'
 ENVIRONMENT = env('DJANGO_ENV', default='development')
