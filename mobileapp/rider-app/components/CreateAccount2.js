@@ -81,7 +81,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
   React.useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       Animated.timing(formContainerTranslateY, {
-        toValue: -200,
+        toValue: -260,
         duration: 250,
         useNativeDriver: true,
       }).start();
