@@ -34,3 +34,4 @@ tzdata==2025.1
 whitenoise==6.9.0
 zope.interface==7.2
 twilio==9.4.0
+daphne==4.1.0
