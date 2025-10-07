@@ -676,7 +676,7 @@ const RiderMainPage = ({ onLogout }) => {
         {/* Hero Image Container */}
         <View style={styles.heroContainer}>
           <Image 
-            source={require('../assets/riderHeader.png')} 
+            source={require('../assets/riderHeader.webp')} 
             style={styles.heroImage}
             resizeMode="cover"
           />

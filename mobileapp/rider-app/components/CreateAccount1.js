@@ -174,7 +174,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
     <View style={styles.container}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/createaccount1.png')} 
+        source={require('../assets/createaccount1.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />

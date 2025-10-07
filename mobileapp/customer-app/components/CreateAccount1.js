@@ -78,7 +78,7 @@ const CreateAccount1 = ({ regData, onNext }) => {
     <View style={styles.createContainer}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/createaccountbg.jpg')} 
+        source={require('../assets/createaccountbg.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />

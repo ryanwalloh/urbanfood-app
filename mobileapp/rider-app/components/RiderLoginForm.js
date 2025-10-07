@@ -149,7 +149,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
     <View style={styles.container}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/loginbg1.png')} 
+        source={require('../assets/loginbg1.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />

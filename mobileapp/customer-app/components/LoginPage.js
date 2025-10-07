@@ -36,7 +36,7 @@ const LoginPage = ({ onLoginSuccess, onCreateAccount }) => {
     <View style={styles.loginContainer}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/loginbg3.png')} 
+        source={require('../assets/loginbg3.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />

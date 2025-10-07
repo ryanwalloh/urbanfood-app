@@ -157,7 +157,7 @@ const MainPage = ({ user, onLogout }) => {
         {/* Hero Image Container */}
         <View style={styles.heroContainer}>
           <Image 
-            source={require('../assets/imageHero.png')} 
+            source={require('../assets/imageHero.webp')} 
             style={styles.heroImage}
             resizeMode="cover"
           />

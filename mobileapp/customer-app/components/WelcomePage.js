@@ -34,7 +34,7 @@ const WelcomePage = ({ onGetStarted, onCreateAccount }) => {
     <View style={styles.container}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/welcomePage.png')} 
+        source={require('../assets/welcomePage.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />
