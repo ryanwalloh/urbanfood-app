@@ -219,7 +219,7 @@ const CustomerCodeConfirmation = ({ email, verificationId, userData, onSuccess, 
     <View style={styles.container}>
       {/* Background Image (reuse customer create background if available) */}
       <Image 
-        source={require('../assets/createaccountbg.jpg')} 
+        source={require('../assets/createaccountbg.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />
