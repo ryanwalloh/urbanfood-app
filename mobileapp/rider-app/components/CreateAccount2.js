@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: width,
     height: '75%',
-    zIndex: 0,
+    zIndex: 1,
   },
   darkOverlay: {
     position: 'absolute',
@@ -417,13 +417,13 @@ const styles = StyleSheet.create({
     width: width,
     height: '75%',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 0.5,
+    zIndex: 2,
   },
   logoContainer: {
     position: 'absolute',
     top: 10,
     right: 20,
-    zIndex: 1,
+    zIndex: 3,
   },
   logo: {
     width: 150,
@@ -459,6 +459,8 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingBottom: 40,
     minHeight: 400,
+    zIndex: 10,
+    elevation: 10,
   },
   inputContainer: {
     marginBottom: 20,
