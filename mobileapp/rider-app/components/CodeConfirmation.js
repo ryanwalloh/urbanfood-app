@@ -345,7 +345,7 @@ const CodeConfirmation = ({ verificationId, phoneNumber, onVerificationSuccess, 
     <View style={styles.container}>
       {/* Background Image */}
       <Image 
-        source={require('../assets/createaccount2.png')} 
+        source={require('../assets/createaccount2.webp')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       />
