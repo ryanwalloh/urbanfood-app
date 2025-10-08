@@ -26,7 +26,7 @@
           "apiKey": "AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ"
         }
       },
-      "package": "com.ryamazingw.riderapp"
+      "package": "com.ryamazingw.sotirider"
     },
     "web": {
       "favicon": "./assets/favicon.png"
