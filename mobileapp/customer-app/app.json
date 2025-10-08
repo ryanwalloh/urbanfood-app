@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "customer-app",
+    "name": "Soti Delivery",
     "slug": "customer-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -31,10 +31,16 @@
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "package": "com.ryamazingw.sotidelivery"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "79312119-7695-4789-afaa-a61d9f6b2099"
+      }
     }
   }
 }
