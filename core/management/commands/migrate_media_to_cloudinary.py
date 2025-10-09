@@ -3,7 +3,7 @@ import cloudinary
 import cloudinary.uploader
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from users.models import User
+from restaurant.models import Restaurant
 from menu.models import Product
 
 
@@ -21,8 +21,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Starting media migration to Cloudinary...'))
         
         # Migrate Restaurant Profile Pictures
-        self.stdout.write('\n📸 Migrating restaurant profile pictures...')
-        restaurants = User.objects.filter(role='restaurant', profile_picture__isnull=False).exclude(profile_picture='')
+        self.stdout.write('\n[IMAGES] Migrating restaurant profile pictures...')
+        restaurants = Restaurant.objects.filter(profile_picture__isnull=False).exclude(profile_picture='')
         
         for restaurant in restaurants:
             try:
@@ -45,15 +45,15 @@ class Command(BaseCommand):
                     restaurant.profile_picture = f"restaurant_profiles/{os.path.basename(old_path)}"
                     restaurant.save()
                     
-                    self.stdout.write(self.style.SUCCESS(f'  ✅ {restaurant.name}: {old_path}'))
+                    self.stdout.write(self.style.SUCCESS(f'  [OK] {restaurant.name}: {old_path}'))
                 else:
-                    self.stdout.write(self.style.WARNING(f'  ⚠️  File not found: {local_file_path}'))
+                    self.stdout.write(self.style.WARNING(f'  [WARN] File not found: {local_file_path}'))
                     
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f'  ❌ Error with {restaurant.name}: {str(e)}'))
+                self.stdout.write(self.style.ERROR(f'  [ERROR] Error with {restaurant.name}: {str(e)}'))
 
         # Migrate Product Pictures
-        self.stdout.write('\n🍕 Migrating product pictures...')
+        self.stdout.write('\n[PRODUCTS] Migrating product pictures...')
         products = Product.objects.filter(product_picture__isnull=False).exclude(product_picture='')
         
         for product in products:
@@ -77,14 +77,14 @@ class Command(BaseCommand):
                     product.product_picture = f"restaurant_products/{os.path.basename(old_path)}"
                     product.save()
                     
-                    self.stdout.write(self.style.SUCCESS(f'  ✅ {product.name}: {old_path}'))
+                    self.stdout.write(self.style.SUCCESS(f'  [OK] {product.name}: {old_path}'))
                 else:
-                    self.stdout.write(self.style.WARNING(f'  ⚠️  File not found: {local_file_path}'))
+                    self.stdout.write(self.style.WARNING(f'  [WARN] File not found: {local_file_path}'))
                     
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f'  ❌ Error with {product.name}: {str(e)}'))
+                self.stdout.write(self.style.ERROR(f'  [ERROR] Error with {product.name}: {str(e)}'))
 
-        self.stdout.write(self.style.SUCCESS('\n🎉 Migration complete!'))
-        self.stdout.write(self.style.SUCCESS(f'✅ Restaurants migrated: {restaurants.count()}'))
-        self.stdout.write(self.style.SUCCESS(f'✅ Products migrated: {products.count()}'))
+        self.stdout.write(self.style.SUCCESS('\n[DONE] Migration complete!'))
+        self.stdout.write(self.style.SUCCESS(f'[OK] Restaurants migrated: {restaurants.count()}'))
+        self.stdout.write(self.style.SUCCESS(f'[OK] Products migrated: {products.count()}'))
 
