@@ -4,7 +4,7 @@
       "builder": "NIXPACKS"
     },
     "deploy": {
-      "startCommand": "python manage.py collectstatic --noinput && python manage.py migrate && python -m daphne soti_delivery.asgi:application --port $PORT --bind 0.0.0.0",
+      "startCommand": "python manage.py collectstatic --noinput --clear && python manage.py migrate && python -m daphne soti_delivery.asgi:application --port $PORT --bind 0.0.0.0",
       "healthcheckPath": "/",
       "healthcheckTimeout": 100,
       "restartPolicyType": "ON_FAILURE",
