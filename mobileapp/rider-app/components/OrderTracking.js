@@ -1390,7 +1390,7 @@ const OrderTracking = ({ orderId, onBack }) => {
           )}
           
           {/* Restaurant Location - Custom Asset Marker (shown when order not picked up) */}
-          {restaurantLocation && orderDetails?.status !== 'otw' && (
+          {restaurantLocation && (orderDetails?.status === 'assigned' || orderDetails?.status === 'ready') && (
             <Marker
               coordinate={restaurantLocation}
               title="Restaurant"
