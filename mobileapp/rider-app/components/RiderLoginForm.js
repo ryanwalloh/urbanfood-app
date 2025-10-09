@@ -197,7 +197,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Email"
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
@@ -222,7 +222,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
               }),
               color: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -254,7 +254,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Password"
             placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}
@@ -280,7 +280,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
               }),
               color: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],

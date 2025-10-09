@@ -209,7 +209,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={vehicleType}
             onChangeText={setVehicleType}
@@ -233,7 +233,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               color: vehicleTypeLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: vehicleTypeLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -241,7 +241,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               borderColor: vehicleTypeLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: vehicleTypeLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -265,7 +265,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={licenseNumber}
             onChangeText={setLicenseNumber}
@@ -289,7 +289,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               color: licenseNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: licenseNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -297,7 +297,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               borderColor: licenseNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: licenseNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -321,7 +321,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={phoneNumber}
             onChangeText={setPhoneNumber}
@@ -346,7 +346,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               color: phoneNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: phoneNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -354,7 +354,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
               }),
               borderColor: phoneNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: phoneNumberLabelAnimation.interpolate({
                 inputRange: [0, 1],

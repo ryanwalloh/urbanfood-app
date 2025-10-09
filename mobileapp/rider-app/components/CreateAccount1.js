@@ -208,7 +208,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={username}
             onChangeText={setUsername}
@@ -232,7 +232,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               color: usernameLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: usernameLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -240,7 +240,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               borderColor: usernameLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: usernameLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -266,7 +266,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
           <View style={styles.nameInputContainer}>
             <TextInput
               style={styles.nameInput}
-              placeholder=""
+              placeholder="Enter here"
               placeholderTextColor="#999"
               value={firstName}
               onChangeText={setFirstName}
@@ -290,7 +290,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
                 }),
                 color: firstNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['transparent', '#666'],
+                  outputRange: ['#999', '#666'],
                 }),
                 borderWidth: firstNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
@@ -298,7 +298,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
                 }),
                 borderColor: firstNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['transparent', '#666'],
+                  outputRange: ['#999', '#666'],
                 }),
                 borderRadius: firstNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
@@ -322,7 +322,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
           <View style={[styles.nameInputContainer, { marginRight: 0 }]}>
             <TextInput
               style={styles.nameInput}
-              placeholder=""
+              placeholder="Enter here"
               placeholderTextColor="#999"
               value={lastName}
               onChangeText={setLastName}
@@ -346,7 +346,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
                 }),
                 color: lastNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['transparent', '#666'],
+                  outputRange: ['#999', '#666'],
                 }),
                 borderWidth: lastNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
@@ -354,7 +354,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
                 }),
                 borderColor: lastNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['transparent', '#666'],
+                  outputRange: ['#999', '#666'],
                 }),
                 borderRadius: lastNameLabelAnimation.interpolate({
                   inputRange: [0, 1],
@@ -379,7 +379,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
@@ -404,7 +404,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               color: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -412,7 +412,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               borderColor: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: emailLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -436,7 +436,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder=""
+            placeholder="Enter here"
             placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}
@@ -462,7 +462,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               color: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderWidth: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],
@@ -470,7 +470,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
               }),
               borderColor: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],
-                outputRange: ['transparent', '#666'],
+                outputRange: ['#999', '#666'],
               }),
               borderRadius: passwordLabelAnimation.interpolate({
                 inputRange: [0, 1],
