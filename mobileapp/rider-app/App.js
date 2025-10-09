@@ -63,7 +63,7 @@ export default function App() {
             if (appState) {
               try {
                 const state = JSON.parse(appState);
-                const validScreens = ['landing', 'login', 'register', 'register2', 'confirmation', 'main'];
+                const validScreens = ['landing', 'login', 'create1', 'create2', 'code-confirmation', 'main'];
                 if (state.currentScreen && validScreens.includes(state.currentScreen)) {
                   console.log('🔄 Restored rider app state:', state);
                   setCurrentScreen(state.currentScreen);
@@ -106,7 +106,7 @@ export default function App() {
           if (appState) {
             try {
               const state = JSON.parse(appState);
-              const validScreens = ['landing', 'login', 'register', 'register2', 'confirmation', 'main'];
+              const validScreens = ['landing', 'login', 'create1', 'create2', 'code-confirmation', 'main'];
               if (state.currentScreen && validScreens.includes(state.currentScreen)) {
                 console.log('🔄 Restoring rider app state:', state);
                 setCurrentScreen(state.currentScreen);

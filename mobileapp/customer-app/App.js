@@ -98,7 +98,7 @@ export default function App() {
           if (appState) {
             try {
               const state = JSON.parse(appState);
-              const validPages = ['landing', 'login', 'register', 'codeConfirmation', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
+              const validPages = ['landing', 'welcome', 'login', 'create1', 'create2', 'verify', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
               if (state.currentPage && validPages.includes(state.currentPage)) {
                 console.log('🔄 Restoring app state:', state);
                 setCurrentPage(state.currentPage);
@@ -153,7 +153,7 @@ export default function App() {
               if (appState) {
                 try {
                   const state = JSON.parse(appState);
-                  const validPages = ['landing', 'login', 'register', 'codeConfirmation', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
+                  const validPages = ['landing', 'welcome', 'login', 'create1', 'create2', 'verify', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
                   if (state.currentPage && validPages.includes(state.currentPage)) {
                     console.log('🔄 Restored app state:', state);
                     setCurrentPage(state.currentPage);
