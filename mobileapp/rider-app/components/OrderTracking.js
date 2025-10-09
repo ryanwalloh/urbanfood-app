@@ -2124,8 +2124,8 @@ const styles = StyleSheet.create({
     height: 60,
   },
   markerImage: {
-    width: 50,
-    height: 50,
+    width: 30,
+    height: 30,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
