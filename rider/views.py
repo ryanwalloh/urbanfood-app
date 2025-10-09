@@ -335,10 +335,19 @@ def fetch_order_details(request):
 
             subtotal = order.items.aggregate(total=Sum('subtotal'))['total'] or 0
 
+            # Get restaurant profile picture URL (Cloudinary URLs are already absolute)
+            restaurant_profile_url = ''
+            if restaurant_obj.profile_picture:
+                pic_url = str(restaurant_obj.profile_picture)
+                if pic_url.startswith('http'):
+                    restaurant_profile_url = pic_url
+                else:
+                    restaurant_profile_url = request.build_absolute_uri(restaurant_obj.profile_picture.url)
+            
             response_data = {
                 'order_id': order.id,
                 'status': order.status,  # Add order status to response
-                'restaurant_profile': request.build_absolute_uri(restaurant_obj.profile_picture.url) if restaurant_obj.profile_picture else '',
+                'restaurant_profile': restaurant_profile_url,
                 'restaurant_name': restaurant_obj.name,
                 'restaurant_barangay': restaurant_obj.barangay,
                 'restaurant_street': restaurant_obj.street,
