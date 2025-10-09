@@ -19,7 +19,7 @@
       "icon": "./assets/icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#F43332"
       },
       "edgeToEdgeEnabled": true,
       "config": {
