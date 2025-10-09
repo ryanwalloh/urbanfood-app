@@ -7,7 +7,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    product_picture = models.ImageField(upload_to='restaurant_products/', blank=True, null=True)  # Added
+    product_picture = models.ImageField(upload_to='restaurant_products/', max_length=500, blank=True, null=True)  # Increased for Cloudinary URLs
 
     def __str__(self):
         return f"{self.name} ({self.restaurant.name})"
