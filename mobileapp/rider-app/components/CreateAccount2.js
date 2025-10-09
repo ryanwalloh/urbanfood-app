@@ -209,7 +209,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={vehicleType}
             onChangeText={setVehicleType}
@@ -265,7 +265,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={licenseNumber}
             onChangeText={setLicenseNumber}
@@ -321,7 +321,7 @@ const CreateAccount2 = ({ userData, onBack, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={phoneNumber}
             onChangeText={setPhoneNumber}

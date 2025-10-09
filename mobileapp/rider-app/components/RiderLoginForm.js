@@ -197,7 +197,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder=""
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
@@ -254,7 +254,7 @@ const RiderLoginForm = ({ onLoginSuccess, onCreateAccount }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder=""
             placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}

@@ -208,7 +208,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={username}
             onChangeText={setUsername}
@@ -266,7 +266,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
           <View style={styles.nameInputContainer}>
             <TextInput
               style={styles.nameInput}
-              placeholder="Enter here"
+              placeholder=""
               placeholderTextColor="#999"
               value={firstName}
               onChangeText={setFirstName}
@@ -322,7 +322,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
           <View style={[styles.nameInputContainer, { marginRight: 0 }]}>
             <TextInput
               style={styles.nameInput}
-              placeholder="Enter here"
+              placeholder=""
               placeholderTextColor="#999"
               value={lastName}
               onChangeText={setLastName}
@@ -379,7 +379,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
@@ -436,7 +436,7 @@ const CreateAccount1 = ({ onNext, onBack }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Enter here"
+            placeholder=""
             placeholderTextColor="#999"
             value={password}
             onChangeText={setPassword}
