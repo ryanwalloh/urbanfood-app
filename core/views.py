@@ -383,10 +383,16 @@ def get_restaurants(request):
             base_url = request.build_absolute_uri('/')[:-1]  # Remove trailing slash
             
             for restaurant in restaurants:
-                # Build absolute URL for profile picture
+                # Get profile picture URL (Cloudinary URLs are already absolute)
                 profile_picture_url = None
                 if restaurant.profile_picture:
-                    profile_picture_url = base_url + restaurant.profile_picture.url
+                    # Check if it's already a full URL (starts with http)
+                    pic_url = str(restaurant.profile_picture)
+                    if pic_url.startswith('http'):
+                        profile_picture_url = pic_url
+                    else:
+                        # Old local files - build absolute URL
+                        profile_picture_url = base_url + restaurant.profile_picture.url
                 
                 restaurant_data = {
                     'id': restaurant.id,
@@ -424,10 +430,16 @@ def get_restaurant_products(request, restaurant_id):
             base_url = request.build_absolute_uri('/')[:-1]  # Remove trailing slash
             
             for product in products:
-                # Build absolute URL for product picture
+                # Get product picture URL (Cloudinary URLs are already absolute)
                 product_picture_url = None
                 if product.product_picture:
-                    product_picture_url = base_url + product.product_picture.url
+                    # Check if it's already a full URL (starts with http)
+                    pic_url = str(product.product_picture)
+                    if pic_url.startswith('http'):
+                        product_picture_url = pic_url
+                    else:
+                        # Old local files - build absolute URL
+                        product_picture_url = base_url + product.product_picture.url
                 
                 product_data = {
                     'id': product.id,
