@@ -703,8 +703,17 @@ const OrderTracking = ({ orderId, onBack }) => {
         }
       }
 
-      // Geocode customer address
-      if (orderData.customer_barangay) {
+      // Set customer location - use precise coordinates if available, otherwise geocode
+      if (orderData.customer_latitude && orderData.customer_longitude) {
+        // Use precise coordinates from database (from plus code)
+        const customerCoords = {
+          latitude: parseFloat(orderData.customer_latitude),
+          longitude: parseFloat(orderData.customer_longitude),
+        };
+        setCustomerLocation(customerCoords);
+        console.log('✅ Customer location from database (precise):', customerCoords);
+      } else if (orderData.customer_barangay) {
+        // Fallback: Geocode customer address
         const customerQuery = buildCustomerAddress(orderData);
         console.log('🧭 Geocoding customer with query:', customerQuery);
         const customerResponse = await fetch(
@@ -719,7 +728,7 @@ const OrderTracking = ({ orderId, onBack }) => {
             longitude: location.lng,
           };
           setCustomerLocation(customerCoords);
-          console.log('✅ Customer location geocoded:', customerCoords);
+          console.log('✅ Customer location geocoded (approximate):', customerCoords);
         } else {
           console.log('❌ Failed to geocode customer address');
           setError('Unable to locate customer address. Please check your connection and try again.');

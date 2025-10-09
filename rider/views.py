@@ -347,6 +347,8 @@ def fetch_order_details(request):
                 'customer_phone': customer_obj.phone,
                 'customer_barangay': customer_address.barangay,
                 'customer_street': customer_address.street,
+                'customer_latitude': float(customer_address.latitude) if customer_address.latitude else None,
+                'customer_longitude': float(customer_address.longitude) if customer_address.longitude else None,
                 'total_amount': float(order.total_amount),
                 'rider_fee': float(order.rider_fee),
                 'small_order_fee': float(order.small_order_fee),

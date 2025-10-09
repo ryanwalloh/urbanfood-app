@@ -17,6 +17,8 @@ class Address(models.Model):
     barangay = models.CharField(max_length=255)
     note = models.CharField(max_length=255, blank=True, null=True)
     label = models.CharField(max_length=50, choices=[('home', 'Home'), ('work', 'Work'), ('partner', 'Partner'), ('other', 'Other')])
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
 
     def __str__(self):
         return f'{self.street}, {self.barangay}'
