@@ -96,9 +96,20 @@ export default function App() {
           
           // Restore app state if it exists
           if (appState) {
-            const state = JSON.parse(appState);
-            console.log('🔄 Restoring app state:', state);
-            setCurrentPage(state.currentPage || 'main');
+            try {
+              const state = JSON.parse(appState);
+              const validPages = ['landing', 'login', 'register', 'codeConfirmation', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
+              if (state.currentPage && validPages.includes(state.currentPage)) {
+                console.log('🔄 Restoring app state:', state);
+                setCurrentPage(state.currentPage);
+              } else {
+                console.log('⚠️ Invalid saved page, defaulting to main');
+                setCurrentPage('main');
+              }
+            } catch (e) {
+              console.log('⚠️ Error parsing app state, defaulting to main:', e);
+              setCurrentPage('main');
+            }
           } else {
             setCurrentPage('main');
           }
@@ -140,9 +151,20 @@ export default function App() {
               
               // Restore app state
               if (appState) {
-                const state = JSON.parse(appState);
-                console.log('🔄 Restored app state:', state);
-                setCurrentPage(state.currentPage || 'main');
+                try {
+                  const state = JSON.parse(appState);
+                  const validPages = ['landing', 'login', 'register', 'codeConfirmation', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
+                  if (state.currentPage && validPages.includes(state.currentPage)) {
+                    console.log('🔄 Restored app state:', state);
+                    setCurrentPage(state.currentPage);
+                  } else {
+                    console.log('⚠️ Invalid saved page, defaulting to main');
+                    setCurrentPage('main');
+                  }
+                } catch (e) {
+                  console.log('⚠️ Error parsing app state, defaulting to main:', e);
+                  setCurrentPage('main');
+                }
               } else {
                 setCurrentPage('main');
               }

@@ -61,9 +61,20 @@ export default function App() {
             
             // Restore app state
             if (appState) {
-              const state = JSON.parse(appState);
-              console.log('🔄 Restored rider app state:', state);
-              setCurrentScreen(state.currentScreen || 'main');
+              try {
+                const state = JSON.parse(appState);
+                const validScreens = ['landing', 'login', 'register', 'register2', 'confirmation', 'main'];
+                if (state.currentScreen && validScreens.includes(state.currentScreen)) {
+                  console.log('🔄 Restored rider app state:', state);
+                  setCurrentScreen(state.currentScreen);
+                } else {
+                  console.log('⚠️ Invalid saved screen, defaulting to main');
+                  setCurrentScreen('main');
+                }
+              } catch (e) {
+                console.log('⚠️ Error parsing app state, defaulting to main:', e);
+                setCurrentScreen('main');
+              }
             } else {
               setCurrentScreen('main');
             }
@@ -93,9 +104,20 @@ export default function App() {
           
           // Restore app state if it exists
           if (appState) {
-            const state = JSON.parse(appState);
-            console.log('🔄 Restoring rider app state:', state);
-            setCurrentScreen(state.currentScreen || 'main');
+            try {
+              const state = JSON.parse(appState);
+              const validScreens = ['landing', 'login', 'register', 'register2', 'confirmation', 'main'];
+              if (state.currentScreen && validScreens.includes(state.currentScreen)) {
+                console.log('🔄 Restoring rider app state:', state);
+                setCurrentScreen(state.currentScreen);
+              } else {
+                console.log('⚠️ Invalid saved screen, defaulting to main');
+                setCurrentScreen('main');
+              }
+            } catch (e) {
+              console.log('⚠️ Error parsing app state, defaulting to main:', e);
+              setCurrentScreen('main');
+            }
           } else {
             setCurrentScreen('main');
           }
