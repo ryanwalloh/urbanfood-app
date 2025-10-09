@@ -41,8 +41,8 @@ class Command(BaseCommand):
                         unique_filename=False
                     )
                     
-                    # Update database with Cloudinary URL path (relative)
-                    restaurant.profile_picture = f"restaurant_profiles/{os.path.basename(old_path)}"
+                    # Update database with full Cloudinary URL
+                    restaurant.profile_picture = result['secure_url']
                     restaurant.save()
                     
                     self.stdout.write(self.style.SUCCESS(f'  [OK] {restaurant.name}: {old_path}'))
@@ -73,8 +73,8 @@ class Command(BaseCommand):
                         unique_filename=False
                     )
                     
-                    # Update database with Cloudinary URL path (relative)
-                    product.product_picture = f"restaurant_products/{os.path.basename(old_path)}"
+                    # Update database with full Cloudinary URL
+                    product.product_picture = result['secure_url']
                     product.save()
                     
                     self.stdout.write(self.style.SUCCESS(f'  [OK] {product.name}: {old_path}'))
