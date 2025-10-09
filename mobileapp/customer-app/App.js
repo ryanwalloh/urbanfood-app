@@ -9,7 +9,8 @@ import {
   Animated,
   Dimensions,
   Easing,
-  Alert
+  Alert,
+  AppState
 } from 'react-native';
 import { Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -100,6 +101,32 @@ export default function App() {
     loadFonts();
     loadSession();
   }, []);
+
+  // Add AppState listener to restore session when app comes to foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      if (nextAppState === 'active') {
+        // App came to foreground, restore session if user is null
+        if (!user) {
+          try {
+            const sessionData = await AsyncStorage.getItem('user_session');
+            if (sessionData) {
+              const userData = JSON.parse(sessionData);
+              console.log('🔄 App resumed - restored session:', userData);
+              setUser(userData);
+              setCurrentPage('main');
+            }
+          } catch (error) {
+            console.log('Error restoring session on resume:', error);
+          }
+        }
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [user]);
 
   useEffect(() => {
     if (!fontsLoaded) return;

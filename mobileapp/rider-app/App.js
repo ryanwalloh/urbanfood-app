@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, View, AppState } from 'react-native';
 import * as Font from 'expo-font';
 import RiderMainPage from './components/RiderMainPage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,6 +35,28 @@ export default function App() {
 
     loadFonts();
   }, []);
+
+  // Add AppState listener to restore session when app comes to foreground
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextAppState) => {
+      if (nextAppState === 'active' && currentScreen === 'landing') {
+        // App came to foreground, check for existing session
+        try {
+          const storedUser = await AsyncStorage.getItem('rider:user');
+          if (storedUser) {
+            console.log('🔄 App resumed - restored rider session');
+            setCurrentScreen('main');
+          }
+        } catch (error) {
+          console.log('Error restoring session on resume:', error);
+        }
+      }
+    });
+
+    return () => {
+      subscription?.remove();
+    };
+  }, [currentScreen]);
 
   useEffect(() => {
     if (!fontsLoaded) return;
