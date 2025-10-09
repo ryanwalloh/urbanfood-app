@@ -87,11 +87,21 @@ export default function App() {
     const loadSession = async () => {
       try {
         const sessionData = await AsyncStorage.getItem('user_session');
+        const appState = await AsyncStorage.getItem('app_state');
+        
         if (sessionData) {
           const userData = JSON.parse(sessionData);
           console.log('📱 Loaded existing session:', userData);
           setUser(userData);
-          setCurrentPage('main');
+          
+          // Restore app state if it exists
+          if (appState) {
+            const state = JSON.parse(appState);
+            console.log('🔄 Restoring app state:', state);
+            setCurrentPage(state.currentPage || 'main');
+          } else {
+            setCurrentPage('main');
+          }
         }
       } catch (error) {
         console.log('Error loading session:', error);
@@ -102,19 +112,40 @@ export default function App() {
     loadSession();
   }, []);
 
-  // Add AppState listener to restore session when app comes to foreground
+  // Add AppState listener to save/restore state when app is backgrounded/foregrounded
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
-      if (nextAppState === 'active') {
+      if (nextAppState === 'background') {
+        // App going to background - save current state
+        try {
+          const appState = {
+            currentPage,
+          };
+          await AsyncStorage.setItem('app_state', JSON.stringify(appState));
+          console.log('💾 Saved app state:', appState);
+        } catch (error) {
+          console.log('Error saving app state:', error);
+        }
+      } else if (nextAppState === 'active') {
         // App came to foreground, restore session if user is null
         if (!user) {
           try {
             const sessionData = await AsyncStorage.getItem('user_session');
+            const appState = await AsyncStorage.getItem('app_state');
+            
             if (sessionData) {
               const userData = JSON.parse(sessionData);
               console.log('🔄 App resumed - restored session:', userData);
               setUser(userData);
-              setCurrentPage('main');
+              
+              // Restore app state
+              if (appState) {
+                const state = JSON.parse(appState);
+                console.log('🔄 Restored app state:', state);
+                setCurrentPage(state.currentPage || 'main');
+              } else {
+                setCurrentPage('main');
+              }
             }
           } catch (error) {
             console.log('Error restoring session on resume:', error);
@@ -126,7 +157,7 @@ export default function App() {
     return () => {
       subscription?.remove();
     };
-  }, [user]);
+  }, [user, currentPage]);
 
   useEffect(() => {
     if (!fontsLoaded) return;

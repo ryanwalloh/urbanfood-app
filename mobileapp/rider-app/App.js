@@ -36,16 +36,37 @@ export default function App() {
     loadFonts();
   }, []);
 
-  // Add AppState listener to restore session when app comes to foreground
+  // Add AppState listener to save/restore state when app is backgrounded/foregrounded
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
-      if (nextAppState === 'active' && currentScreen === 'landing') {
+      if (nextAppState === 'background') {
+        // App going to background - save current state
+        try {
+          const appState = {
+            currentScreen,
+          };
+          await AsyncStorage.setItem('rider:app_state', JSON.stringify(appState));
+          console.log('💾 Saved rider app state:', appState);
+        } catch (error) {
+          console.log('Error saving app state:', error);
+        }
+      } else if (nextAppState === 'active' && currentScreen === 'landing') {
         // App came to foreground, check for existing session
         try {
           const storedUser = await AsyncStorage.getItem('rider:user');
+          const appState = await AsyncStorage.getItem('rider:app_state');
+          
           if (storedUser) {
             console.log('🔄 App resumed - restored rider session');
-            setCurrentScreen('main');
+            
+            // Restore app state
+            if (appState) {
+              const state = JSON.parse(appState);
+              console.log('🔄 Restored rider app state:', state);
+              setCurrentScreen(state.currentScreen || 'main');
+            } else {
+              setCurrentScreen('main');
+            }
           }
         } catch (error) {
           console.log('Error restoring session on resume:', error);
@@ -61,13 +82,23 @@ export default function App() {
   useEffect(() => {
     if (!fontsLoaded) return;
     
-    // Check if rider is already logged in
+    // Check if rider is already logged in and restore app state
     const checkExistingSession = async () => {
       try {
         const storedUser = await AsyncStorage.getItem('rider:user');
+        const appState = await AsyncStorage.getItem('rider:app_state');
+        
         if (storedUser) {
           console.log('Found existing rider session:', storedUser);
-          setCurrentScreen('main');
+          
+          // Restore app state if it exists
+          if (appState) {
+            const state = JSON.parse(appState);
+            console.log('🔄 Restoring rider app state:', state);
+            setCurrentScreen(state.currentScreen || 'main');
+          } else {
+            setCurrentScreen('main');
+          }
           return;
         }
       } catch (error) {
