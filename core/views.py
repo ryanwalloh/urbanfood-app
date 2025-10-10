@@ -139,6 +139,15 @@ def restaurant_home(request):
     except:
         restaurant = None
 
+    # Get profile picture URL (handle Cloudinary)
+    restaurant_profile_url = ''
+    if restaurant and restaurant.profile_picture:
+        pic_url = str(restaurant.profile_picture)
+        if pic_url.startswith('http'):
+            restaurant_profile_url = pic_url
+        else:
+            restaurant_profile_url = request.build_absolute_uri(restaurant.profile_picture.url)
+
     pending_orders = Order.objects.filter(
         restaurant=request.user,
         status='pending'
@@ -156,10 +165,10 @@ def restaurant_home(request):
 
     return render(request, 'restaurant/dashboard.html', {
         'restaurant': restaurant,
+        'restaurant_profile_url': restaurant_profile_url,
         'pending_orders': pending_orders,
         'preparing_orders': preparing_orders,
         'ready_orders': ready_orders,
-        
     })
 
 
