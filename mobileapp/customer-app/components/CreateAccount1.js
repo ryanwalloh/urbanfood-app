@@ -303,6 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
+    color: '#000000',
     fontFamily: 'Nexa-ExtraLight',
   },
   eyeButton: {
