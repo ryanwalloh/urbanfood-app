@@ -178,13 +178,17 @@ def login_by_password(request):
         print(f"DEBUG: Received login attempt - Email: {email}, Password: {password}")
 
         try:
-            user = User.objects.get(email=email)
-            print(f"DEBUG: Found user with username: {user.username}")
+            found_user = User.objects.get(email=email)
+            print(f"DEBUG: Found user with username: {found_user.username}")
+            print(f"DEBUG: User is_active: {found_user.is_active}")
+            print(f"DEBUG: Password stored: {found_user.password[:20]}...")
+            if not found_user.password.startswith('pbkdf2_'):
+                print("DEBUG: Password appears to be plain text, not hashed!")
         except User.DoesNotExist:
             print("DEBUG: No user found with that email.")
             return JsonResponse({'success': False, 'error': 'Invalid email or password'})
 
-        user = authenticate(request, username=user.username, password=password)
+        user = authenticate(request, username=found_user.username, password=password)
         print(f"DEBUG: authenticate() result: {user}")
 
         if user is not None:
