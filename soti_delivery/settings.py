@@ -128,7 +128,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Add any other directories for static files here.
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 # WhiteNoise configuration for static files
