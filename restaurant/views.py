@@ -88,16 +88,40 @@ def restaurant_detail(request, restaurant_id):
 def dashboard(request):
     # Get restaurant profile
     from restaurant.models import Restaurant
-    restaurant = get_object_or_404(Restaurant, user=request.user)
+    
+    try:
+        restaurant = Restaurant.objects.get(user=request.user)
+        print(f"DEBUG: Found restaurant: {restaurant.name}")
+        print(f"DEBUG: Profile picture field: {restaurant.profile_picture}")
+    except Restaurant.DoesNotExist:
+        print(f"DEBUG: No Restaurant record found for user: {request.user.username} (ID: {request.user.id})")
+        # Create a temporary restaurant object for the template
+        restaurant = type('obj', (object,), {'name': request.user.username, 'profile_picture': None})()
+        restaurant_profile_url = ''
+        pending_orders = Order.objects.filter(status='pending', restaurant=request.user).order_by('-created_at')
+        preparing_orders = Order.objects.filter(status='preparing', restaurant=request.user).order_by('-created_at')
+        ready_orders = Order.objects.filter(status='ready', restaurant=request.user).order_by('-created_at')
+        
+        return render(request, 'restaurant/dashboard.html', {
+            'restaurant': restaurant,
+            'restaurant_profile_url': restaurant_profile_url,
+            'pending_orders': pending_orders,
+            'preparing_orders': preparing_orders,
+            'ready_orders': ready_orders,
+        })
     
     # Get profile picture URL (handle Cloudinary)
     restaurant_profile_url = ''
     if restaurant.profile_picture:
         pic_url = str(restaurant.profile_picture)
+        print(f"DEBUG: Profile picture URL: {pic_url}")
         if pic_url.startswith('http'):
             restaurant_profile_url = pic_url
         else:
             restaurant_profile_url = request.build_absolute_uri(restaurant.profile_picture.url)
+        print(f"DEBUG: Final restaurant_profile_url: {restaurant_profile_url}")
+    else:
+        print("DEBUG: No profile picture set for this restaurant")
     
     # Fetch orders for the logged-in restaurant user
     pending_orders = Order.objects.filter(status='pending', restaurant=request.user).order_by('-created_at')
