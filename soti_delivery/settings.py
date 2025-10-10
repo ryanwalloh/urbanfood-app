@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'anymail',
-    'cloudinary_storage',
-    'cloudinary',
     'users',
     'menu',
     'orders',
@@ -61,6 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',  # Moved AFTER staticfiles
+    'cloudinary',          # Moved AFTER staticfiles
 ]
 
 MIDDLEWARE = [
