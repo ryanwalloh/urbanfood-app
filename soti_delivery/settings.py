@@ -35,6 +35,11 @@ DEBUG = env.bool('DEBUG', default=False)
 # Accept hosts from env (comma-separated), fall back to local/dev hosts
 ALLOWED_HOSTS = [h.strip() for h in env('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',') if h.strip()]
 
+# CSRF Trusted Origins for Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://soti-delivery.up.railway.app',
+]
+
 
 
 # Application definition
