@@ -4,7 +4,7 @@
       "builder": "NIXPACKS"
     },
     "deploy": {
-      "startCommand": "python manage.py collectstatic --noinput --verbosity 2 && python manage.py migrate && python -m daphne soti_delivery.asgi:application --port $PORT --bind 0.0.0.0",
+      "startCommand": "pwd && ls -la && python -c 'import os; from pathlib import Path; BASE_DIR = Path(\"/app\"); print(\"BASE_DIR:\", BASE_DIR); print(\"static path:\", os.path.join(BASE_DIR, \"static\")); print(\"exists?\", os.path.exists(os.path.join(BASE_DIR, \"static\")))' && python manage.py findstatic core/css/index.css --verbosity 2 || echo 'File not found' && python manage.py collectstatic --noinput --verbosity 2 && python manage.py migrate && python -m daphne soti_delivery.asgi:application --port $PORT --bind 0.0.0.0",
       "healthcheckPath": "/",
       "healthcheckTimeout": 100,
       "restartPolicyType": "ON_FAILURE",
