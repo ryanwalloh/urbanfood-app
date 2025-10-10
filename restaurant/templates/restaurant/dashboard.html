@@ -17,7 +17,11 @@
   <header class="header">
 
     <div class="logo-container">
-      <img class="logo-img" src="{{ restaurant.profile_picture.url }}" alt="Profile Picture">
+      {% if restaurant_profile_url %}
+        <img class="logo-img" src="{{ restaurant_profile_url }}" alt="Profile Picture">
+      {% else %}
+        <img class="logo-img" src="{% static 'default-product.png' %}" alt="Default Profile">
+      {% endif %}
       <h1>{{ restaurant.name }}</h1>
     </div>
 

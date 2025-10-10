@@ -86,10 +86,30 @@ def restaurant_detail(request, restaurant_id):
 
 @login_required
 def dashboard(request):
-    # Only fetch orders for the logged-in restaurant user
-    new_orders = Order.objects.filter(status='pending', restaurant=request.user)
+    # Get restaurant profile
+    from restaurant.models import Restaurant
+    restaurant = get_object_or_404(Restaurant, user=request.user)
+    
+    # Get profile picture URL (handle Cloudinary)
+    restaurant_profile_url = ''
+    if restaurant.profile_picture:
+        pic_url = str(restaurant.profile_picture)
+        if pic_url.startswith('http'):
+            restaurant_profile_url = pic_url
+        else:
+            restaurant_profile_url = request.build_absolute_uri(restaurant.profile_picture.url)
+    
+    # Fetch orders for the logged-in restaurant user
+    pending_orders = Order.objects.filter(status='pending', restaurant=request.user).order_by('-created_at')
+    preparing_orders = Order.objects.filter(status='preparing', restaurant=request.user).order_by('-created_at')
+    ready_orders = Order.objects.filter(status='ready', restaurant=request.user).order_by('-created_at')
+    
     return render(request, 'restaurant/dashboard.html', {
-        'new_orders': new_orders,
+        'restaurant': restaurant,
+        'restaurant_profile_url': restaurant_profile_url,
+        'pending_orders': pending_orders,
+        'preparing_orders': preparing_orders,
+        'ready_orders': ready_orders,
     })
 
 @login_required
