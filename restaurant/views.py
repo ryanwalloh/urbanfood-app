@@ -86,29 +86,45 @@ def restaurant_detail(request, restaurant_id):
 
 @login_required
 def dashboard(request):
-    # Get restaurant profile
+    # Get restaurant profile using reverse relationship
     from restaurant.models import Restaurant
     
+    print(f"DEBUG: Logged in user: {request.user.username} (ID: {request.user.id}, Role: {request.user.role})")
+    
     try:
-        restaurant = Restaurant.objects.get(user=request.user)
-        print(f"DEBUG: Found restaurant: {restaurant.name}")
+        # Try reverse relationship first (user.restaurant)
+        restaurant = request.user.restaurant
+        print(f"DEBUG: Found restaurant via reverse relationship: {restaurant.name}")
+        print(f"DEBUG: Restaurant ID: {restaurant.id}")
         print(f"DEBUG: Profile picture field: {restaurant.profile_picture}")
-    except Restaurant.DoesNotExist:
-        print(f"DEBUG: No Restaurant record found for user: {request.user.username} (ID: {request.user.id})")
-        # Create a temporary restaurant object for the template
-        restaurant = type('obj', (object,), {'name': request.user.username, 'profile_picture': None})()
-        restaurant_profile_url = ''
-        pending_orders = Order.objects.filter(status='pending', restaurant=request.user).order_by('-created_at')
-        preparing_orders = Order.objects.filter(status='preparing', restaurant=request.user).order_by('-created_at')
-        ready_orders = Order.objects.filter(status='ready', restaurant=request.user).order_by('-created_at')
-        
-        return render(request, 'restaurant/dashboard.html', {
-            'restaurant': restaurant,
-            'restaurant_profile_url': restaurant_profile_url,
-            'pending_orders': pending_orders,
-            'preparing_orders': preparing_orders,
-            'ready_orders': ready_orders,
-        })
+    except AttributeError:
+        # If reverse relationship doesn't exist, try direct query
+        try:
+            restaurant = Restaurant.objects.get(user=request.user)
+            print(f"DEBUG: Found restaurant via direct query: {restaurant.name}")
+            print(f"DEBUG: Profile picture field: {restaurant.profile_picture}")
+        except Restaurant.DoesNotExist:
+            print(f"DEBUG: No Restaurant record found for user: {request.user.username} (ID: {request.user.id})")
+            # List all restaurants to debug
+            all_restaurants = Restaurant.objects.all()
+            print(f"DEBUG: Total restaurants in DB: {all_restaurants.count()}")
+            for r in all_restaurants[:5]:  # Show first 5
+                print(f"  - Restaurant: {r.name}, User ID: {r.user_id}, Username: {r.user.username}")
+            
+            # Create a temporary restaurant object for the template
+            restaurant = type('obj', (object,), {'name': request.user.username, 'profile_picture': None})()
+            restaurant_profile_url = ''
+            pending_orders = Order.objects.filter(status='pending', restaurant=request.user).order_by('-created_at')
+            preparing_orders = Order.objects.filter(status='preparing', restaurant=request.user).order_by('-created_at')
+            ready_orders = Order.objects.filter(status='ready', restaurant=request.user).order_by('-created_at')
+            
+            return render(request, 'restaurant/dashboard.html', {
+                'restaurant': restaurant,
+                'restaurant_profile_url': restaurant_profile_url,
+                'pending_orders': pending_orders,
+                'preparing_orders': preparing_orders,
+                'ready_orders': ready_orders,
+            })
     
     # Get profile picture URL (handle Cloudinary)
     restaurant_profile_url = ''
