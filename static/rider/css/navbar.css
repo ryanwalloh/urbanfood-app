@@ -12,17 +12,15 @@ nav {
     background-color: #fff; /* Optional: add a background color */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Optional: add shadow */
     z-index: 1000;    /* Ensure the nav is above other content */
-    padding: 20px 0;  /* Adjust padding as necessary */
-    height: 60px;
-
-
+    padding: 12px 0;  /* Adjust padding as necessary */
+    height: 80px;     /* Increased height to accommodate labels */
 }
 
 @media (max-width: 768px) {
     .navbar {
-       padding: 20px 0px 40px 0px;
+       padding: 20px 0px 60px 0px;
        
-    
+   
     }
     
     .links-container {
@@ -39,7 +37,8 @@ nav {
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        line-height: 0px;
+        gap: 4px;
+        padding: 8px 4px;
     }
 
     .icon-container {
@@ -57,6 +56,16 @@ nav {
     
     .icon-container img:hover {
         filter: grayscale(0%); /* Revert to color on hover */
+    }
+
+    /* Navigation text labels */
+    .link span, .link p {
+        font-size: 10px;
+        font-weight: 500;
+        color: #666;
+        text-align: center;
+        margin-top: 2px;
+        line-height: 1.2;
     }
 
     .main-container {
