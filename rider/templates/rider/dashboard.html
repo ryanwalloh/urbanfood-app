@@ -68,11 +68,12 @@
     <!-- Orders Container -->
     <div class="orders-container" id="ordersContainer">
         <div class="orders-content">
-            <img class="orders-icon" src="{% static 'icons/delivery-bag.png' %}" alt="Orders">
+            <img class="orders-icon" src="{% static 'icons/foodPack.png' %}" alt="Orders">
             <div class="orders-text-container">
-                <div class="orders-title" id="ordersTitle">No available orders at the moment.</div>
+                <div class="orders-title" id="ordersTitle">Download the app to receive orders</div>
                 <div class="view-orders-text">
-                    <a href="/rider/orders/" class="cta-view-link">View details &gt;</a>
+                    <a href="/rider/orders/" class="cta-view-link">Download &gt;</a>
+                    <img class="google-play-icon" src="{% static 'rider/images/googleplay.png' %}" alt="Google Play Store">
                 </div>
             </div>
         </div>
@@ -128,7 +129,7 @@
             if (data.new_status === 'Online') {
                 toggleButton.classList.add('toggle-button-active');
                 toggleCircle.classList.add('toggle-circle-active');
-                statusMessage.innerText = 'Open to any delivery';
+                statusMessage.innerText = 'Download the app to receive orders';
                 offlineOverlay.style.display = 'none';
             } else {
                 toggleButton.classList.remove('toggle-button-active');
@@ -163,7 +164,7 @@
                 if (data.count >= 1) {
                     ordersTitle.innerText = `${data.count} delivery orders found!`;
                 } else {
-                    ordersTitle.innerText = 'No available orders at the moment.';
+                    ordersTitle.innerText = 'Download the app to receive orders';
                 }
             });
     }

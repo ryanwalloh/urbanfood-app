@@ -48,13 +48,13 @@ body {
 
 .hero-button {
     position: absolute;
-    top: 20px;
+    top: 40px;
     z-index: 5;
     left: 20px;
     padding: 8px 16px;
     border-radius: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.4);
+
 }
 
 .hero-button-text {
@@ -83,7 +83,7 @@ body {
     background-color: rgba(0, 0, 0, 0.3);
     padding: 12px;
     border-radius: 12px;
-    backdrop-filter: blur(10px);
+
     max-width: 70%;
     flex: 1;
 }
@@ -134,10 +134,10 @@ body {
 
 .clock-container,
 .session-timer-container {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
     padding: 8px 12px;
     border-radius: 12px;
-    backdrop-filter: blur(10px);
+
     text-align: center;
 }
 
@@ -268,6 +268,9 @@ body {
 .view-orders-text {
     font-size: 14px;
     font-weight: 300;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .cta-view-link {
@@ -280,6 +283,12 @@ body {
 .cta-view-link:hover {
     opacity: 1;
     text-decoration: underline;
+}
+
+.google-play-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
 }
 
 /* Offline Overlay */
@@ -400,7 +409,7 @@ body {
     }
     
     .hero-button {
-        top: 15px;
+        top: -75px;
         left: 15px;
         padding: 6px 12px;
         border-radius: 16px;
@@ -441,16 +450,16 @@ body {
     .status-container {
         margin: -25px auto 15px auto;
         border-radius: 60px;
-        width: calc(100% - 30px);
-        max-width: 350px;
-        min-width: 350px;
+        width: calc(100% - 20px);
+        max-width: 400px;
+        min-width: 400px;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     
     .status-content {
-        padding: 12px 16px;
+        padding: 8px 16px;
     }
     
     .status-title {
@@ -462,13 +471,18 @@ body {
     }
     
     .orders-icon {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
         margin-right: 20px;
     }
     
     .orders-title {
         font-size: 18px;
+    }
+    
+    .google-play-icon {
+        width: 18px;
+        height: 18px;
     }
     
     .assignments-container {
@@ -558,6 +572,11 @@ body {
     
     .orders-title {
         font-size: 16px;
+    }
+    
+    .google-play-icon {
+        width: 16px;
+        height: 16px;
     }
     
     .assignment-card {
