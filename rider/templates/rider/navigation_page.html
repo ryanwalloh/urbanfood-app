@@ -471,13 +471,7 @@
                 map: map,
                 title: 'Your Live Location',
                 icon: {
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="16" cy="16" r="12" fill="#F43332" stroke="#FFFFFF" stroke-width="3"/>
-                            <circle cx="16" cy="16" r="6" fill="#FFFFFF"/>
-                            <circle cx="16" cy="16" r="2" fill="#F43332"/>
-                        </svg>
-                    `),
+                    url: '{% static "rider/images/ridermarker.png" %}',
                     scaledSize: new google.maps.Size(32, 32),
                     anchor: new google.maps.Point(16, 16)
                 },
@@ -531,14 +525,9 @@
             map: map,
             title: 'Iligan City (Location not available)',
             icon: {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="12" cy="12" r="8" fill="#FFA500" stroke="#FFFFFF" stroke-width="2"/>
-                        <circle cx="12" cy="12" r="3" fill="#FFFFFF"/>
-                    </svg>
-                `),
-                scaledSize: new google.maps.Size(24, 24),
-                anchor: new google.maps.Point(12, 12)
+                url: '{% static "rider/images/ridermarker.png" %}',
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 16)
             }
         });
     }
@@ -703,16 +692,15 @@
     /* Zoom Controls */
     .zoom-controls {
         position: absolute;
-        top: 80px;
+        top: 20px;
         right: 20px;
         z-index: 1000;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 6px;
     }
-
     .zoom-button {
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: rgba(223, 35, 35, 0.7);
         border: none;
         border-radius: 4px;
         width: 40px;
@@ -723,10 +711,11 @@
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         transition: all 0.3s ease;
+        color: #FFFFFF;
     }
 
     .zoom-button:hover {
-        background-color: rgba(255, 255, 255, 1);
+        background-color: rgb(216, 91, 91);
         transform: scale(1.05);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
@@ -736,9 +725,9 @@
     }
 
     .zoom-button svg {
-        color: #333;
-        width: 16px;
-        height: 16px;
+        color: #f7f7f7;
+        width: 46px;
+        height: 46px;
     }
 
     .zoom-in {
@@ -817,8 +806,8 @@
         }
 
         .back-button svg {
-            width: 18px;
-            height: 18px;
+            width: 28px;
+            height: 28px;
         }
 
         .tracking-indicator {
@@ -829,18 +818,18 @@
         }
 
         .zoom-controls {
-            top: 70px;
+            top: 480px;
             right: 15px;
         }
 
         .zoom-button {
-            width: 36px;
-            height: 36px;
+            width: 46px;
+            height: 46px;
         }
 
         .zoom-button svg {
-            width: 14px;
-            height: 14px;
+            width: 24px;
+            height: 24px;
         }
 
         .bottom-navigation-container {
@@ -874,8 +863,8 @@
         }
 
         .back-button svg {
-            width: 16px;
-            height: 16px;
+            width: 26px;
+            height: 26px;
         }
 
         .tracking-indicator {
