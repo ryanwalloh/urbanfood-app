@@ -19,7 +19,7 @@ nav {
 @media (max-width: 768px) {
     .navbar {
        padding: 20px 0px 60px 0px;
-       
+   
    
     }
     
@@ -45,6 +45,7 @@ nav {
         width: 30px;
         object-fit: cover;
         overflow: hidden;
+        margin-bottom: 20px;
     }
 
     .icon-container img {
@@ -64,7 +65,7 @@ nav {
         font-weight: 500;
         color: #666;
         text-align: center;
-        margin-top: 2px;
+        margin-top: 10px;
         line-height: 1.2;
     }
 

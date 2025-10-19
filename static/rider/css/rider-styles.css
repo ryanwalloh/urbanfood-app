@@ -480,6 +480,7 @@ body {
     .hero-container {
         height: 300px;
     }
+   
     
     .hero-button {
         top: -75px;
@@ -610,6 +611,58 @@ body {
         margin: 0 12px 12px 12px;
         border-radius: 8px;
     }
+
+    .navbar {
+        padding: 20px 0px 80px 0px;
+    
+    
+     }
+     
+     .links-container {
+         display: flex;
+         gap: 10px;
+         justify-content: space-between;
+         align-items: center;
+         margin: 0 auto;
+         padding: 0px 30px 0px 30px;
+     }
+ 
+     .link {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         flex-direction: column;
+         gap: 4px;
+         padding: 8px 4px;
+     }
+ 
+     .icon-container {
+         width: 30px;
+         object-fit: cover;
+         overflow: hidden;
+
+     }
+ 
+     .icon-container img {
+         width: 100%;
+         object-fit: cover;
+         filter: grayscale(100%) opacity(0.6); /* Apply grayscale and slightly reduce opacity */
+         transition: filter 0.3s ease; /* Smooth transition */
+     }
+     
+     .icon-container img:hover {
+         filter: grayscale(0%); /* Revert to color on hover */
+     }
+ 
+     /* Navigation text labels */
+     .link span, .link p {
+         font-size: 10px;
+         font-weight: 500;
+         color: #666;
+         text-align: center;
+         margin-top: 0px;
+         line-height: 1.2;
+     }
 }
 
 @media (max-width: 480px) {
