@@ -3,7 +3,8 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from rider.models import Rider
 from .models import Rider, RiderEarnings
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from orders.models import Order, OrderLine
 from customer.models import Address, Customer
 from restaurant.models import Restaurant
@@ -443,12 +444,26 @@ def profile_page(request):
     """Profile page view"""
     try:
         rider = Rider.objects.get(user=request.user)
+        
+        if request.method == 'POST':
+            from .forms import RiderProfileForm
+            form = RiderProfileForm(request.POST, request.FILES, instance=rider)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('rider:profile')
+        else:
+            from .forms import RiderProfileForm
+            form = RiderProfileForm(instance=rider)
+            
         return render(request, 'rider/profile.html', {
             'rider': rider,
-            'user': request.user
+            'user': request.user,
+            'form': form
         })
     except Rider.DoesNotExist:
         return render(request, 'rider/profile.html', {
             'rider': None,
-            'user': request.user
+            'user': request.user,
+            'form': None
         })

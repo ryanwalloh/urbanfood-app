@@ -1,6 +1,7 @@
 # rider/models.py
 from django.conf import settings
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -11,6 +12,7 @@ class Rider(models.Model):
     license_number = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)
     is_available = models.BooleanField(default=True)
+    profile_picture = CloudinaryField('profile_picture', null=True, blank=True, help_text="Upload your profile picture")
 
     def __str__(self):
         return self.user.username
