@@ -141,12 +141,15 @@
     .back-button {
         position: absolute;
         left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
         background: none;
         border: none;
         padding: 8px;
         border-radius: 8px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        z-index: 10;
     }
 
     .back-button:hover {
@@ -165,6 +168,7 @@
         color: #333;
         margin: 0;
         text-align: center;
+        padding: 0 60px; /* Add padding to prevent overlap with back button */
     }
 
     .header-spacer {
@@ -297,7 +301,7 @@
     }
 
     .primary-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ce3d2a 0%, #764ba2 100%);
         color: #FFFFFF;
         box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
@@ -330,8 +334,13 @@
             padding: 16px;
         }
 
+        .back-button {
+            left: 16px;
+        }
+
         .profile-title {
             font-size: 18px;
+            padding: 0 50px;
         }
 
         .profile-content {
@@ -370,8 +379,13 @@
             padding: 12px;
         }
 
+        .back-button {
+            left: 12px;
+        }
+
         .profile-title {
             font-size: 16px;
+            padding: 0 40px;
         }
 
         .profile-content {
