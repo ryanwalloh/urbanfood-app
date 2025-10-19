@@ -20,6 +20,12 @@
         </svg>
     </button>
     
+    <!-- Live Tracking Indicator (Top Right) -->
+    <div class="tracking-indicator" id="trackingIndicator">
+        <div class="tracking-dot"></div>
+        <span class="tracking-text">Live Tracking</span>
+    </div>
+    
     <!-- Bottom Container -->
     <div class="bottom-navigation-container">
         <div class="download-message">
@@ -32,7 +38,7 @@
             </div>
             <div class="download-content">
                 <h3>Get the Full Experience</h3>
-                <p>Download our mobile app to access live navigation, real-time order tracking, and exclusive rider features.</p>
+                <p>Download our mobile app to access rider assignments, real-time order tracking, and exclusive rider features.</p>
                 <div class="download-buttons">
                     <img class="google-play-download" src="{% static 'rider/images/googleplay.png' %}" alt="Download on Google Play">
                 </div>
@@ -48,6 +54,8 @@
     let map;
     let userMarker;
     let watchId;
+    let isTracking = false;
+    let currentLocation = null;
 
     // Custom map styles
     const mapStyles = [
@@ -358,7 +366,7 @@
         const iliganCity = { lat: 8.2474, lng: 124.2452 };
         
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 15,
+            zoom: 16,
             center: iliganCity,
             styles: mapStyles,
             mapTypeControl: false,
@@ -370,56 +378,132 @@
             }
         });
 
-        // Get user's current location
-        getCurrentLocation();
+        // Start live location tracking
+        startLiveTracking();
     }
 
-    // Get current location using GPS
-    function getCurrentLocation() {
+    // Start live location tracking
+    function startLiveTracking() {
         if (navigator.geolocation) {
+            console.log('🔄 Starting live location tracking...');
+            
+            // Get initial position
             navigator.geolocation.getCurrentPosition(
                 function(position) {
-                    const userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    
-                    // Center map on user location
-                    map.setCenter(userLocation);
-                    
-                    // Add user marker
-                    userMarker = new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        title: 'Your Location',
-                        icon: {
-                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="12" cy="12" r="8" fill="#F43332" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="12" cy="12" r="3" fill="#FFFFFF"/>
-                                </svg>
-                            `),
-                            scaledSize: new google.maps.Size(24, 24),
-                            anchor: new google.maps.Point(12, 12)
-                        }
-                    });
-                    
-                    console.log('📍 User location found:', userLocation);
+                    updateLocation(position);
+                    startWatchingLocation();
                 },
                 function(error) {
-                    console.log('❌ Location error:', error.message);
-                    // Fallback to Iligan City if GPS fails
+                    console.log('❌ Initial location error:', error.message);
                     showLocationError();
                 },
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 300000
+                    maximumAge: 0
                 }
             );
         } else {
             console.log('❌ Geolocation not supported');
             showLocationError();
+        }
+    }
+
+    // Start watching location changes
+    function startWatchingLocation() {
+        if (navigator.geolocation) {
+            watchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    updateLocation(position);
+                },
+                function(error) {
+                    console.log('❌ Watch location error:', error.message);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 5000
+                }
+            );
+            isTracking = true;
+            console.log('✅ Live tracking started');
+            
+            // Show tracking indicator
+            const trackingIndicator = document.getElementById('trackingIndicator');
+            if (trackingIndicator) {
+                trackingIndicator.classList.add('active');
+            }
+        }
+    }
+
+    // Update location on map
+    function updateLocation(position) {
+        const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+        
+        currentLocation = userLocation;
+        
+        // Center map on user location
+        map.setCenter(userLocation);
+        
+        // Update or create user marker
+        if (userMarker) {
+            userMarker.setPosition(userLocation);
+        } else {
+            userMarker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: 'Your Live Location',
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="12" fill="#F43332" stroke="#FFFFFF" stroke-width="3"/>
+                            <circle cx="16" cy="16" r="6" fill="#FFFFFF"/>
+                            <circle cx="16" cy="16" r="2" fill="#F43332"/>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(32, 32),
+                    anchor: new google.maps.Point(16, 16)
+                },
+                animation: google.maps.Animation.DROP
+            });
+        }
+        
+        // Add accuracy circle
+        const accuracyCircle = new google.maps.Circle({
+            strokeColor: '#F43332',
+            strokeOpacity: 0.3,
+            strokeWeight: 2,
+            fillColor: '#F43332',
+            fillOpacity: 0.1,
+            map: map,
+            center: userLocation,
+            radius: position.coords.accuracy
+        });
+        
+        // Remove previous accuracy circle after 5 seconds
+        setTimeout(() => {
+            accuracyCircle.setMap(null);
+        }, 5000);
+        
+        console.log('📍 Location updated:', userLocation, 'Accuracy:', position.coords.accuracy + 'm');
+    }
+
+    // Stop live tracking
+    function stopLiveTracking() {
+        if (watchId) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+            isTracking = false;
+            console.log('⏹️ Live tracking stopped');
+            
+            // Hide tracking indicator
+            const trackingIndicator = document.getElementById('trackingIndicator');
+            if (trackingIndicator) {
+                trackingIndicator.classList.remove('active');
+            }
         }
     }
 
@@ -447,8 +531,15 @@
 
     // Go back to dashboard
     function goBack() {
+        // Stop live tracking before leaving
+        stopLiveTracking();
         window.location.href = '/rider/dashboard/';
     }
+
+    // Clean up when page is unloaded
+    window.addEventListener('beforeunload', function() {
+        stopLiveTracking();
+    });
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
@@ -503,6 +594,51 @@
         color: #333;
         width: 20px;
         height: 20px;
+    }
+
+    /* Live Tracking Indicator */
+    .tracking-indicator {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #FFFFFF;
+        padding: 8px 16px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .tracking-indicator.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .tracking-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #00FF00;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(0, 255, 0, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+        }
     }
 
     /* Bottom Container */
@@ -577,6 +713,13 @@
             height: 18px;
         }
 
+        .tracking-indicator {
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
         .bottom-navigation-container {
             padding: 15px;
         }
@@ -610,6 +753,13 @@
         .back-button svg {
             width: 16px;
             height: 16px;
+        }
+
+        .tracking-indicator {
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         .bottom-navigation-container {
