@@ -832,7 +832,7 @@
     /* Zoom Controls */
     .zoom-controls {
         position: absolute;
-        top: 20px;
+   
         right: 20px;
         z-index: 1000;
         display: flex;
@@ -852,6 +852,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         transition: all 0.3s ease;
         color: #FFFFFF;
+   
     }
 
     .zoom-button:hover {
@@ -866,8 +867,10 @@
 
     .zoom-button svg {
         color: #f7f7f7;
-        width: 46px;
-        height: 46px;
+        max-width: 16px;
+        max-height: 16px;
+        min-width: 16px;
+        min-height: 16px;
     }
 
     .zoom-in {
@@ -880,8 +883,8 @@
 
     /* Traffic Status Container */
     .traffic-status-container {
-        position: absolute;
-        bottom: 120px;
+      
+        bottom: 0px;
         left: 20px;
         right: 20px;
         z-index: 1000;
@@ -893,7 +896,7 @@
         align-items: center;
         gap: 12px;
         opacity: 0;
-        transform: translateY(20px);
+       
         transition: all 0.3s ease;
     }
 
@@ -1026,11 +1029,15 @@
             left: 15px;
             width: 44px;
             height: 44px;
+            
+          
         }
 
         .back-button svg {
-            width: 28px;
-            height: 28px;
+            max-width: 22px;
+            max-height: 22px;
+            min-width: 22px;
+            min-height: 22px;
         }
 
         .tracking-indicator {
@@ -1041,8 +1048,7 @@
         }
 
         .zoom-controls {
-            top: 420px;
-            right: 15px;
+            transform: translateY(400px);
         }
 
         .zoom-button {
@@ -1056,11 +1062,13 @@
         }
 
         .traffic-status-container {
-            bottom: 220px;
+            position: absolute;
+            margin-top: 535px;
             left: 15px;
             right: 15px;
             padding: 10px 14px;
             height: 50px;
+            
             z-index: 1000;
         }
 
@@ -1074,19 +1082,29 @@
 
         .bottom-navigation-container {
             padding: 15px;
+            display: flex;
+       
         }
 
         .download-message {
             padding: 20px;
             gap: 16px;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .download-content {
+            flex: 1;
         }
 
         .download-content h3 {
             font-size: 16px;
+            margin-bottom: 4px;
         }
 
         .download-content p {
             font-size: 13px;
+            margin-bottom: 0;
         }
 
         .google-play-download {
