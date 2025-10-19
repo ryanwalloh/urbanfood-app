@@ -2,66 +2,109 @@
 
 {% load static %}
 
-
-
-
 {% if not user.is_authenticated %}
     <script>window.location.href = "/";</script>
 {% endif %}
-
 
 {% block content %}
 {% include 'layout/rider/navbar.html' %}
 
 <div class="main-container">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <div class="header-container">
-        <div class="header-img-container">
-            <img class="header-img" src="{% static 'icons/header.png' %}" alt="Header">
-        </div>
-        <div class="header-data">
-            <div class="level1">
-                <button id="level" disabled>Soti Delivery</button>
+    
+    <!-- Hero Section -->
+    <div class="hero-container">
+        <img class="hero-image" src="{% static 'icons/header.webp' %}" alt="Hero Background">
+        
+        <!-- Hero Content Overlay -->
+        <div class="hero-content">
+            <div class="hero-title">
+                <h1>Welcome back, {{ user.first_name }}!</h1>
             </div>
-            <div class="name">
-                <h2>Partner {{ user.first_name }}</h2>
-            </div>
-
-            <div class="earnings">
-                <h3>Your Earnings</h3>
-                <h1>₱0.0<span id="totalEarnings">{{ total_earnings }}</span></h1>
-            </div>
-        </div>
-
-        <div class="status-container">
-            <div class="wrap-left">
-                <h1>Status: <span id="status">{{ rider.is_available|yesno:"Online,Offline" }}</span></h1>
-                <p id="statusMessage">
-                    {{ rider.is_available|yesno:"Open to any delivery,Turn on status to receive Delivery Assignments" }}
-                </p>
-            </div>
-            <div class="wrap-right">
-                <img class="on" src="{% static 'icons/' %}{{ rider.is_available|yesno:'online,offline' }}.png" id="toggleStatus" alt="Toggle Status">
-            </div>
-        </div>
-
-        <div id="order-cta" class="order-cta-container">
-            <div class="cta-orders">
-                <div class="order-bag-container">
-                    <img id="orderBag" class="orderBag" src="{% static 'icons/delivery-bag.png' %}" alt="Delivery Bag">
+            
+            <div class="main-info-container">
+                <!-- Weather Container -->
+                <div class="weather-container">
+                    <div class="weather-text">
+                        <span id="temperature">--</span><span class="degree-symbol">°</span><span class="degree-unit">C</span>
+                    </div>
+                    <div class="weather-description" id="weatherDescription">Loading weather...</div>
+                    <div class="location-text" id="locationText">Getting location...</div>
                 </div>
-                <div class="order-cta-details" id="ctaDetails">
-                    <h1 class="cta1"></h1>
-                    <a class="ctaView" href="/rider/orders/">View details &gt;</a>
+                
+                <!-- Time Column -->
+                <div class="time-column">
+                    <div class="clock-container">
+                        <div class="clock-text" id="currentTime">--:--</div>
+                        <div class="clock-description">Current Time</div>
+                    </div>
+                    <div class="session-timer-container">
+                        <div class="session-timer-text" id="sessionTimer">--:--</div>
+                        <div class="session-timer-description">Session Time</div>
+                    </div>
                 </div>
             </div>
         </div>
- 
     </div>
+
+    <!-- Status Container -->
+    <div class="status-container">
+        <div class="status-content">
+            <div class="status-text-container">
+                <div class="status-title">Status: <span id="status">{{ rider.is_available|yesno:"Online,Offline" }}</span></div>
+                <div class="status-subtitle" id="statusMessage">
+                    {{ rider.is_available|yesno:"Open to any delivery,Turn on status to receive Delivery Assignments" }}
+                </div>
+            </div>
+            <div class="toggle-button" id="toggleButton" onclick="toggleStatus()">
+                <div class="toggle-circle" id="toggleCircle"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Container -->
+    <div class="orders-container" id="ordersContainer">
+        <div class="orders-content">
+            <img class="orders-icon" src="{% static 'icons/delivery-bag.png' %}" alt="Orders">
+            <div class="orders-text-container">
+                <div class="orders-title" id="ordersTitle">No available orders at the moment.</div>
+                <div class="view-orders-text">
+                    <a href="/rider/orders/" class="cta-view-link">View details &gt;</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Offline Overlay -->
+        <div class="offline-overlay" id="offlineOverlay" style="display: none;">
+            <div class="offline-text">You're Offline</div>
+            <div class="offline-subtext">Turn on your status to receive delivery assignments</div>
+        </div>
+    </div>
+
+    <!-- Assignments Section -->
+    <div class="assignments-container">
+        <div class="section-title">Recent Assignments</div>
+        <div class="assignment-card">
+            <div class="assignment-header">
+                <div class="restaurant-name">Sample Restaurant</div>
+                <div class="assignment-amount">₱150.00</div>
+            </div>
+            <div class="customer-name">Customer: John Doe</div>
+            <div class="assignment-address">123 Main Street, City</div>
+            <div class="assignment-footer">
+                <div class="assignment-status">Completed</div>
+                <div class="assignment-time">2 hours ago</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Padding for Navigation -->
+    <div class="bottom-padding"></div>
 </div>
 
 <script>
-    document.getElementById('toggleStatus').addEventListener('click', function() {
+    // Status Toggle Functionality
+    function toggleStatus() {
         fetch("{% url 'rider:toggle_status' %}", {
             method: 'POST',
             headers: {
@@ -72,84 +115,116 @@
         .then(response => response.json())
         .then(data => {
             document.getElementById('status').innerText = data.new_status;
-            document.getElementById('toggleStatus').src = "{% static 'icons/' %}" + data.status_image;
-
-            // Update the paragraph message
-            const messageElement = document.getElementById('statusMessage');
-            const orderCta = document.getElementById('order-cta');
-
+            
+            // Update toggle button appearance
+            const toggleButton = document.getElementById('toggleButton');
+            const toggleCircle = document.getElementById('toggleCircle');
+            const statusMessage = document.getElementById('statusMessage');
+            const offlineOverlay = document.getElementById('offlineOverlay');
+            
             if (data.new_status === 'Online') {
-                messageElement.innerText = 'Open to any delivery';
-                orderCta.style.display = 'block';
+                toggleButton.classList.add('toggle-button-active');
+                toggleCircle.classList.add('toggle-circle-active');
+                statusMessage.innerText = 'Open to any delivery';
+                offlineOverlay.style.display = 'none';
             } else {
-                messageElement.innerText = 'Turn on status to receive Delivery Assignments';
-                orderCta.style.display = 'none';
+                toggleButton.classList.remove('toggle-button-active');
+                toggleCircle.classList.remove('toggle-circle-active');
+                statusMessage.innerText = 'Turn on status to receive Delivery Assignments';
+                offlineOverlay.style.display = 'flex';
             }
         });
+    }
+
+    // Initialize toggle button state
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.getElementById('toggleButton');
+        const toggleCircle = document.getElementById('toggleCircle');
+        const offlineOverlay = document.getElementById('offlineOverlay');
+        
+        {% if rider.is_available %}
+            toggleButton.classList.add('toggle-button-active');
+            toggleCircle.classList.add('toggle-circle-active');
+            offlineOverlay.style.display = 'none';
+        {% else %}
+            offlineOverlay.style.display = 'flex';
+        {% endif %}
     });
 
-    const ordersUrl = "{% url 'rider:orders' %}";
-
+    // Order Count Updates
     function updateOrderCount() {
         fetch("{% url 'rider:get_order_count' %}")
             .then(response => response.json())
             .then(data => {
+                const ordersTitle = document.getElementById('ordersTitle');
                 if (data.count >= 1) {
-                    document.getElementById('ctaDetails').innerHTML =
-                       `<h1 class="cta1">${data.count} delivery orders found!</h1>
-                        <a class="ctaView" href="${ordersUrl}">View details &gt;</a>`;
+                    ordersTitle.innerText = `${data.count} delivery orders found!`;
                 } else {
-                    document.getElementById('ctaDetails').innerHTML =
-                        `<h1 class="cta1">No available orders at the moment.</h1>`;
-                       
+                    ordersTitle.innerText = 'No available orders at the moment.';
                 }
-                
             });
     }
 
+    // Earnings Updates
     function updateEarnings() {
-    const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
-    if (!csrfTokenElement) {
-        console.error("CSRF token not found.");
-        return;
+        const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfTokenElement) {
+            console.error("CSRF token not found.");
+            return;
+        }
+
+        fetch("{% url 'rider:fetch_updated_earnings' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfTokenElement.value
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.total_earnings) {
+                // Update earnings display if needed
+                console.log('Updated earnings:', data.total_earnings);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching updated earnings:', error);
+        });
     }
 
-    fetch("{% url 'rider:fetch_updated_earnings' %}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfTokenElement.value
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.total_earnings) {
-            // Update the earnings on the page
-            document.getElementById('totalEarnings').textContent = data.total_earnings.toFixed(2);
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching updated earnings:', error);
+    // Time Updates
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour12: false, 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        document.getElementById('currentTime').textContent = timeString;
+    }
+
+    // Weather API (placeholder - you can integrate with a real weather API)
+    function updateWeather() {
+        // Placeholder weather data
+        document.getElementById('temperature').textContent = '25';
+        document.getElementById('weatherDescription').textContent = 'Partly Cloudy';
+        document.getElementById('locationText').textContent = 'Manila, Philippines';
+    }
+
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTime();
+        updateWeather();
+        updateOrderCount();
+        updateEarnings();
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+        
+        // Update other data periodically
+        setInterval(updateOrderCount, 30000);
+        setInterval(updateEarnings, 60000);
     });
-}
-
-
-    // Optionally, set a timer to update earnings periodically
-    setInterval(updateEarnings, 60000);  // Update every 60 seconds (1 minute)
-    
-    // Call it once when the page loads
-    updateEarnings();
-
-    
-
-    // Call it once on page load
-    updateOrderCount();
-
-    setInterval(updateOrderCount, 30000);
-
-    
-
-
 </script>
     
 
