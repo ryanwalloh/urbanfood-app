@@ -239,12 +239,14 @@ body {
     border-radius: 0;
     position: relative;
     overflow: hidden;
+    width: fit-content;
+    min-width: 100%;
 }
 
 .orders-content {
     display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 16px 20px;
 }
 
 .orders-icon {
@@ -262,7 +264,16 @@ body {
     font-size: 20px;
     font-weight: 800;
     color: #333;
-    margin-bottom: 4px;
+  
+}
+
+
+
+.orders-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 8px;
 }
 
 .view-orders-text {
@@ -286,8 +297,8 @@ body {
 }
 
 .google-play-icon {
-    width: 20px;
-    height: 20px;
+    width: 120px;
+    height: 40px;
     object-fit: contain;
 }
 
@@ -481,8 +492,9 @@ body {
     }
     
     .google-play-icon {
-        width: 18px;
-        height: 18px;
+        width: 100px;
+        height: 32px;
+        opacity: 0.8;
     }
     
     .assignments-container {
@@ -575,8 +587,8 @@ body {
     }
     
     .google-play-icon {
-        width: 16px;
-        height: 16px;
+        width: 80px;
+        height: 28px;
     }
     
     .assignment-card {
