@@ -640,7 +640,7 @@
             </div>
             
             <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeProfileEditModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary" onclick="closeProfileEditModal()" id="cancelButton">Cancel</button>
                 <button type="submit" class="btn btn-primary" id="saveButton" onclick="showLoadingState()">
                     <span id="saveButtonText">Update</span>
                     <span id="saveButtonSpinner" style="display: none;">
@@ -653,6 +653,7 @@
                         Updating...
                     </span>
                 </button>
+                <button type="button" class="btn btn-secondary" id="cancelUploadButton" style="display: none;" onclick="cancelUpload()">Cancel Upload</button>
             </div>
         </form>
         {% endif %}
@@ -670,29 +671,39 @@ function openProfileEditModal() {
 function closeProfileEditModal() {
     document.getElementById('profileEditModal').classList.remove('active');
     document.body.style.overflow = 'auto';
+    hideLoadingState(); // Reset loading state when closing modal
 }
 
 function showLoadingState() {
     const saveButton = document.getElementById('saveButton');
     const saveButtonText = document.getElementById('saveButtonText');
     const saveButtonSpinner = document.getElementById('saveButtonSpinner');
+    const cancelUploadButton = document.getElementById('cancelUploadButton');
     
     // Show loading state
     saveButton.disabled = true;
     saveButtonText.style.display = 'none';
     saveButtonSpinner.style.display = 'inline-flex';
     saveButtonSpinner.style.alignItems = 'center';
+    cancelUploadButton.style.display = 'inline-block';
 }
 
 function hideLoadingState() {
     const saveButton = document.getElementById('saveButton');
     const saveButtonText = document.getElementById('saveButtonText');
     const saveButtonSpinner = document.getElementById('saveButtonSpinner');
+    const cancelUploadButton = document.getElementById('cancelUploadButton');
     
     // Hide loading state
     saveButton.disabled = false;
     saveButtonText.style.display = 'inline';
     saveButtonSpinner.style.display = 'none';
+    cancelUploadButton.style.display = 'none';
+}
+
+function cancelUpload() {
+    hideLoadingState();
+    alert('Upload cancelled. You can try again or close the modal.');
 }
 
 // Close modal when clicking outside
@@ -710,6 +721,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if form is valid before showing loading state
             if (form.checkValidity()) {
                 showLoadingState();
+                
+                // Add timeout to prevent infinite loading
+                setTimeout(function() {
+                    hideLoadingState();
+                    alert('Upload is taking longer than expected. Please try again.');
+                }, 30000); // 30 second timeout
+                
+                console.log('Form submission started...');
             } else {
                 // If form is invalid, don't show loading state
                 e.preventDefault();

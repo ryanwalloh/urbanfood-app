@@ -447,9 +447,19 @@ def profile_page(request):
         
         if request.method == 'POST':
             from .forms import RiderProfileForm
+            print(f"POST request received for rider profile update")
+            print(f"Files: {request.FILES}")
+            print(f"POST data: {request.POST}")
+            
             form = RiderProfileForm(request.POST, request.FILES, instance=rider)
+            print(f"Form is valid: {form.is_valid()}")
+            if not form.is_valid():
+                print(f"Form errors: {form.errors}")
+            
             if form.is_valid():
+                print("Saving form...")
                 form.save()
+                print("Form saved successfully")
                 messages.success(request, 'Profile updated successfully!')
                 return redirect('rider:profile')
             else:
