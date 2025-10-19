@@ -195,6 +195,9 @@
         });
     }
 
+    // Session Timer
+    let sessionStartTime = Date.now();
+    
     // Time Updates
     function updateTime() {
         const now = new Date();
@@ -205,6 +208,25 @@
             second: '2-digit'
         });
         document.getElementById('currentTime').textContent = timeString;
+    }
+    
+    // Session Timer Updates
+    function updateSessionTimer() {
+        const currentTime = Date.now();
+        const sessionDuration = currentTime - sessionStartTime;
+        
+        // Convert milliseconds to hours, minutes, seconds
+        const hours = Math.floor(sessionDuration / (1000 * 60 * 60));
+        const minutes = Math.floor((sessionDuration % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((sessionDuration % (1000 * 60)) / 1000);
+        
+        // Format as HH:MM:SS
+        const sessionTimeString = 
+            hours.toString().padStart(2, '0') + ':' +
+            minutes.toString().padStart(2, '0') + ':' +
+            seconds.toString().padStart(2, '0');
+            
+        document.getElementById('sessionTimer').textContent = sessionTimeString;
     }
 
     // Weather API (placeholder - you can integrate with a real weather API)
@@ -218,12 +240,14 @@
     // Initialize everything
     document.addEventListener('DOMContentLoaded', function() {
         updateTime();
+        updateSessionTimer();
         updateWeather();
         updateOrderCount();
         updateEarnings();
         
-        // Update time every second
+        // Update time and session timer every second
         setInterval(updateTime, 1000);
+        setInterval(updateSessionTimer, 1000);
         
         // Update other data periodically
         setInterval(updateOrderCount, 30000);
