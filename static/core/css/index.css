@@ -85,6 +85,29 @@ button:hover {
         font-size: 0.9rem;
         padding: 6px;
     }
+
+    /* Password Modal Small Mobile Optimization */
+    .password-modal-content {
+        max-width: 95vw;
+        min-width: 95vw;
+        padding: 15px 15px;
+        margin-top: 2%;
+        min-height: 45vh;
+    }
+
+    .passwordimg {
+        width: 10vw;
+        margin-top: 5%;
+        margin-bottom: 3%;
+    }
+
+    .passwordForm {
+        padding: 0;
+    }
+
+    .password-input-container {
+        gap: 15px;
+    }
 }
 
 
@@ -634,6 +657,37 @@ input[name="last-name"] {
         height: 50vh;
         object-fit: cover;
         object-position: 50% 50%;
+    }
+
+    /* Password Modal Mobile Optimization */
+    .password-modal-content {
+        max-width: 90vw;
+        min-width: 90vw;
+        padding: 20px 20px;
+        margin-top: 5%;
+        height: auto;
+        min-height: 50vh;
+    }
+
+    .passwordForm {
+        width: 100%;
+        top: 0;
+        right: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    .password-input-container {
+        width: 100%;
+        top: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    .passwordimg {
+        width: 8vw;
+        margin-top: 10%;
+        margin-bottom: 5%;
     }
     
 }
