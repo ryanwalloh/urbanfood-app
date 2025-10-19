@@ -124,6 +124,15 @@ body {
     opacity: 0.8;
 }
 
+.weather-message {
+    font-size: 11px;
+    font-weight: 300;
+    color: #FFFFFF;
+    opacity: 0.8;
+    font-style: italic;
+    margin-top: 2px;
+}
+
 /* Time Column */
 .time-column {
     display: flex;
@@ -476,6 +485,19 @@ body {
     .status-title {
         font-size: 16px;
     }
+
+    .orders-container {
+        background-color: #FFFFFF;
+        margin: 0 0 20px 0;
+        border-radius: 0;
+        position: relative;
+        overflow: hidden;
+        width: fit-content;
+        min-width: 100%;
+        height: 110px;
+    }
+
+  
     
     .orders-content {
         padding: 16px;
@@ -489,11 +511,12 @@ body {
     
     .orders-title {
         font-size: 18px;
+        color: #333;
     }
     
     .google-play-icon {
-        width: 100px;
-        height: 32px;
+        width: 160px;
+        height: 42px;
         opacity: 0.8;
     }
     
@@ -571,6 +594,8 @@ body {
     .status-title {
         font-size: 15px;
     }
+
+  
     
     .orders-content {
         padding: 12px;

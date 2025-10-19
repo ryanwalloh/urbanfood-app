@@ -33,6 +33,7 @@
                     </div>
                     <div class="weather-description" id="weatherDescription">Loading weather...</div>
                     <div class="location-text" id="locationText">Getting location...</div>
+                    <div class="weather-message" id="weatherMessage">💬 Safe delivery!</div>
                 </div>
                 
                 <!-- Time Column -->
@@ -266,12 +267,17 @@
             // Update location
             document.getElementById('locationText').textContent = 'Iligan City, Philippines';
             
+            // Update weather message
+            const weatherMessage = getWeatherMessage(data.current_weather.weathercode, temperature, data.current_weather.windspeed);
+            document.getElementById('weatherMessage').textContent = weatherMessage;
+            
         } catch (error) {
             console.log('❌ Weather API error:', error.message);
             // Fallback weather data
             document.getElementById('temperature').textContent = '28';
             document.getElementById('weatherDescription').textContent = 'Partly Cloudy';
             document.getElementById('locationText').textContent = 'Iligan City, Philippines';
+            document.getElementById('weatherMessage').textContent = '💬 Safe delivery!';
         }
     }
     
@@ -308,6 +314,50 @@
             99: 'Thunderstorm with heavy hail'
         };
         return weatherCodes[weatherCode] || 'Partly cloudy';
+    }
+
+    // Get friendly message based on weather conditions
+    function getWeatherMessage(weatherCode, temperature, windSpeed) {
+        // Rain conditions
+        if (weatherCode >= 51 && weatherCode <= 67) {
+            return '🌧️ Bring your raincoat!';
+        }
+        if (weatherCode >= 80 && weatherCode <= 82) {
+            return '🌦️ Wear your raincoat!';
+        }
+        
+        // Snow conditions
+        if (weatherCode >= 71 && weatherCode <= 77) {
+            return '❄️ Be careful on slippery roads!';
+        }
+        
+        // Thunderstorm
+        if (weatherCode >= 95 && weatherCode <= 99) {
+            return '⛈️ Stay at home during the storm!';
+        }
+        
+        // High wind
+        if (windSpeed > 20) {
+            return '💨 Strong winds - drive carefully!';
+        }
+        
+        // Hot weather
+        if (temperature > 35) {
+            return '🌡️ Stay hydrated in this heat!';
+        }
+        
+        // Cold weather
+        if (temperature < 10) {
+            return '🧥 Bundle up - it\'s chilly!';
+        }
+        
+        // Clear weather
+        if (weatherCode === 0 || weatherCode === 1) {
+            return '☀️ Perfect weather for deliveries!';
+        }
+        
+        // Default
+        return '💬 Safe delivery!';
     }
 
     // Initialize everything
