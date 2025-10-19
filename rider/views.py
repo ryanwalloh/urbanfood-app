@@ -422,3 +422,18 @@ def fetch_updated_earnings(request):
         total_earnings = RiderEarnings.get_total_earnings(rider)
         return JsonResponse({'total_earnings': total_earnings})
     return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
+@login_required
+def navigation_page(request):
+    """Navigation page view"""
+    try:
+        rider = Rider.objects.get(user=request.user)
+        return render(request, 'rider/navigation_page.html', {
+            'rider': rider,
+            'user': request.user
+        })
+    except Rider.DoesNotExist:
+        return render(request, 'rider/navigation_page.html', {
+            'rider': None,
+            'user': request.user
+        })

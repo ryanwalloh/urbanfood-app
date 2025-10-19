@@ -93,7 +93,7 @@
                 <div class="navigator-title">Live route navigation</div>
                 <div class="navigator-subtitle">free tier feature</div>
             </div>
-            <button class="navigator-button">Navigation</button>
+            <button class="navigator-button" onclick="openNavigationPage()">Navigation</button>
         </div>
     </div>
 
@@ -369,6 +369,11 @@
         
         // Default
         return '💬 Safe delivery!';
+    }
+
+    // Navigation functionality
+    function openNavigationPage() {
+        window.location.href = '/rider/navigation/';
     }
 
     // Initialize everything

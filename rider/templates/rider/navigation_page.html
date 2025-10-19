@@ -1,0 +1,640 @@
+{% extends 'components/rider/dashboard_base.html' %}
+
+{% load static %}
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+{% block content %}
+
+<!-- Navigation Page Container -->
+<div class="navigation-container">
+    <!-- Full Width Map -->
+    <div id="map" class="map-container"></div>
+    
+    <!-- Back Button (Top Left) -->
+    <button class="back-button" onclick="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    
+    <!-- Bottom Container -->
+    <div class="bottom-navigation-container">
+        <div class="download-message">
+            <div class="download-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="download-content">
+                <h3>Get the Full Experience</h3>
+                <p>Download our mobile app to access live navigation, real-time order tracking, and exclusive rider features.</p>
+                <div class="download-buttons">
+                    <img class="google-play-download" src="{% static 'rider/images/googleplay.png' %}" alt="Download on Google Play">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Google Maps Script -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCuDLJMhB-23kQiXYpXwi-yYGvKz7OgSQ&libraries=geometry"></script>
+
+<script>
+    let map;
+    let userMarker;
+    let watchId;
+
+    // Custom map styles
+    const mapStyles = [
+        {
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#1d2c4d"
+                }
+            ]
+        },
+        {
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#8ec3b9"
+                }
+            ]
+        },
+        {
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "color": "#1a3646"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative.country",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "color": "#4b6878"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative.land_parcel",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative.land_parcel",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#64779e"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative.neighborhood",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "administrative.province",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "color": "#4b6878"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape.man_made",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "color": "#334e87"
+                }
+            ]
+        },
+        {
+            "featureType": "landscape.natural",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#023e58"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#283d6a"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.text",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#6f9ba5"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "color": "#1d2c4d"
+                }
+            ]
+        },
+        {
+            "featureType": "poi.business",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "poi.park",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "color": "#023e58"
+                }
+            ]
+        },
+        {
+            "featureType": "poi.park",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#3C7680"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#304a7d"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels.icon",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#98a5be"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "color": "#1d2c4d"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#2c6675"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "geometry.stroke",
+            "stylers": [
+                {
+                    "color": "#255763"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#b0d5ce"
+                }
+            ]
+        },
+        {
+            "featureType": "road.highway",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "color": "#023e58"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#98a5be"
+                }
+            ]
+        },
+        {
+            "featureType": "transit",
+            "elementType": "labels.text.stroke",
+            "stylers": [
+                {
+                    "color": "#1d2c4d"
+                }
+            ]
+        },
+        {
+            "featureType": "transit.line",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "color": "#283d6a"
+                }
+            ]
+        },
+        {
+            "featureType": "transit.station",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#3a4762"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#0e1626"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "labels.text",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "labels.text.fill",
+            "stylers": [
+                {
+                    "color": "#4e6d70"
+                }
+            ]
+        }
+    ];
+
+    // Initialize map
+    function initMap() {
+        // Default to Iligan City coordinates
+        const iliganCity = { lat: 8.2474, lng: 124.2452 };
+        
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: iliganCity,
+            styles: mapStyles,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            zoomControl: true,
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_BOTTOM
+            }
+        });
+
+        // Get user's current location
+        getCurrentLocation();
+    }
+
+    // Get current location using GPS
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    // Center map on user location
+                    map.setCenter(userLocation);
+                    
+                    // Add user marker
+                    userMarker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: 'Your Location',
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="8" fill="#F43332" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="12" cy="12" r="3" fill="#FFFFFF"/>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(24, 24),
+                            anchor: new google.maps.Point(12, 12)
+                        }
+                    });
+                    
+                    console.log('📍 User location found:', userLocation);
+                },
+                function(error) {
+                    console.log('❌ Location error:', error.message);
+                    // Fallback to Iligan City if GPS fails
+                    showLocationError();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000
+                }
+            );
+        } else {
+            console.log('❌ Geolocation not supported');
+            showLocationError();
+        }
+    }
+
+    // Show location error and fallback
+    function showLocationError() {
+        // Add a marker at Iligan City as fallback
+        const iliganCity = { lat: 8.2474, lng: 124.2452 };
+        
+        userMarker = new google.maps.Marker({
+            position: iliganCity,
+            map: map,
+            title: 'Iligan City (Location not available)',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="8" fill="#FFA500" stroke="#FFFFFF" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="3" fill="#FFFFFF"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(24, 24),
+                anchor: new google.maps.Point(12, 12)
+            }
+        });
+    }
+
+    // Go back to dashboard
+    function goBack() {
+        window.location.href = '/rider/dashboard/';
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+    });
+</script>
+
+<style>
+    /* Navigation Page Styles */
+    .navigation-container {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .map-container {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    /* Back Button */
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+    }
+
+    .back-button svg {
+        color: #333;
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Bottom Container */
+    .bottom-navigation-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        padding: 20px;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    }
+
+    .download-message {
+        background-color: #FFFFFF;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .download-icon {
+        flex-shrink: 0;
+        color: #F43332;
+    }
+
+    .download-content h3 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #333;
+        margin: 0 0 8px 0;
+    }
+
+    .download-content p {
+        font-size: 14px;
+        font-weight: 300;
+        color: #666;
+        margin: 0 0 16px 0;
+        line-height: 1.4;
+    }
+
+    .download-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .google-play-download {
+        height: 40px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .google-play-download:hover {
+        transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .back-button {
+            top: 15px;
+            left: 15px;
+            width: 44px;
+            height: 44px;
+        }
+
+        .back-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .bottom-navigation-container {
+            padding: 15px;
+        }
+
+        .download-message {
+            padding: 20px;
+            gap: 16px;
+        }
+
+        .download-content h3 {
+            font-size: 16px;
+        }
+
+        .download-content p {
+            font-size: 13px;
+        }
+
+        .google-play-download {
+            height: 36px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .back-button {
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+        }
+
+        .back-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .bottom-navigation-container {
+            padding: 10px;
+        }
+
+        .download-message {
+            padding: 16px;
+            gap: 12px;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .download-content h3 {
+            font-size: 15px;
+        }
+
+        .download-content p {
+            font-size: 12px;
+        }
+
+        .google-play-download {
+            height: 32px;
+        }
+    }
+</style>
+
+{% endblock %}

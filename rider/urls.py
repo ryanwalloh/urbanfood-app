@@ -18,4 +18,5 @@ urlpatterns = [
     path('recent-transactions/', views.recent_transactions, name='recent_transactions'),
     path('rider/add_earnings/', views.add_rider_earnings, name='add_earnings'),
     path('fetch_updated_earnings/', views.fetch_updated_earnings, name='fetch_updated_earnings'),
+    path('navigation/', views.navigation_page, name='navigation'),
 ]
