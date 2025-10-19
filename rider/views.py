@@ -452,6 +452,8 @@ def profile_page(request):
                 form.save()
                 messages.success(request, 'Profile updated successfully!')
                 return redirect('rider:profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
         else:
             from .forms import RiderProfileForm
             form = RiderProfileForm(instance=rider)
