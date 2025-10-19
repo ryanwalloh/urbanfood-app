@@ -193,6 +193,11 @@ nav {
     color: #333333;
     cursor: pointer;
     margin-right: 7%;
+    transition: color 0.3s ease;
+}
+
+.hamburger:hover {
+    color: #2c786c;
 }
 
 #menu-toggle {
@@ -213,35 +218,14 @@ nav {
         
     }
 
-    #menu-toggle:checked + .hamburger + .nav-links {
-        display: flex;
-        flex-direction: column;
-        
-    }
-
-    #menu-toggle:checked + .hamburger + .nav-links .home-icons {
-        display: flex;
-        flex-direction: row; 
-        gap: 10px;
-        margin-top: 10px; 
-    }
-
+    /* Hide nav-links completely on mobile - no dropdown menu */
     .nav-links {
-        margin: 0 auto;
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        max-width: 1200px;
-        /* position: absolute; */
-        z-index: 5;
-        /* left: 0; */
-        background-color: white;
-        text-align: center;
-        /* margin-left: 0; */
-        max-height: 1200px;
-        height: 100%;
-        margin-top: 1rem;
-      
+        display: none !important;
+    }
+
+    /* Remove the checkbox functionality for mobile */
+    #menu-toggle:checked + .hamburger + .nav-links {
+        display: none !important;
     }
 }
 

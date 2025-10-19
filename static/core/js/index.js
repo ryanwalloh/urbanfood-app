@@ -47,6 +47,14 @@ document.getElementById('login').addEventListener('click', openModal);
 document.getElementById('signup').addEventListener('click', openModal);
 document.getElementById('log-in').addEventListener('click', checkEmail);
 document.getElementById('sign-up').addEventListener('click', checkEmail);
+
+// Add direct modal functionality to hamburger button on mobile
+document.querySelector('.hamburger').addEventListener('click', function() {
+    // Check if we're on mobile (screen width <= 768px)
+    if (window.innerWidth <= 768) {
+        openModal();
+    }
+});
 // document.getElementById('closeModalButton').addEventListener('click', closeModal);
 
 function getCookie(name) {
