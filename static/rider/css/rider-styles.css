@@ -48,7 +48,8 @@ body {
 
 .hero-button {
     position: absolute;
-    top: 70px;
+    top: 20px;
+    z-index: 5;
     left: 20px;
     padding: 8px 16px;
     border-radius: 20px;
@@ -399,7 +400,7 @@ body {
     }
     
     .hero-button {
-        top: 50px;
+        top: 15px;
         left: 15px;
         padding: 6px 12px;
         border-radius: 16px;
@@ -498,7 +499,7 @@ body {
     }
     
     .hero-button {
-        top: 40px;
+        top: 10px;
         left: 10px;
         padding: 5px 10px;
         border-radius: 14px;
