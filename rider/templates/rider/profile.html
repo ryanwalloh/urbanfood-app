@@ -641,7 +641,7 @@
             
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeProfileEditModal()" id="cancelButton">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="saveButton" onclick="showLoadingState()">
+                <button type="submit" class="btn btn-primary" id="saveButton">
                     <span id="saveButtonText">Update</span>
                     <span id="saveButtonSpinner" style="display: none;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="spinner">
@@ -653,7 +653,6 @@
                         Updating...
                     </span>
                 </button>
-                <button type="button" class="btn btn-secondary" id="cancelUploadButton" style="display: none;" onclick="cancelUpload()">Cancel Upload</button>
             </div>
         </form>
         {% endif %}
@@ -678,32 +677,23 @@ function showLoadingState() {
     const saveButton = document.getElementById('saveButton');
     const saveButtonText = document.getElementById('saveButtonText');
     const saveButtonSpinner = document.getElementById('saveButtonSpinner');
-    const cancelUploadButton = document.getElementById('cancelUploadButton');
     
     // Show loading state
     saveButton.disabled = true;
     saveButtonText.style.display = 'none';
     saveButtonSpinner.style.display = 'inline-flex';
     saveButtonSpinner.style.alignItems = 'center';
-    cancelUploadButton.style.display = 'inline-block';
 }
 
 function hideLoadingState() {
     const saveButton = document.getElementById('saveButton');
     const saveButtonText = document.getElementById('saveButtonText');
     const saveButtonSpinner = document.getElementById('saveButtonSpinner');
-    const cancelUploadButton = document.getElementById('cancelUploadButton');
     
     // Hide loading state
     saveButton.disabled = false;
     saveButtonText.style.display = 'inline';
     saveButtonSpinner.style.display = 'none';
-    cancelUploadButton.style.display = 'none';
-}
-
-function cancelUpload() {
-    hideLoadingState();
-    alert('Upload cancelled. You can try again or close the modal.');
 }
 
 // Close modal when clicking outside
@@ -718,22 +708,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Check if form is valid before showing loading state
-            if (form.checkValidity()) {
-                showLoadingState();
-                
-                // Add timeout to prevent infinite loading
-                setTimeout(function() {
-                    hideLoadingState();
-                    alert('Upload is taking longer than expected. Please try again.');
-                }, 30000); // 30 second timeout
-                
-                console.log('Form submission started...');
-            } else {
-                // If form is invalid, don't show loading state
-                e.preventDefault();
-                form.reportValidity();
-            }
+            // Show loading state immediately when form is submitted
+            showLoadingState();
+            console.log('Form submission started...');
         });
     }
     
