@@ -19,4 +19,5 @@ urlpatterns = [
     path('rider/add_earnings/', views.add_rider_earnings, name='add_earnings'),
     path('fetch_updated_earnings/', views.fetch_updated_earnings, name='fetch_updated_earnings'),
     path('navigation/', views.navigation_page, name='navigation'),
+    path('profile/', views.profile_page, name='profile'),
 ]

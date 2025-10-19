@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 
+
 <nav class="navbar">
     <div class="links-container">
         <div class="link">
@@ -21,7 +22,7 @@
             </div>
             <p>Chat</p>
         </div>
-        <div class="link">
+        <div class="link" onclick="openProfile()">
             <div class="icon-container">
                 <img src="{% static 'icons/user1.svg' %}">
             </div>
@@ -31,3 +32,9 @@
     </div>
 
 </nav>
+
+<script>
+    function openProfile() {
+        window.location.href = '/rider/profile/';
+    }
+</script>

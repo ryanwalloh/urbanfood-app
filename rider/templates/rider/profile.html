@@ -1,0 +1,410 @@
+{% extends 'components/rider/dashboard_base.html' %}
+
+{% load static %}
+
+{% if not user.is_authenticated %}
+    <script>window.location.href = "/";</script>
+{% endif %}
+
+{% block content %}
+
+<!-- Profile Page Container -->
+<div class="profile-container">
+    <!-- Header Section -->
+    <div class="profile-header">
+        <button class="back-button" onclick="goBack()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <h1 class="profile-title">Profile</h1>
+        <div class="header-spacer"></div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+        <!-- Profile Picture Section -->
+        <div class="profile-picture-section">
+            <div class="profile-picture-container">
+                <div class="profile-picture-placeholder">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <button class="change-photo-btn" onclick="changeProfilePhoto()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 4H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Change Photo
+                </button>
+            </div>
+        </div>
+
+        <!-- Rider Details Section -->
+        <div class="rider-details-section">
+            <div class="details-card">
+                <div class="detail-item">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ user.first_name }} {{ user.last_name }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">{{ user.email }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value">{{ user.phone_number|default:"Not provided" }}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value status-value {{ rider.is_available|yesno:'online,offline' }}">
+                        {{ rider.is_available|yesno:"Online,Offline" }}
+                    </div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">Member Since</div>
+                    <div class="detail-value">{{ user.date_joined|date:"F Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons Section -->
+        <div class="action-buttons-section">
+            <button class="action-btn primary-btn" onclick="editProfile()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18.5 2.5C18.8978 2.10218 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10218 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10218 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Edit Profile
+            </button>
+            
+            <button class="action-btn secondary-btn" onclick="logout()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Logout
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '/rider/dashboard/';
+    }
+
+    function changeProfilePhoto() {
+        alert('Profile photo upload feature coming soon!');
+    }
+
+    function editProfile() {
+        alert('Edit profile feature coming soon!');
+    }
+
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            window.location.href = '/logout/';
+        }
+    }
+</script>
+
+<style>
+    /* Profile Page Styles */
+    .profile-container {
+        min-height: 100vh;
+        background-color: #F8F9FA;
+        padding-bottom: 100px;
+    }
+
+    /* Header Section */
+    .profile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        background-color: #FFFFFF;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .back-button {
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+        background-color: #F5F5F5;
+    }
+
+    .back-button svg {
+        color: #333;
+        width: 20px;
+        height: 20px;
+    }
+
+    .profile-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .header-spacer {
+        width: 36px; /* Same width as back button for centering */
+    }
+
+    /* Profile Content */
+    .profile-content {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Profile Picture Section */
+    .profile-picture-section {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .profile-picture-container {
+        text-align: center;
+    }
+
+    .profile-picture-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    }
+
+    .profile-picture-placeholder svg {
+        color: #FFFFFF;
+    }
+
+    .change-photo-btn {
+        background: none;
+        border: 2px solid #E5E5E5;
+        border-radius: 20px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+    }
+
+    .change-photo-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .change-photo-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Rider Details Section */
+    .rider-details-section {
+        margin-bottom: 40px;
+    }
+
+    .details-card {
+        background-color: #FFFFFF;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #F0F0F0;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    .detail-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        text-align: right;
+    }
+
+    .status-value.online {
+        color: #00C851;
+    }
+
+    .status-value.offline {
+        color: #FF4444;
+    }
+
+    /* Action Buttons Section */
+    .action-buttons-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .primary-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #FFFFFF;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .primary-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .secondary-btn {
+        background-color: #FFFFFF;
+        color: #666;
+        border: 2px solid #E5E5E5;
+    }
+
+    .secondary-btn:hover {
+        border-color: #FF4444;
+        color: #FF4444;
+        transform: translateY(-2px);
+    }
+
+    .action-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .profile-header {
+            padding: 16px;
+        }
+
+        .profile-title {
+            font-size: 18px;
+        }
+
+        .profile-content {
+            padding: 16px;
+        }
+
+        .profile-picture-placeholder {
+            width: 100px;
+            height: 100px;
+        }
+
+        .details-card {
+            padding: 20px;
+        }
+
+        .detail-item {
+            padding: 14px 0;
+        }
+
+        .detail-label {
+            font-size: 13px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+        }
+
+        .action-btn {
+            padding: 14px 20px;
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-header {
+            padding: 12px;
+        }
+
+        .profile-title {
+            font-size: 16px;
+        }
+
+        .profile-content {
+            padding: 12px;
+        }
+
+        .profile-picture-placeholder {
+            width: 80px;
+            height: 80px;
+        }
+
+        .profile-picture-placeholder svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .details-card {
+            padding: 16px;
+        }
+
+        .detail-item {
+            padding: 12px 0;
+        }
+
+        .detail-label {
+            font-size: 12px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+        }
+
+        .action-btn {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+    }
+</style>
+
+{% endblock %}
