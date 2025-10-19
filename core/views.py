@@ -58,15 +58,23 @@ def request_magic_link(request):
 
         # Send the magic link to the user's email
         magic_link_url = f"{settings.SITE_URL}/magic-link-login/{token}/"
-        send_mail(
-            'Your Magic Link for Login',
-            f'Click the following link to log in: {magic_link_url}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
-
-        return JsonResponse({'message': 'Magic link sent successfully! Click the link to securely log in.'})
+        try:
+            send_mail(
+                'Your Magic Link for Login',
+                f'Click the following link to log in: {magic_link_url}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            return JsonResponse({'message': 'Magic link sent successfully! Click the link to securely log in.'})
+        except Exception as e:
+            # If email sending fails, still return success but indicate to use password login
+            logger.warning(f"Magic link email failed to send for {email}: {e}")
+            return JsonResponse({
+                'success': True, 
+                'email_found': True,
+                'message': 'Email found. Please use password login instead.'
+            })
 
 
     return JsonResponse({'error': 'Invalid request'}, status=400)

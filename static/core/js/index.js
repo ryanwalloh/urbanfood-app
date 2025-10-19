@@ -117,6 +117,11 @@ document.getElementById('magicLinkForm').addEventListener('submit', function(e) 
             messageElement.innerHTML = 'Magic link sent successfully!<br>Click the link to securely log in.';
             messageElement.style.color = '#2c786c';
             loginPassword.style.display = 'block';
+        } else if (data.email_found && data.success) {
+            // Email found but magic link failed to send - show password login
+            messageElement.innerHTML = 'Email found. Please use password login instead.';
+            messageElement.style.color = '#2c786c';
+            loginPassword.style.display = 'block';
         } else if (data.error === 'Email not found') {
             document.getElementById('register-Modal').style.display = 'block';
             document.getElementById('loginModal').style.display = 'none';
