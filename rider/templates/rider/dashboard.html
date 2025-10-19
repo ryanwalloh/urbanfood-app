@@ -72,7 +72,7 @@
             <div class="orders-text-container">
                 <div class="orders-title" id="ordersTitle">Download the app to receive orders</div>
                 <div class="view-orders-text">
-                    <a href="/rider/orders/" class="cta-view-link">Download &gt;</a>
+                    <a href="/rider/orders/" class="cta-view-link"></a>
                     <img class="google-play-icon" src="{% static 'rider/images/googleplay.png' %}" alt="Google Play Store">
                 </div>
             </div>
@@ -230,12 +230,84 @@
         document.getElementById('sessionTimer').textContent = sessionTimeString;
     }
 
-    // Weather API (placeholder - you can integrate with a real weather API)
-    function updateWeather() {
-        // Placeholder weather data
-        document.getElementById('temperature').textContent = '25';
-        document.getElementById('weatherDescription').textContent = 'Partly Cloudy';
-        document.getElementById('locationText').textContent = 'Manila, Philippines';
+    // Weather API using Open-Meteo (FREE, no API key required)
+    async function updateWeather() {
+        try {
+            // Iligan City coordinates
+            const latitude = 8.2474;
+            const longitude = 124.2452;
+            
+            console.log('🌤️ Fetching weather data for Iligan City:', latitude, longitude);
+            
+            // Open-Meteo API endpoint (FREE, no API key required!)
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (!data.current_weather) {
+                throw new Error('Invalid response from Open-Meteo API');
+            }
+            
+            console.log('✅ Weather data fetched successfully:', {
+                temperature: data.current_weather.temperature,
+                condition: data.current_weather.weathercode,
+                windSpeed: data.current_weather.windspeed
+            });
+            
+            // Update temperature
+            const temperature = Math.round(data.current_weather.temperature);
+            document.getElementById('temperature').textContent = temperature;
+            
+            // Update weather description
+            const weatherDescription = getWeatherDescription(data.current_weather.weathercode);
+            document.getElementById('weatherDescription').textContent = weatherDescription;
+            
+            // Update location
+            document.getElementById('locationText').textContent = 'Iligan City, Philippines';
+            
+        } catch (error) {
+            console.log('❌ Weather API error:', error.message);
+            // Fallback weather data
+            document.getElementById('temperature').textContent = '28';
+            document.getElementById('weatherDescription').textContent = 'Partly Cloudy';
+            document.getElementById('locationText').textContent = 'Iligan City, Philippines';
+        }
+    }
+    
+    // Get weather condition description from weather code
+    function getWeatherDescription(weatherCode) {
+        const weatherCodes = {
+            0: 'Clear sky',
+            1: 'Mainly clear',
+            2: 'Partly cloudy',
+            3: 'Overcast',
+            45: 'Fog',
+            48: 'Depositing rime fog',
+            51: 'Light drizzle',
+            53: 'Moderate drizzle',
+            55: 'Dense drizzle',
+            56: 'Light freezing drizzle',
+            57: 'Dense freezing drizzle',
+            61: 'Slight rain',
+            63: 'Moderate rain',
+            65: 'Heavy rain',
+            66: 'Light freezing rain',
+            67: 'Heavy freezing rain',
+            71: 'Slight snow fall',
+            73: 'Moderate snow fall',
+            75: 'Heavy snow fall',
+            77: 'Snow grains',
+            80: 'Slight rain showers',
+            81: 'Moderate rain showers',
+            82: 'Violent rain showers',
+            85: 'Slight snow showers',
+            86: 'Heavy snow showers',
+            95: 'Thunderstorm',
+            96: 'Thunderstorm with slight hail',
+            99: 'Thunderstorm with heavy hail'
+        };
+        return weatherCodes[weatherCode] || 'Partly cloudy';
     }
 
     // Initialize everything
