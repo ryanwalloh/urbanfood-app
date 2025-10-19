@@ -55,7 +55,7 @@
         <div class="status-container">
         <div class="status-content">
             <div class="status-text-container">
-                <div class="status-title">Status: <span id="status">{{ rider.is_available|yesno:"Online,Offline" }}</span></div>
+                <div class="status-title"><span id="status">{{ rider.is_available|yesno:"Online,Offline" }}</span></div>
                 <div class="status-subtitle" id="statusMessage">
                     {{ rider.is_available|yesno:"Open to any delivery,Turn on status to receive Delivery Assignments" }}
                 </div>
