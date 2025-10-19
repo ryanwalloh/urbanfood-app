@@ -130,12 +130,13 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        padding: 20px;
+        padding: 20px 60px 20px 60px; /* Add left and right padding to make space for back button */
         background-color: #FFFFFF;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         position: sticky;
         top: 0;
         z-index: 100;
+        min-height: 60px; /* Ensure minimum height */
     }
 
     .back-button {
@@ -168,7 +169,7 @@
         color: #333;
         margin: 0;
         text-align: center;
-        padding: 0 60px; /* Add padding to prevent overlap with back button */
+        width: 100%; /* Take full width to center properly */
     }
 
     .header-spacer {
@@ -331,7 +332,8 @@
     /* Responsive Design */
     @media (max-width: 768px) {
         .profile-header {
-            padding: 16px;
+            padding: 16px 50px 16px 50px;
+            min-height: 56px;
         }
 
         .back-button {
@@ -340,7 +342,6 @@
 
         .profile-title {
             font-size: 18px;
-            padding: 0 50px;
         }
 
         .profile-content {
@@ -376,7 +377,8 @@
 
     @media (max-width: 480px) {
         .profile-header {
-            padding: 12px;
+            padding: 12px 40px 12px 40px;
+            min-height: 52px;
         }
 
         .back-button {
@@ -385,7 +387,6 @@
 
         .profile-title {
             font-size: 16px;
-            padding: 0 40px;
         }
 
         .profile-content {
