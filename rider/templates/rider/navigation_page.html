@@ -26,6 +26,20 @@
         <span class="tracking-text">Live Tracking</span>
     </div>
     
+    <!-- Zoom Controls (Top Right Below Tracking) -->
+    <div class="zoom-controls">
+        <button class="zoom-button zoom-in" onclick="zoomIn()" title="Zoom In">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button class="zoom-button zoom-out" onclick="zoomOut()" title="Zoom Out">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+    
     <!-- Bottom Container -->
     <div class="bottom-navigation-container">
         <div class="download-message">
@@ -536,6 +550,51 @@
         window.location.href = '/rider/dashboard/';
     }
 
+    // Zoom controls
+    function zoomIn() {
+        if (map && currentLocation) {
+            const currentZoom = map.getZoom();
+            const newZoom = Math.min(currentZoom + 1, 20); // Max zoom level 20
+            
+            map.setZoom(newZoom);
+            map.setCenter(currentLocation);
+            
+            console.log('🔍 Zoomed in to level:', newZoom);
+        } else if (map) {
+            // Fallback to Iligan City if no current location
+            const iliganCity = { lat: 8.2474, lng: 124.2452 };
+            const currentZoom = map.getZoom();
+            const newZoom = Math.min(currentZoom + 1, 20);
+            
+            map.setZoom(newZoom);
+            map.setCenter(iliganCity);
+            
+            console.log('🔍 Zoomed in to level:', newZoom, '(Iligan City)');
+        }
+    }
+
+    function zoomOut() {
+        if (map && currentLocation) {
+            const currentZoom = map.getZoom();
+            const newZoom = Math.max(currentZoom - 1, 1); // Min zoom level 1
+            
+            map.setZoom(newZoom);
+            map.setCenter(currentLocation);
+            
+            console.log('🔍 Zoomed out to level:', newZoom);
+        } else if (map) {
+            // Fallback to Iligan City if no current location
+            const iliganCity = { lat: 8.2474, lng: 124.2452 };
+            const currentZoom = map.getZoom();
+            const newZoom = Math.max(currentZoom - 1, 1);
+            
+            map.setZoom(newZoom);
+            map.setCenter(iliganCity);
+            
+            console.log('🔍 Zoomed out to level:', newZoom, '(Iligan City)');
+        }
+    }
+
     // Clean up when page is unloaded
     window.addEventListener('beforeunload', function() {
         stopLiveTracking();
@@ -641,6 +700,55 @@
         }
     }
 
+    /* Zoom Controls */
+    .zoom-controls {
+        position: absolute;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .zoom-button {
+        background-color: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 4px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+
+    .zoom-button:hover {
+        background-color: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .zoom-button:active {
+        transform: scale(0.95);
+    }
+
+    .zoom-button svg {
+        color: #333;
+        width: 16px;
+        height: 16px;
+    }
+
+    .zoom-in {
+        border-radius: 4px 4px 0 0;
+    }
+
+    .zoom-out {
+        border-radius: 0 0 4px 4px;
+    }
+
     /* Bottom Container */
     .bottom-navigation-container {
         position: absolute;
@@ -720,6 +828,21 @@
             font-size: 13px;
         }
 
+        .zoom-controls {
+            top: 70px;
+            right: 15px;
+        }
+
+        .zoom-button {
+            width: 36px;
+            height: 36px;
+        }
+
+        .zoom-button svg {
+            width: 14px;
+            height: 14px;
+        }
+
         .bottom-navigation-container {
             padding: 15px;
         }
@@ -760,6 +883,21 @@
             right: 10px;
             padding: 5px 10px;
             font-size: 12px;
+        }
+
+        .zoom-controls {
+            top: 60px;
+            right: 10px;
+        }
+
+        .zoom-button {
+            width: 32px;
+            height: 32px;
+        }
+
+        .zoom-button svg {
+            width: 12px;
+            height: 12px;
         }
 
         .bottom-navigation-container {
