@@ -152,6 +152,10 @@ body {
     width: calc(100% - 20px);
     max-width: 400px;
     min-width: 400px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .status-content {
@@ -159,6 +163,7 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
+    width: 100%;
 }
 
 .status-text-container {
@@ -411,6 +416,9 @@ body {
         width: calc(100% - 30px);
         max-width: 350px;
         min-width: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     
     .status-content {
@@ -486,6 +494,9 @@ body {
         width: calc(100% - 20px);
         max-width: 320px;
         min-width: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     
     .status-content {
