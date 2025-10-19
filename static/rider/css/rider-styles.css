@@ -32,7 +32,7 @@ body {
 }
 
 .hero-image {
-    width: 100%;
+        width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
@@ -73,8 +73,8 @@ body {
 }
 
 .main-info-container {
-    display: flex;
-    justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
     align-items: flex-start;
     gap: 12px;
 }
@@ -162,7 +162,7 @@ body {
 .clock-description,
 .session-timer-description {
     font-size: 11px;
-    font-weight: 300;
+        font-weight: 300;
     color: #FFFFFF;
     opacity: 0.8;
     font-style: italic;
@@ -176,9 +176,9 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 3;
-    width: calc(100% - 20px);
-    max-width: 400px;
-    min-width: 400px;
+    width: calc(100% - 10px);
+    max-width: 700px;
+    min-width: 500px;
     top: 0;
     display: flex;
     align-items: center;
@@ -201,7 +201,7 @@ body {
     font-size: 18px;
     font-weight: 800;
     color: #333;
-    margin-bottom: 4px;
+
 }
 
 .status-subtitle {
@@ -260,8 +260,8 @@ body {
 }
 
 .orders-icon {
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
     margin-right: 25px;
     opacity: 0.8;
 }
@@ -289,8 +289,8 @@ body {
 .view-orders-text {
     font-size: 14px;
     font-weight: 300;
-    display: flex;
-    align-items: center;
+        display: flex;
+        align-items: center;
     gap: 8px;
 }
 
@@ -323,8 +323,8 @@ body {
 }
 
 .navigator-content {
-    display: flex;
-    align-items: center;
+        display: flex;
+        align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
 }
@@ -399,8 +399,8 @@ body {
 /* Assignments Section */
 .assignments-container {
     padding: 0 0 20px 0;
-    margin-bottom: 20px;
-}
+        margin-bottom: 20px;
+    }
 
 .section-title {
     font-size: 20px;
@@ -453,10 +453,10 @@ body {
 }
 
 .assignment-footer {
-    display: flex;
+        display: flex;
     justify-content: space-between;
-    align-items: center;
-}
+        align-items: center;
+    }
 
 .assignment-status {
     font-size: 12px;
@@ -475,6 +475,7 @@ body {
     height: 20px;
 }
 
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-container {
@@ -483,10 +484,10 @@ body {
    
     
     .hero-button {
-        top: -75px;
-        left: 5px;
+        transform: translateY(-80px);
         padding: 6px 12px;
         border-radius: 16px;
+      
     }
     
     .hero-button-text {
@@ -498,7 +499,7 @@ body {
         margin-bottom: 15px;
         position: relative;
         top: -35px;
-       
+       left: 15px;
     }
     
     .main-info-container {
@@ -527,9 +528,9 @@ body {
     .status-container {
         margin: -25px auto 15px auto;
         border-radius: 60px;
-        width: calc(100% - 20px);
-        max-width: 400px;
-        min-width: 400px;
+        width: calc(100% - 10px);
+        max-width: 600px;
+        min-width: 600px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -551,7 +552,9 @@ body {
         overflow: hidden;
         width: fit-content;
         min-width: 100%;
-        height: 110px;
+        height: 90px;
+        margin-top: 20px;
+        padding-top: 10px;
     }
 
   
@@ -561,22 +564,30 @@ body {
     }
     
     .orders-icon {
-        width: 80px;
-        height: 80px;
-        margin-right: 20px;
+        min-width: 65px;
+        min-height: 65px;
+
+        margin-right: 0;
+        margin-left: 10px;
     }
     
     .orders-title {
-        font-size: 18px;
+        font-size: 14px;
         color: #333;
         position: relative;
         top: 5px;
+        margin-left: 0;
     }
     
     .google-play-icon {
-        width: 180px;
-        height: 42px;
+        max-width: 190px;
+        min-width: 150px;
+        max-height: 52px;
+        min-height: 32px;
         opacity: 0.8;
+        position: relative;
+        left: -10px;
+       
     }
     
     .navigator-content {
@@ -584,6 +595,7 @@ body {
         align-items: center;
         justify-content: space-between;
         padding: 12px 22px;
+        height: 70px;
     }
     
     .navigator-title {
@@ -613,55 +625,57 @@ body {
     }
 
     .navbar {
-        padding: 20px 0px 80px 0px;
+        padding: 20px 0px 0px 0px;
     
     
      }
      
      .links-container {
-         display: flex;
-         gap: 10px;
-         justify-content: space-between;
-         align-items: center;
-         margin: 0 auto;
-         padding: 0px 30px 0px 30px;
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 auto;
+        padding: 0px 30px 0px 30px;
      }
  
      .link {
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         flex-direction: column;
-         gap: 4px;
-         padding: 8px 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0px 0px;
      }
  
      .icon-container {
-         width: 30px;
-         object-fit: cover;
-         overflow: hidden;
-
+        width: 30px;
+        object-fit: cover;
+        overflow: hidden;
+        
      }
  
      .icon-container img {
-         width: 100%;
-         object-fit: cover;
-         filter: grayscale(100%) opacity(0.6); /* Apply grayscale and slightly reduce opacity */
-         transition: filter 0.3s ease; /* Smooth transition */
+        width: 100%;
+        object-fit: cover;
+        filter: grayscale(100%) opacity(0.6); /* Apply grayscale and slightly reduce opacity */
+        transition: filter 0.3s ease; /* Smooth transition */
      }
      
      .icon-container img:hover {
-         filter: grayscale(0%); /* Revert to color on hover */
+        filter: grayscale(0%); /* Revert to color on hover */
      }
  
      /* Navigation text labels */
      .link span, .link p {
-         font-size: 10px;
-         font-weight: 500;
-         color: #666;
-         text-align: center;
-         margin-top: 0px;
-         line-height: 1.2;
+        font-size: 10px;
+        font-weight: 500;
+        color: #666;
+        text-align: center;
+        position: relative;
+        top: -30px;
+    
+        line-height: 1.2;
      }
 }
 
