@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
-  const { presentPaymentSheet } = useStripe();
+  const { presentPaymentSheet, initPaymentSheet } = useStripe();
   const [selectedPayment, setSelectedPayment] = useState('Cash on Delivery');
   const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -390,10 +390,20 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
 
       console.log('✅ Payment intent created:', paymentIntentResult.payment_intent_id);
 
-      // Step 2: Show Stripe Payment Sheet
-      const { error: presentError } = await presentPaymentSheet({
-        clientSecret: paymentIntentResult.client_secret,
+      // Step 2: Initialize Payment Sheet
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: 'Soti Delivery',
+        paymentIntentClientSecret: paymentIntentResult.client_secret,
       });
+
+      if (initError) {
+        Alert.alert('Payment Error', initError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Step 3: Show Stripe Payment Sheet
+      const { error: presentError } = await presentPaymentSheet();
 
       if (presentError) {
         Alert.alert('Payment Error', presentError.message);
@@ -401,7 +411,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
         return;
       }
 
-      // Step 3: Confirm payment and create order
+      // Step 4: Confirm payment and create order
       console.log('✅ Payment confirmed. Creating order...');
       const confirmResult = await apiService.confirmPayment({
         payment_intent_id: paymentIntentResult.payment_intent_id,

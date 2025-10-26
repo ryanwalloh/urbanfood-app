@@ -18,6 +18,7 @@ import * as Location from 'expo-location';
 import * as Font from 'expo-font';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import { apiService } from './services/api';
 import API_CONFIG from './config/apiConfig';
 import MainPage from './components/MainPage';
@@ -313,27 +314,29 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      {currentPage === 'landing' && <LandingPage />}
-      {currentPage === 'welcome' && <WelcomePage onGetStarted={handleGetStarted} onCreateAccount={openCreateAccount} />}
-      {currentPage === 'login' && <LoginPage onLoginSuccess={handleLoginSuccess} onCreateAccount={openCreateAccount} />}
-      {currentPage === 'create1' && <CreateAccount1 regData={regData} onNext={(data) => { setRegData(data); setCurrentPage('create2'); }} onBack={() => setCurrentPage('login')} />}
-      {currentPage === 'create2' && <CreateAccount2 regData={regData} addressData={addressData} onSuccess={handleRegistrationSuccess} onBack={() => setCurrentPage('create1')} />}
-      {currentPage === 'verify' && verificationData && (
-        <CustomerCodeConfirmation 
-          email={verificationData.userData.email}
-          verificationId={verificationData.verificationId}
-          userData={verificationData.userData}
-          onSuccess={handleVerificationSuccess}
-          onBack={() => setCurrentPage('create2')}
-        />
-      )}
-      {currentPage === 'onboarding1' && <OnboardingPage1 onNext={() => setCurrentPage('onboarding2')} onSkip={() => setCurrentPage('main')} />}
-      {currentPage === 'onboarding2' && <OnboardingPage2 onBack={() => setCurrentPage('onboarding1')} onNext={() => setCurrentPage('onboarding3')} onSkip={() => setCurrentPage('main')} />}
-      {currentPage === 'onboarding3' && <OnboardingPage3 onBack={() => setCurrentPage('onboarding2')} onGetStarted={() => setCurrentPage('main')} onSkip={() => setCurrentPage('main')} />}
-      {currentPage === 'main' && <MainPage user={user} onLogout={handleLogout} />}
-      <StatusBar style="auto" />
-    </View>
+    <StripeProvider publishableKey={API_CONFIG.STRIPE_PUBLISHABLE_KEY}>
+      <View style={styles.container}>
+        {currentPage === 'landing' && <LandingPage />}
+        {currentPage === 'welcome' && <WelcomePage onGetStarted={handleGetStarted} onCreateAccount={openCreateAccount} />}
+        {currentPage === 'login' && <LoginPage onLoginSuccess={handleLoginSuccess} onCreateAccount={openCreateAccount} />}
+        {currentPage === 'create1' && <CreateAccount1 regData={regData} onNext={(data) => { setRegData(data); setCurrentPage('create2'); }} onBack={() => setCurrentPage('login')} />}
+        {currentPage === 'create2' && <CreateAccount2 regData={regData} addressData={addressData} onSuccess={handleRegistrationSuccess} onBack={() => setCurrentPage('create1')} />}
+        {currentPage === 'verify' && verificationData && (
+          <CustomerCodeConfirmation 
+            email={verificationData.userData.email}
+            verificationId={verificationData.verificationId}
+            userData={verificationData.userData}
+            onSuccess={handleVerificationSuccess}
+            onBack={() => setCurrentPage('create2')}
+          />
+        )}
+        {currentPage === 'onboarding1' && <OnboardingPage1 onNext={() => setCurrentPage('onboarding2')} onSkip={() => setCurrentPage('main')} />}
+        {currentPage === 'onboarding2' && <OnboardingPage2 onBack={() => setCurrentPage('onboarding1')} onNext={() => setCurrentPage('onboarding3')} onSkip={() => setCurrentPage('main')} />}
+        {currentPage === 'onboarding3' && <OnboardingPage3 onBack={() => setCurrentPage('onboarding2')} onGetStarted={() => setCurrentPage('main')} onSkip={() => setCurrentPage('main')} />}
+        {currentPage === 'main' && <MainPage user={user} onLogout={handleLogout} />}
+        <StatusBar style="auto" />
+      </View>
+    </StripeProvider>
   );
 }
 
