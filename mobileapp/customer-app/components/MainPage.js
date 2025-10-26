@@ -51,6 +51,15 @@ const MainPage = ({ user, onLogout }) => {
     };
   }, []);
 
+  // Debug: Monitor selectedRestaurant changes
+  useEffect(() => {
+    if (selectedRestaurant) {
+      console.log('🎯 selectedRestaurant changed:', selectedRestaurant);
+      console.log('🎯 Restaurant ID:', selectedRestaurant.id);
+      console.log('🎯 Restaurant Name:', selectedRestaurant.name);
+    }
+  }, [selectedRestaurant]);
+
   const fetchRestaurants = async () => {
     try {
       setLoading(true);
@@ -163,32 +172,37 @@ const MainPage = ({ user, onLogout }) => {
         address: '',
         barangay: '',
         street: '',
-        restaurant_type: '',
+        restaurant_type: 'Unknown',
         phone: '',
         profile_picture: null,
       };
+      console.log('📝 Created fallback restaurant data:', restaurantData);
     }
     
-    console.log('✅ Restaurant data:', restaurantData);
-    console.log('✅ Setting selectedRestaurant...');
+    console.log('✅ Final restaurant data:', restaurantData);
+    console.log('✅ Restaurant ID:', restaurantData?.id);
+    console.log('✅ Restaurant ID type:', typeof restaurantData?.id);
     
-    if (restaurantData) {
-      // Close search results
-      setShowSearchResults(false);
-      setSearchQuery('');
-      // Navigate to restaurant page
-      setSelectedRestaurant(restaurantData);
-      console.log('✅ Navigation triggered');
-    } else {
-      console.log('❌ Restaurant not found with id:', product.restaurant_id);
-    }
+    // Always try to navigate
+    // Reset activeNav to 'home' to ensure proper navigation
+    setActiveNav('home');
+    setShowSearchResults(false);
+    setSearchQuery('');
+    setSelectedRestaurant(restaurantData);
+    console.log('✅ Navigation triggered with restaurant:', restaurantData?.name);
   };
 
   // Handle restaurant selection from search
   const handleRestaurantSelectFromSearch = (restaurant) => {
+    console.log('🏪 Restaurant selected from search:', restaurant);
+    console.log('🏪 Restaurant data type check:', typeof restaurant);
+    console.log('🏪 Restaurant ID:', restaurant?.id);
+    // Reset activeNav to 'home' to ensure proper navigation
+    setActiveNav('home');
     setShowSearchResults(false);
     setSearchQuery('');
     setSelectedRestaurant(restaurant);
+    console.log('✅ Navigating to restaurant:', restaurant?.name);
   };
 
   // Handle scroll to detect when search becomes sticky
@@ -224,8 +238,10 @@ const MainPage = ({ user, onLogout }) => {
     </Svg>
   );
 
-  // Show RestaurantOrder page if a restaurant is selected
-  if (selectedRestaurant) {
+  // Show RestaurantOrder page if a restaurant is selected (only if activeNav is 'home')
+  // This prevents Orders/Profile pages from blocking RestaurantOrder
+  if (selectedRestaurant && activeNav === 'home') {
+    console.log('🎯 Rendering RestaurantOrder for:', selectedRestaurant?.name);
     return (
       <RestaurantOrder 
         restaurant={selectedRestaurant} 
