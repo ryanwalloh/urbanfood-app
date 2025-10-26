@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@stripe/stripe-react-native": "^0.43.1",
+    "@stripe/stripe-react-native": "^0.55.1",
     "axios": "^1.12.2",
     "expo": "~54.0.7",
     "expo-dev-client": "^6.0.16",

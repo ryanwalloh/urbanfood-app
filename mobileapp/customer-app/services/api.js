@@ -1134,6 +1134,125 @@ export const apiService = {
     }
   },
 
+  // Stripe Payment Integration Functions
+  createPaymentIntent: async (paymentData) => {
+    try {
+      console.log('💳 Creating payment intent:', paymentData);
+      
+      // Use cached URL or find working URL
+      let workingUrl = cachedWorkingUrl;
+      if (!workingUrl) {
+        workingUrl = await testMultipleUrls();
+        if (!workingUrl) {
+          return {
+            success: false,
+            error: 'No working URL found',
+            message: 'Cannot reach Django server!'
+          };
+        }
+      }
+      
+      console.log('🌐 Using working URL for payment intent:', workingUrl);
+      
+      const paymentApi = axios.create({
+        baseURL: workingUrl,
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const response = await paymentApi.post('/api/stripe/create-payment-intent/', paymentData, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      });
+      
+      console.log('✅ Create payment intent response:', response.data);
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          client_secret: response.data.client_secret,
+          payment_intent_id: response.data.payment_intent_id,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.error,
+          message: response.data.message || 'Failed to create payment intent!'
+        };
+      }
+    } catch (error) {
+      console.log('❌ Create payment intent error:', error);
+      cachedWorkingUrl = null;
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to create payment intent!'
+      };
+    }
+  },
+
+  confirmPayment: async (confirmData) => {
+    try {
+      console.log('✅ Confirming payment:', confirmData);
+      
+      // Use cached URL or find working URL
+      let workingUrl = cachedWorkingUrl;
+      if (!workingUrl) {
+        workingUrl = await testMultipleUrls();
+        if (!workingUrl) {
+          return {
+            success: false,
+            error: 'No working URL found',
+            message: 'Cannot reach Django server!'
+          };
+        }
+      }
+      
+      console.log('🌐 Using working URL for confirm payment:', workingUrl);
+      
+      const confirmApi = axios.create({
+        baseURL: workingUrl,
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const response = await confirmApi.post('/api/stripe/confirm-payment/', confirmData, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      });
+      
+      console.log('✅ Confirm payment response:', response.data);
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          order: response.data.order,
+          message: response.data.message
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.error,
+          message: response.data.message || 'Failed to confirm payment!'
+        };
+      }
+    } catch (error) {
+      console.log('❌ Confirm payment error:', error);
+      cachedWorkingUrl = null;
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to confirm payment!'
+      };
+    }
+  },
+
 };
 
 export default api;

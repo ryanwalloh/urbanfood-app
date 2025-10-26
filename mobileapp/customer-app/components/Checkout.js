@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions
 import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useStripe } from '@stripe/stripe-react-native';
 import { apiService } from '../services/api';
 import API_CONFIG from '../config/apiConfig';
 
@@ -10,6 +11,7 @@ const { width, height } = Dimensions.get('window');
 const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
+  const { presentPaymentSheet } = useStripe();
   const [selectedPayment, setSelectedPayment] = useState('Cash on Delivery');
   const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -355,11 +357,81 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
     setIsEditingInstruction(false);
   };
 
+  // Stripe Payment Handlers
+  const handlePlaceOrderWrapper = async () => {
+    console.log('📦 Place Order clicked. Payment method:', selectedPayment);
+    
+    // If Stripe payment selected, handle differently
+    if (selectedPayment === 'Card Payment') {
+      await handleStripePayment();
+    } else {
+      // For COD and other payment methods, use existing flow
+      onPlaceOrder();
+    }
+  };
+
+  const handleStripePayment = async () => {
+    try {
+      setLoading(true);
+      
+      // Step 1: Create payment intent on backend
+      console.log('💳 Creating payment intent...');
+      const paymentIntentResult = await apiService.createPaymentIntent({
+        user_id: user.id,
+        restaurant_id: restaurant.id,
+        total_amount: total,
+      });
+
+      if (!paymentIntentResult.success) {
+        Alert.alert('Payment Error', paymentIntentResult.error || 'Failed to initialize payment');
+        setLoading(false);
+        return;
+      }
+
+      console.log('✅ Payment intent created:', paymentIntentResult.payment_intent_id);
+
+      // Step 2: Show Stripe Payment Sheet
+      const { error: presentError } = await presentPaymentSheet({
+        clientSecret: paymentIntentResult.client_secret,
+      });
+
+      if (presentError) {
+        Alert.alert('Payment Error', presentError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Step 3: Confirm payment and create order
+      console.log('✅ Payment confirmed. Creating order...');
+      const confirmResult = await apiService.confirmPayment({
+        payment_intent_id: paymentIntentResult.payment_intent_id,
+        user_id: user.id,
+        restaurant_id: restaurant.id,
+        total_amount: total,
+        payment_method: 'Card Payment',
+      });
+
+      if (confirmResult.success) {
+        console.log('✅ Order created successfully:', confirmResult.order);
+        // Call the original onPlaceOrder to handle navigation
+        onPlaceOrder();
+      } else {
+        Alert.alert('Payment Error', confirmResult.error || 'Failed to confirm payment');
+      }
+      
+    } catch (error) {
+      console.error('Stripe payment error:', error);
+      Alert.alert('Error', 'Payment processing failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const paymentMethods = [
-    { id: 'visa', name: 'Visa', icon: '💳' },
+    { id: 'stripe', name: 'Card Payment', icon: '💳', description: 'Visa, Mastercard, etc.' },
+    { id: 'cod', name: 'Cash on Delivery', icon: '💰' },
     { id: 'gcash', name: 'GCash', icon: '📱' },
     { id: 'paymaya', name: 'PayMaya', icon: '💳' },
-    { id: 'cod', name: 'Cash on Delivery', icon: '💰' },
   ];
 
   // Icons
@@ -679,7 +751,10 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
               >
                 <View style={styles.paymentMethodContent}>
                   <Text style={styles.paymentIcon}>{method.icon}</Text>
-                  <Text style={styles.paymentName}>{method.name}</Text>
+                  <View style={styles.paymentTextContainer}>
+                    <Text style={styles.paymentName}>{method.name}</Text>
+                    {method.description && <Text style={styles.paymentDescription}>{method.description}</Text>}
+                  </View>
                 </View>
                 <RadioIcon selected={selectedPayment === method.name} />
               </TouchableOpacity>
@@ -738,8 +813,16 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
           <Text style={styles.totalAmount}>₱{total.toFixed(2)}</Text>
         </View>
         <View style={styles.totalSeparator} />
-        <TouchableOpacity style={styles.placeOrderButton} onPress={onPlaceOrder}>
-          <Text style={styles.placeOrderButtonText}>Place Order</Text>
+        <TouchableOpacity 
+          style={[styles.placeOrderButton, loading && styles.placeOrderButtonDisabled]} 
+          onPress={handlePlaceOrderWrapper}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.placeOrderButtonText}>Place Order</Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -1283,10 +1366,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginRight: 12,
   },
+  paymentTextContainer: {
+    flexDirection: 'column',
+  },
   paymentName: {
     fontSize: 16,
     color: '#333333',
     fontWeight: '500',
+  },
+  paymentDescription: {
+    fontSize: 12,
+    color: '#666666',
+    marginTop: 2,
   },
 
   // Order Items
@@ -1401,6 +1492,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+  },
+  placeOrderButtonDisabled: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.6,
   },
   placeOrderButtonText: {
     fontSize: 16,
