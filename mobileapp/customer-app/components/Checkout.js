@@ -390,10 +390,22 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
 
       console.log('✅ Payment intent created:', paymentIntentResult.payment_intent_id);
 
-      // Step 2: Initialize Payment Sheet
+      // Step 2: Initialize Payment Sheet with default billing details
       const { error: initError } = await initPaymentSheet({
         merchantDisplayName: 'Soti Delivery',
         paymentIntentClientSecret: paymentIntentResult.client_secret,
+        defaultBillingDetails: {
+          name: `${personalDetails.firstName || user?.firstName || ''} ${personalDetails.lastName || user?.lastName || ''}`.trim() || 'Customer',
+          address: {
+            country: 'PH',
+            postalCode: '0000', // Default Philippines postal code
+          },
+        },
+        appearance: {
+          colors: {
+            primary: '#F43332', // Brand vibrant red
+          },
+        },
       });
 
       if (initError) {
@@ -423,8 +435,8 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
 
       if (confirmResult.success) {
         console.log('✅ Order created successfully:', confirmResult.order);
-        // Call the original onPlaceOrder to handle navigation
-        onPlaceOrder();
+        // Pass order data to onPlaceOrder for navigation
+        onPlaceOrder(confirmResult.order);
       } else {
         Alert.alert('Payment Error', confirmResult.error || 'Failed to confirm payment');
       }

@@ -114,8 +114,25 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
     setShowCheckout(false);
   };
 
-  const handlePlaceOrder = async () => {
+  const handlePlaceOrder = async (orderDataFromStripe = null) => {
     try {
+      // If order data is passed from Stripe, use it directly
+      if (orderDataFromStripe) {
+        console.log('✅ Using order from Stripe:', orderDataFromStripe);
+        
+        // Fetch user address
+        const addressResult = await apiService.getUserAddress(user);
+        if (addressResult.success) {
+          setUserAddress(addressResult.address);
+        }
+        
+        setOrderData(orderDataFromStripe);
+        setShowCheckout(false);
+        setShowOrderTracking(true);
+        return;
+      }
+      
+      // Original COD flow
       console.log('🛒 Placing order...');
       
       // Fetch user address first
