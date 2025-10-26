@@ -124,8 +124,53 @@ const MainPage = ({ user, onLogout }) => {
 
   // Handle product selection - navigate to restaurant page
   const handleProductSelect = async (product) => {
-    // Find the restaurant for this product
-    const restaurantData = restaurants.find(r => r.id === product.restaurant_id);
+    console.log('🔍 Product selected:', product);
+    console.log('🔍 Product restaurant_id:', product.restaurant_id);
+    console.log('🔍 Product restaurant_id type:', typeof product.restaurant_id);
+    console.log('🔍 Loaded restaurants count:', restaurants.length);
+    console.log('🔍 Loaded restaurant IDs:', restaurants.map(r => ({ id: r.id, type: typeof r.id })));
+    
+    // Normalize restaurant_id to number for comparison
+    const restaurantId = typeof product.restaurant_id === 'string' ? parseInt(product.restaurant_id, 10) : product.restaurant_id;
+    console.log('🔍 Normalized restaurant_id:', restaurantId);
+    
+    // Try to find in loaded restaurants first
+    let restaurantData = restaurants.find(r => r.id === restaurantId);
+    
+    console.log('🔍 Found in loaded restaurants:', restaurantData ? 'YES' : 'NO');
+    
+    // If not found in loaded restaurants, fetch all restaurants and find it
+    if (!restaurantData) {
+      console.log('⚠️ Restaurant not found in loaded restaurants, fetching all restaurants...');
+      try {
+        const result = await apiService.getRestaurants();
+        if (result.success && result.restaurants) {
+          console.log('📋 Fetched restaurants:', result.restaurants.map(r => ({ id: r.id, name: r.name })));
+          restaurantData = result.restaurants.find(r => r.id === restaurantId);
+          console.log('🔍 Found after fetching:', restaurantData ? 'YES' : 'NO');
+        }
+      } catch (error) {
+        console.log('❌ Error fetching restaurants:', error);
+      }
+    }
+    
+    // If still not found, create from product data as fallback
+    if (!restaurantData) {
+      console.log('⚠️ Restaurant not found anywhere, creating from product data...');
+      restaurantData = {
+        id: restaurantId,
+        name: product.restaurant_name,
+        address: '',
+        barangay: '',
+        street: '',
+        restaurant_type: '',
+        phone: '',
+        profile_picture: null,
+      };
+    }
+    
+    console.log('✅ Restaurant data:', restaurantData);
+    console.log('✅ Setting selectedRestaurant...');
     
     if (restaurantData) {
       // Close search results
@@ -133,6 +178,9 @@ const MainPage = ({ user, onLogout }) => {
       setSearchQuery('');
       // Navigate to restaurant page
       setSelectedRestaurant(restaurantData);
+      console.log('✅ Navigation triggered');
+    } else {
+      console.log('❌ Restaurant not found with id:', product.restaurant_id);
     }
   };
 
