@@ -1071,8 +1071,9 @@ def search_products_and_restaurants(request):
                 Q(name__icontains=query) | Q(barangay__icontains=query) | Q(address__icontains=query)
             ).filter(is_approved=True)[:10]  # Limit to 10 results and only approved
             
-            # Get restaurant IDs that matched the query (to exclude from products)
+            # Get restaurant IDs and names that matched the query (to exclude from products)
             matched_restaurant_ids = list(restaurants.values_list('id', flat=True))
+            matched_restaurant_names = [name.lower() for name in restaurants.values_list('name', flat=True)]
             print(f'🍽️ Found {len(matched_restaurant_ids)} matching restaurants: {list(restaurants.values_list("name", flat=True))}')
             
             # Search products (case-insensitive) - EXCLUDE products that match only by restaurant name
@@ -1088,6 +1089,14 @@ def search_products_and_restaurants(request):
                 # Check if product name or description matches
                 product_name_match = query.lower() in product.name.lower()
                 product_description_match = query.lower() in product.description.lower() if product.description else False
+                
+                # Check if the product name exactly matches a restaurant name (common data issue)
+                product_name_is_restaurant = product.name.lower() in matched_restaurant_names
+                
+                # Exclude product if its name matches a restaurant name
+                if product_name_is_restaurant:
+                    print(f'🚫 Excluding product (name matches restaurant): {product.name}')
+                    continue
                 
                 # Only include product if it matches in its own fields (not just restaurant name)
                 if product_name_match or product_description_match:

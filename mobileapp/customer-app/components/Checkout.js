@@ -19,6 +19,8 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isMapMoving, setIsMapMoving] = useState(false);
   const [isEditingPersonalDetails, setIsEditingPersonalDetails] = useState(false);
+  const [isEditingInstruction, setIsEditingInstruction] = useState(false);
+  const [instructionText, setInstructionText] = useState('');
   const [personalDetails, setPersonalDetails] = useState({
     email: user?.email || '',
     firstName: user?.firstName || '',
@@ -243,7 +245,6 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
           label: selectedLabel,
         });
         setShowEditModal(false);
-        Alert.alert('Success', 'Address updated successfully!');
       } else {
         Alert.alert('Error', result.error || 'Failed to save address');
       }
@@ -303,6 +304,55 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
       phone: user?.phone || '',
     });
     setIsEditingPersonalDetails(false);
+  };
+
+  // Handle instruction editing
+  const handleEditInstruction = () => {
+    setInstructionText(address?.note || '');
+    setIsEditingInstruction(true);
+  };
+
+  // Save instruction
+  const handleSaveInstruction = async () => {
+    if (!address || !user?.id) {
+      Alert.alert('Error', 'Please set an address first');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const result = await apiService.saveAddress({
+        user_id: user.id,
+        street: address.street,
+        barangay: address.barangay,
+        note: instructionText,
+        label: address.label,
+        latitude: address.latitude,
+        longitude: address.longitude,
+      });
+
+      if (result.success) {
+        setAddress({
+          ...address,
+          note: instructionText,
+        });
+        setIsEditingInstruction(false);
+      } else {
+        Alert.alert('Error', result.error || 'Failed to save instruction');
+      }
+    } catch (error) {
+      console.error('Error saving instruction:', error);
+      Alert.alert('Error', 'Failed to save instruction');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cancel instruction editing
+  const handleCancelEditInstruction = () => {
+    setInstructionText('');
+    setIsEditingInstruction(false);
   };
 
   const paymentMethods = [
@@ -430,6 +480,10 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                   }}
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  pitchEnabled={false}
+                  rotateEnabled={false}
                 >
                   <Marker
                     coordinate={{
@@ -446,9 +500,67 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                 <Text style={styles.addressDetails}>
                   {address.street}, {address.barangay}
                 </Text>
-                <TouchableOpacity style={styles.addInstructionButton}>
-                  <Text style={styles.addInstructionText}>+ Add delivery instruction</Text>
-                </TouchableOpacity>
+                
+                {/* Instruction Section */}
+                {!isEditingInstruction ? (
+                  // Display saved instruction or add button
+                  <>
+                    {address.note && address.note.trim() !== '' ? (
+                      <View style={styles.instructionContainer}>
+                        <View style={styles.instructionHeader}>
+                          <Text style={styles.instructionLabel}>Delivery Instruction:</Text>
+                          <TouchableOpacity 
+                            style={styles.editInstructionButton} 
+                            onPress={handleEditInstruction}
+                          >
+                            <EditIcon />
+                          </TouchableOpacity>
+                        </View>
+                        <Text style={styles.instructionText}>{address.note}</Text>
+                      </View>
+                    ) : (
+                      <TouchableOpacity 
+                        style={styles.addInstructionButton}
+                        onPress={handleEditInstruction}
+                      >
+                        <Text style={styles.addInstructionText}>+ Add delivery instruction</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
+                ) : (
+                  // Edit instruction input
+                  <View style={styles.instructionEditContainer}>
+                    <Text style={styles.instructionLabel}>Delivery Instruction:</Text>
+                    <TextInput
+                      style={styles.instructionInput}
+                      placeholder="E.g., Ring the doorbell, Leave at the gate"
+                      placeholderTextColor="#999"
+                      value={instructionText}
+                      onChangeText={setInstructionText}
+                      multiline
+                      numberOfLines={2}
+                    />
+                    <View style={styles.instructionButtonRow}>
+                      <TouchableOpacity 
+                        style={styles.cancelInstructionButton}
+                        onPress={handleCancelEditInstruction}
+                      >
+                        <Text style={styles.cancelInstructionButtonText}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.saveInstructionButton}
+                        onPress={handleSaveInstruction}
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <ActivityIndicator color="#FFF" />
+                        ) : (
+                          <Text style={styles.saveInstructionButtonText}>Save</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
               </View>
             </>
           )}
@@ -507,6 +619,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                     value={personalDetails.firstName}
                     onChangeText={(text) => setPersonalDetails({...personalDetails, firstName: text})}
                     placeholder="First Name"
+                    placeholderTextColor="#999"
                   />
                 </View>
                 <View style={[styles.inputContainer, styles.inputHalf]}>
@@ -516,6 +629,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                     value={personalDetails.lastName}
                     onChangeText={(text) => setPersonalDetails({...personalDetails, lastName: text})}
                     placeholder="Last Name"
+                    placeholderTextColor="#999"
                   />
                 </View>
               </View>
@@ -528,6 +642,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                   value={personalDetails.phone}
                   onChangeText={(text) => setPersonalDetails({...personalDetails, phone: text})}
                   placeholder="+63 XXX XXX XXXX"
+                  placeholderTextColor="#999"
                   keyboardType="phone-pad"
                 />
               </View>
@@ -636,6 +751,8 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
         onRequestClose={() => setShowEditModal(false)}
       >
         <View style={styles.modalContainer}>
+          {/* Safe area spacer at top */}
+          <View style={styles.safeAreaSpacer} />
           {/* Modal Header */}
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setShowEditModal(false)} style={styles.closeButton}>
@@ -649,8 +766,9 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
 
           {/* Map Container with Fixed Marker */}
           {editingAddress && (
-            <View style={styles.mapWrapper}>
-              <MapView
+            <View style={styles.mapWrapperContainer}>
+              <View style={styles.mapWrapper}>
+                <MapView
                 ref={mapRef}
                 style={styles.modalMap}
                 initialRegion={{
@@ -708,7 +826,8 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                   ]}
                 />
               </View>
-            </View>
+              </View>
+              </View>
           )}
 
           {/* Address Info */}
@@ -723,7 +842,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
                 <ActivityIndicator color="#FFF" />
               ) : (
                 <>
-                  <Text style={styles.locationButtonIcon}>📍</Text>
+                  <Text style={styles.locationButtonIcon}></Text>
                   <Text style={styles.locationButtonText}>Use my current location</Text>
                 </>
               )}
@@ -732,7 +851,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
             {/* Address Display */}
             <View style={styles.addressDisplayContainer}>
               <Text style={styles.addressDisplayLabel}>
-                {isMapMoving ? '📍 Searching location...' : 'Address (Plus Code)'}
+                {isMapMoving ? ' Searching location...' : 'Address (Plus Code)'}
               </Text>
               <Text style={styles.addressDisplayText}>
                 {isMapMoving 
@@ -775,6 +894,7 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
               <TextInput
                 style={styles.noteInput}
                 placeholder="E.g., Ring the doorbell, Leave at the gate"
+                placeholderTextColor="#999"
                 value={editingAddress?.note || ''}
                 onChangeText={(text) => setEditingAddress(prev => ({ ...prev, note: text }))}
                 multiline
@@ -974,6 +1094,81 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#F43332',
     fontWeight: '600',
+  },
+  instructionContainer: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  instructionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  instructionLabel: {
+    fontSize: 12,
+    color: '#666666',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  instructionText: {
+    fontSize: 14,
+    color: '#333333',
+    marginBottom: 4,
+  },
+  editInstructionButton: {
+    padding: 4,
+  },
+  instructionEditContainer: {
+    marginTop: 8,
+  },
+  instructionInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#333333',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    minHeight: 60,
+    textAlignVertical: 'top',
+    marginBottom: 12,
+  },
+  instructionButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelInstructionButton: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  cancelInstructionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666666',
+  },
+  saveInstructionButton: {
+    flex: 1,
+    backgroundColor: '#F43332',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveInstructionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 
   // Personal Details - List View
@@ -1216,7 +1411,10 @@ const styles = StyleSheet.create({
   // Modal Styles
   modalContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+   
+  },
+  safeAreaSpacer: {
+    height: 30,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1224,9 +1422,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
     backgroundColor: '#FFFFFF',
+
   },
   closeButton: {
     width: 40,
@@ -1252,10 +1453,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#F43332',
   },
+  mapWrapperContainer: {
+
+    paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
+  },
   mapWrapper: {
     width: '100%',
-    height: height * 0.25,
+    height: Math.min(height * 0.35, 350),
     position: 'relative',
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
   },
   modalMap: {
     width: '100%',
@@ -1285,6 +1493,7 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#F8F8F8',
   },
   locationButton: {
     backgroundColor: '#F43332',
@@ -1368,7 +1577,7 @@ const styles = StyleSheet.create({
   noteLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333333',
+    color: '#333',
     marginBottom: 8,
   },
   noteInput: {
@@ -1376,9 +1585,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     fontSize: 14,
-    color: '#333333',
+
     minHeight: 60,
     textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
 });
 
