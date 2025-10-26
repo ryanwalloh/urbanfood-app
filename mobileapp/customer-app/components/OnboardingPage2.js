@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
-const OnboardingPage2 = ({ onBack, onNext }) => (
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
+
+const OnboardingPage2 = ({ onBack, onNext, onSkip }) => (
   <View style={styles.onbContainer}>
     <View style={styles.onbTopBar}>
       <TouchableOpacity onPress={onBack}><Text style={styles.onbBack}>Back</Text></TouchableOpacity>
-      <TouchableOpacity><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
+      <TouchableOpacity onPress={onSkip}><Text style={styles.onbSkip}>Skip</Text></TouchableOpacity>
     </View>
     <Image source={require('../assets/onboarding2.png')} style={styles.onbImage} resizeMode="contain" />
     <Text style={styles.onbTitle}>Best Chefs in Lake City</Text>
@@ -25,8 +28,8 @@ const styles = StyleSheet.create({
   onbContainer: {
     flex: 1,
     backgroundColor: '#ffffff',
-    paddingTop: 60,
-    paddingHorizontal: 24,
+    paddingTop: isSmallScreen ? 40 : 60,
+    paddingHorizontal: isSmallScreen ? 20 : 24,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -35,49 +38,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: isSmallScreen ? 8 : 16,
   },
   onbSkip: {
     color: '#F43332',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     fontFamily: 'Nexa-Heavy',
   },
   onbBack: {
     color: '#999999',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     fontFamily: 'Nexa-Heavy',
   },
   onbImage: {
     width: '100%',
-    height: 260,
-    marginBottom: 24,
+    height: isSmallScreen ? 200 : 260,
+    marginBottom: isSmallScreen ? 16 : 24,
   },
   onbTitle: {
-    fontSize: 24,
+    fontSize: isSmallScreen ? 20 : 24,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
     marginBottom: 0,
     fontFamily: 'Nexa-Heavy',
-
   },
   onbText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 13 : 14,
     color: '#999',
     textAlign: 'center',
-    lineHeight: 20,
-    marginTop: -68,
-    marginBottom: 12,
+    lineHeight: isSmallScreen ? 18 : 20,
+    marginTop: isSmallScreen ? -40 : -68,
+    marginBottom: isSmallScreen ? 8 : 12,
     fontFamily: 'Nexa-ExtraLight',
-    
   },
   onbProgressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: isSmallScreen ? 16 : 20,
     gap: 8,
   },
   onbDot: {
@@ -94,15 +95,15 @@ const styles = StyleSheet.create({
   onbNextBtn: {
     backgroundColor: '#F43332',
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: isSmallScreen ? 12 : 14,
     paddingHorizontal: 24,
     width: '100%',
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: isSmallScreen ? 30 : 50,
   },
   onbNextText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     fontFamily: 'Nexa-Heavy',
   },

@@ -212,14 +212,31 @@ def login_by_password(request):
                 'role': user.role,
             }
             
-            # Add phone number from Customer model if user is a customer
+            # Add phone number and address from Customer and Address models if user is a customer
             if user.role == 'customer':
                 try:
-                    from customer.models import Customer
+                    from customer.models import Customer, Address
                     customer = Customer.objects.get(user=user)
                     user_data['phone'] = customer.phone
+                    
+                    # Add address information
+                    try:
+                        address = Address.objects.get(user=user)
+                        user_data['street'] = address.street
+                        user_data['barangay'] = address.barangay
+                        user_data['note'] = address.note
+                        user_data['label'] = address.label
+                    except Address.DoesNotExist:
+                        user_data['street'] = ''
+                        user_data['barangay'] = ''
+                        user_data['note'] = ''
+                        user_data['label'] = 'home'
                 except Customer.DoesNotExist:
                     user_data['phone'] = ''
+                    user_data['street'] = ''
+                    user_data['barangay'] = ''
+                    user_data['note'] = ''
+                    user_data['label'] = 'home'
                 
                 return JsonResponse({
                     'success': True, 

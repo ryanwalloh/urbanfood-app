@@ -328,9 +328,9 @@ export default function App() {
           onBack={() => setCurrentPage('create2')}
         />
       )}
-      {currentPage === 'onboarding1' && <OnboardingPage1 onNext={() => setCurrentPage('onboarding2')} />}
-      {currentPage === 'onboarding2' && <OnboardingPage2 onBack={() => setCurrentPage('onboarding1')} onNext={() => setCurrentPage('onboarding3')} />}
-      {currentPage === 'onboarding3' && <OnboardingPage3 onBack={() => setCurrentPage('onboarding2')} onGetStarted={() => setCurrentPage('main')} />}
+      {currentPage === 'onboarding1' && <OnboardingPage1 onNext={() => setCurrentPage('onboarding2')} onSkip={() => setCurrentPage('main')} />}
+      {currentPage === 'onboarding2' && <OnboardingPage2 onBack={() => setCurrentPage('onboarding1')} onNext={() => setCurrentPage('onboarding3')} onSkip={() => setCurrentPage('main')} />}
+      {currentPage === 'onboarding3' && <OnboardingPage3 onBack={() => setCurrentPage('onboarding2')} onGetStarted={() => setCurrentPage('main')} onSkip={() => setCurrentPage('main')} />}
       {currentPage === 'main' && <MainPage user={user} onLogout={handleLogout} />}
       <StatusBar style="auto" />
     </View>
