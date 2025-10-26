@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Dimensions, TextInput, Alert, ActivityIndicator, Platform } from 'react-native';
 import { apiService } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: { 
     padding: isSmallScreen ? 16 : 20,
-    paddingBottom: isSmallScreen ? 30 : 40,
+    paddingBottom: isSmallScreen ? (Platform.OS === 'android' ? 40 : 30) : (Platform.OS === 'android' ? 50 : 40),
   },
   avatarContainer: { 
     alignItems: 'center', 

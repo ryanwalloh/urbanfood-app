@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Animated, Platform } from 'react-native';
 import { apiService } from '../services/api';
 import API_CONFIG from '../config/apiConfig';
 
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   sectionContainer: {
-    marginBottom: 24,
+    marginBottom: isSmallScreen ? 18 : 24,
   },
   sectionTitle: {
     fontSize: isSmallScreen ? 16 : 18,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   loadingText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
@@ -383,14 +383,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#EAEAEA',
-    padding: 16,
+    padding: isSmallScreen ? 12 : 16,
     marginBottom: 12,
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: isSmallScreen ? 12 : 16,
   },
   restaurantName: {
     fontSize: isSmallScreen ? 16 : 18,
@@ -404,27 +404,27 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: isSmallScreen ? 10 : 12,
+    paddingVertical: isSmallScreen ? 5 : 6,
     borderRadius: 16,
   },
   statusBadgeDelivered: {
     backgroundColor: '#4CAF50',
   },
   statusBadgeText: {
-    fontSize: 11,
+    fontSize: isSmallScreen ? 10 : 11,
     fontFamily: 'Nexa-ExtraLight',
     color: '#FFFFFF',
   },
   // Progress Bars
   progressContainer: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
+    gap: isSmallScreen ? 6 : 8,
+    marginBottom: isSmallScreen ? 12 : 16,
   },
   progressBarWrapper: {
     flex: 1,
-    height: 4,
+    height: isSmallScreen ? 3 : 4,
     backgroundColor: '#F0F0F0',
     borderRadius: 2,
     overflow: 'hidden',
@@ -440,12 +440,12 @@ const styles = StyleSheet.create({
   orderDetails: {
     borderTopWidth: 1,
     borderTopColor: '#EAEAEA',
-    paddingTop: 12,
+    paddingTop: isSmallScreen ? 10 : 12,
   },
   orderDetailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
   },
   orderDetailLabel: {
     fontSize: isSmallScreen ? 13 : 14,
@@ -463,14 +463,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#EAEAEA',
-    padding: 16,
+    padding: isSmallScreen ? 12 : 16,
     marginBottom: 12,
   },
   recentOrderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: isSmallScreen ? 10 : 12,
   },
   recentRestaurantName: {
     fontSize: isSmallScreen ? 15 : 16,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
   recentOrderDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 12,
+    paddingTop: isSmallScreen ? 10 : 12,
     borderTopWidth: 1,
     borderTopColor: '#EAEAEA',
   },

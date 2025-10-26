@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions, Platform } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { apiService } from '../services/api';
 import Cart from './Cart';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 const RestaurantOrder = ({ restaurant, onBack, user }) => {
   const [activeCategory, setActiveCategory] = useState('Popular');
@@ -89,6 +90,11 @@ const RestaurantOrder = ({ restaurant, onBack, user }) => {
     setShowCart(false);
   };
 
+  const handleHomeFromCart = () => {
+    // Navigate back to MainPage
+    onBack();
+  };
+
   // Show Cart page if cart is selected
   if (showCart) {
     return (
@@ -96,6 +102,7 @@ const RestaurantOrder = ({ restaurant, onBack, user }) => {
         restaurant={restaurant} 
         cartItems={cartItems}
         onBack={handleBackFromCart} 
+        onHome={handleHomeFromCart}
         user={user}
       />
     );
@@ -304,6 +311,11 @@ const RestaurantOrder = ({ restaurant, onBack, user }) => {
           )}
         </View>
 
+        {/* Copyright Footer */}
+        <View style={styles.copyrightContainer}>
+          <Text style={styles.copyrightText}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </View>
+
         {/* Bottom padding */}
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -338,7 +350,7 @@ const styles = StyleSheet.create({
   // Header
   headerContainer: {
     position: 'relative',
-    height: 250,
+    height: isSmallScreen ? 200 : 250,
   },
   headerImage: {
     width: '100%',
@@ -346,22 +358,22 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 50,
+    top: isSmallScreen ? 40 : 50,
     left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
+    borderRadius: isSmallScreen ? 18 : 20,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   heartButton: {
     position: 'absolute',
-    top: 50,
+    top: isSmallScreen ? 40 : 50,
     right: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
+    borderRadius: isSmallScreen ? 18 : 20,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -389,28 +401,28 @@ const styles = StyleSheet.create({
   // Restaurant Info Overlay (Inside Image)
   restaurantInfoOverlay: {
     position: 'absolute',
-    bottom: 20,
+    bottom: isSmallScreen ? 15 : 20,
     left: 20,
     right: 20,
   },
   restaurantNameOverlay: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 16 : 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
   ratingContainerOverlay: {
     flexDirection: 'row',
-    gap: 4,
+    gap: isSmallScreen ? 2 : 4,
   },
 
   // Search Field
   searchContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingTop: isSmallScreen ? 15 : 20,
     paddingBottom: 10,
   },
   searchInputContainer: {
@@ -418,14 +430,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F4F4F4',
     borderRadius: 40,
-    paddingHorizontal: 16,
+    paddingHorizontal: isSmallScreen ? 12 : 16,
     paddingVertical: 4,
-    gap: 8,
+    gap: isSmallScreen ? 6 : 8,
     marginTop: 20,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#333333',
   },
 
@@ -436,16 +448,16 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E0E0E0',
   },
   categoryTabs: {
-    paddingHorizontal: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
   },
   categoryTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 16,
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingVertical: isSmallScreen ? 6 : 8,
+    marginRight: isSmallScreen ? 12 : 16,
     position: 'relative',
   },
   categoryTabText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#666666',
     fontWeight: '500',
   },
@@ -467,84 +479,84 @@ const styles = StyleSheet.create({
 
   // Category Section
   categorySection: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 15 : 20,
   },
   categoryTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
-    marginTop: 30,
+    marginTop: isSmallScreen ? 20 : 30,
   },
   categoryIcon: {
-    width: 24,
-    height: 24,
+    width: isSmallScreen ? 20 : 24,
+    height: isSmallScreen ? 20 : 24,
     marginRight: 8,
   },
   categoryTitle: {
-    fontSize: 24,
+    fontSize: isSmallScreen ? 20 : 24,
     fontWeight: 'bold',
     color: '#333333',
   },
   categorySubtitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
   },
 
   // Products Grid
   productsGrid: {
-    paddingHorizontal: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
   productCard: {
-    width: (width - 60) / 2, // 2 columns with 20px padding on each side + 20px gap
-    marginBottom: 20,
+    width: isSmallScreen ? (width - 50) / 2 : (width - 60) / 2,
+    marginBottom: isSmallScreen ? 15 : 20,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
  
   },
   productImageContainer: {
     position: 'relative',
-    height: 160,
+    height: isSmallScreen ? 120 : 160,
     borderRadius: 12,
   },
   productImage: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#c0b8b8', // Mock green background
+    backgroundColor: '#c0b8b8',
     borderRadius: 12,
   },
   plusButton: {
     position: 'absolute',
-    bottom: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    bottom: isSmallScreen ? 6 : 8,
+    right: isSmallScreen ? 6 : 8,
+    width: isSmallScreen ? 28 : 32,
+    height: isSmallScreen ? 28 : 32,
+    borderRadius: isSmallScreen ? 14 : 16,
     backgroundColor: '#F43332',
     justifyContent: 'center',
     alignItems: 'center',
   },
   productInfo: {
-    padding: 12,
+    padding: isSmallScreen ? 10 : 12,
   },
   productName: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#333333',
     marginBottom: 4,
   },
   productPrice: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: 'bold',
     color: '#F43332',
   },
 
   // Bottom Padding
   bottomPadding: {
-    height: 20,
+    height: isSmallScreen ? 120 : 140,
   },
   // Loading and Empty States
   loadingContainer: {
@@ -553,7 +565,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   loadingText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#666',
   },
   emptyContainer: {
@@ -562,25 +574,38 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#666',
+  },
+
+  // Copyright Footer
+  copyrightContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  copyrightText: {
+    fontSize: isSmallScreen ? 11 : 13,
+    color: '#999',
+    textAlign: 'center',
   },
 
   // Floating Cart Button
   floatingCartContainer: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: Platform.OS === 'android' ? (isSmallScreen ? 30 : 35) : (isSmallScreen ? 20 : 25),
+    left: isSmallScreen ? 15 : 20,
+    right: isSmallScreen ? 15 : 20,
     zIndex: 20,
   },
         floatingCartButton: {
           backgroundColor: '#F43332',
           borderRadius: 12,
-          paddingVertical: 16,
-          paddingHorizontal: 24,
+          paddingVertical: isSmallScreen ? 12 : 16,
+          paddingHorizontal: isSmallScreen ? 16 : 24,
           alignItems: 'center',
-          shadowColor: '#000',
+          shadowColor: '#000000',
           shadowOffset: {
             width: 0,
             height: 4,
@@ -592,20 +617,20 @@ const styles = StyleSheet.create({
         floatingCartContent: {
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 8,
+          gap: isSmallScreen ? 6 : 8,
         },
         floatingCartIcon: {
-          width: 20,
-          height: 20,
+          width: isSmallScreen ? 18 : 20,
+          height: isSmallScreen ? 18 : 20,
         },
   floatingCartText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
   },
   floatingCartCount: {
     color: '#D4D4D4',
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '300',
   },
 });

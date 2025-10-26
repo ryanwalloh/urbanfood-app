@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions, Animated } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, TextInput, Dimensions, Animated, Platform } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { apiService } from '../services/api';
 import RestaurantOrder from './RestaurantOrder';
 import CustomerProfile from './CustomerProfile';
 import Orders from './Orders';
+import Support from './Support';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 const MainPage = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('restaurants');
@@ -340,6 +342,45 @@ const MainPage = ({ user, onLogout }) => {
     );
   }
 
+  // Show Support page when support tab is active
+  if (activeNav === 'support') {
+    return (
+      <View style={styles.mainContainer}>
+        <Support onBack={() => setActiveNav('home')} />
+        {/* Sticky Bottom Navigation */}
+        <View style={styles.bottomNavigation}>
+          <TouchableOpacity 
+            style={styles.navItem}
+            onPress={() => setActiveNav('home')}
+          >
+            <View style={[styles.navIconContainer, activeNav === 'home' && styles.navIconActive]}>
+              <Image source={require('../assets/home.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'home' && styles.navLabelActive]}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('orders')}>
+            <View style={[styles.navIconContainer, activeNav === 'orders' && styles.navIconActive]}>
+              <Image source={require('../assets/orders.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'orders' && styles.navLabelActive]}>Orders</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('support')}>
+            <View style={[styles.navIconContainer, activeNav === 'support' && styles.navIconActive]}>
+              <Image source={require('../assets/support.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'support' && styles.navLabelActive]}>Support</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('profile')}>
+            <View style={[styles.navIconContainer, activeNav === 'profile' && styles.navIconActive]}>
+              <Image source={require('../assets/profile.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'profile' && styles.navLabelActive]}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView 
@@ -534,6 +575,11 @@ const MainPage = ({ user, onLogout }) => {
           )}
         </View>
 
+        {/* Copyright Footer */}
+        <View style={styles.copyrightContainer}>
+          <Text style={styles.copyrightText}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </View>
+
         {/* Bottom padding for navigation */}
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -592,7 +638,9 @@ const styles = StyleSheet.create({
   // Hero Section
   heroContainer: {
     position: 'relative',
-    height: 370,
+    height: isSmallScreen ? height * 0.45 : height * 0.5,
+    minHeight: 280,
+    maxHeight: 370,
   },
   heroImage: {
     width: '100%',
@@ -600,14 +648,14 @@ const styles = StyleSheet.create({
   },
   heroButtons: {
     position: 'absolute',
-    top: 70,
+    top: isSmallScreen ? 50 : 70,
     left: 20,
     flexDirection: 'row',
     gap: 8,
   },
   heroButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingVertical: isSmallScreen ? 6 : 8,
     borderRadius: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
@@ -616,20 +664,20 @@ const styles = StyleSheet.create({
   },
   heroButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-Heavy',
   },
   heroTitleContainer: {
     position: 'absolute',
-    bottom: 50,
+    bottom: isSmallScreen ? 30 : 50,
     left: 20,
     right: 20,
   },
   heroTitleText: {
-    fontSize: 32,
+    fontSize: isSmallScreen ? 24 : 32,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
-    lineHeight: 38,
+    lineHeight: isSmallScreen ? 28 : 38,
   },
   // Scroll Container
   scrollContainer: {
@@ -667,14 +715,14 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#333',
   },
   // Section Styles
   sectionContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 40,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 25 : 40,
     marginTop: 10,
   },
   sectionHeader: {
@@ -695,28 +743,28 @@ const styles = StyleSheet.create({
   },
   // Categories
   categoriesScroll: {
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
+    marginHorizontal: isSmallScreen ? -15 : -20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
   },
   categoryItem: {
     alignItems: 'center',
-    marginRight: 20,
-    width: 70,
+    marginRight: isSmallScreen ? 15 : 20,
+    width: isSmallScreen ? 60 : 70,
   },
   categoryIconContainer: {
-    width: 60,
-    height: 60,
+    width: isSmallScreen ? 50 : 60,
+    height: isSmallScreen ? 50 : 60,
     borderRadius: 20,
     marginBottom: 8,
     overflow: 'hidden',
   },
   categoryIcon: {
-    width: 60,
-    height: 60,
+    width: isSmallScreen ? 50 : 60,
+    height: isSmallScreen ? 50 : 60,
     resizeMode: 'cover',
   },
   categoryLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
     textAlign: 'center',
@@ -725,13 +773,13 @@ const styles = StyleSheet.create({
   restaurantCard: {
     backgroundColor: '#F4F4F4',
     borderRadius: 16,
-    marginBottom: 16,
-    bottom: 20,
+    marginBottom: isSmallScreen ? 12 : 16,
+    bottom: isSmallScreen ? 15 : 20,
    
   },
   restaurantImageContainer: {
     position: 'relative',
-    height: 150,
+    height: isSmallScreen ? 120 : 150,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -746,15 +794,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     right: 12,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: isSmallScreen ? 28 : 32,
+    height: isSmallScreen ? 28 : 32,
+    borderRadius: isSmallScreen ? 14 : 16,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   heartIconText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#F43332',
   },
   barangayOverlay: {
@@ -768,20 +816,20 @@ const styles = StyleSheet.create({
   },
   barangayText: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: isSmallScreen ? 10 : 12,
     fontFamily: 'Nexa-Heavy',
   },
   restaurantInfo: {
-    padding: 16,
+    padding: isSmallScreen ? 12 : 16,
   },
   restaurantName: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-Heavy',
     color: '#333',
     marginBottom: 4,
   },
   restaurantAddress: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
@@ -789,8 +837,9 @@ const styles = StyleSheet.create({
   bottomNavigation: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: isSmallScreen ? 8 : 12,
+    paddingHorizontal: isSmallScreen ? 10 : 20,
+    paddingBottom: Platform.OS === 'android' ? (isSmallScreen ? 8 : 12) + 10 : (isSmallScreen ? 8 : 12),
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     shadowColor: '#000',
@@ -804,8 +853,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   navIconContainer: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
@@ -816,11 +865,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   navIcon: {
-    width: 24,
-    height: 24,
+    width: isSmallScreen ? 20 : 24,
+    height: isSmallScreen ? 20 : 24,
   },
   navLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 10 : 12,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
@@ -830,7 +879,7 @@ const styles = StyleSheet.create({
   },
   // Bottom Padding
   bottomPadding: {
-    height: 20,
+    height: isSmallScreen ? 80 : 100,
   },
   // Loading and Empty States
   loadingContainer: {
@@ -838,7 +887,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   loadingText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
@@ -847,7 +896,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
@@ -856,8 +905,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     marginTop: 0,
-    marginHorizontal: 20,
-    maxHeight: 400,
+    marginHorizontal: isSmallScreen ? 15 : 20,
+    maxHeight: isSmallScreen ? 300 : 400,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -873,7 +922,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   searchResultsSectionTitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-Heavy',
     color: '#666',
     paddingHorizontal: 16,
@@ -885,7 +934,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 8 : 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
@@ -893,29 +942,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchResultProductName: {
-    fontSize: 15,
+    fontSize: isSmallScreen ? 13 : 15,
     fontFamily: 'Nexa-Heavy',
     color: '#333',
     marginBottom: 4,
   },
   searchResultRestaurantLabel: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 11 : 13,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
   searchResultRestaurantName: {
-    fontSize: 15,
+    fontSize: isSmallScreen ? 13 : 15,
     fontFamily: 'Nexa-Heavy',
     color: '#333',
     marginBottom: 4,
   },
   searchResultAddress: {
-    fontSize: 13,
+    fontSize: isSmallScreen ? 11 : 13,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
   },
   searchResultPrice: {
-    fontSize: 15,
+    fontSize: isSmallScreen ? 13 : 15,
     fontFamily: 'Nexa-Heavy',
     color: '#F43332',
   },
@@ -924,9 +973,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   noResultsText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#999',
+  },
+  // Copyright Footer
+  copyrightContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  copyrightText: {
+    fontSize: isSmallScreen ? 11 : 13,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999',
+    textAlign: 'center',
   },
 });
 

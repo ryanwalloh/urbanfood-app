@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Modal, TextInput, Alert, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Modal, TextInput, Alert, ActivityIndicator, Animated, Platform } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -8,6 +8,7 @@ import { apiService } from '../services/api';
 import API_CONFIG from '../config/apiConfig';
 
 const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
 const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
@@ -453,10 +454,10 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
   };
 
   const paymentMethods = [
-    { id: 'stripe', name: 'Card Payment', icon: '💳', description: 'Visa, Mastercard, etc.' },
-    { id: 'cod', name: 'Cash on Delivery', icon: '💰' },
-    { id: 'gcash', name: 'GCash', icon: '📱' },
-    { id: 'paymaya', name: 'PayMaya', icon: '💳' },
+    { id: 'stripe', name: 'Card Payment', icon: require('../assets/card.png'), description: 'Visa, Mastercard, etc.', comingSoon: false },
+    { id: 'cod', name: 'Cash on Delivery', icon: require('../assets/cod.png'), comingSoon: false },
+    { id: 'gcash', name: 'GCash', icon: require('../assets/gcash.png'), comingSoon: true },
+    { id: 'paypal', name: 'PayPal', icon: require('../assets/paypal.png'), comingSoon: true },
   ];
 
   // Icons
@@ -771,17 +772,24 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
             {paymentMethods.map((method) => (
               <TouchableOpacity
                 key={method.id}
-                style={styles.paymentMethod}
-                onPress={() => setSelectedPayment(method.name)}
+                style={[styles.paymentMethod, method.comingSoon && styles.paymentMethodDisabled]}
+                onPress={() => !method.comingSoon && setSelectedPayment(method.name)}
+                disabled={method.comingSoon}
+                activeOpacity={method.comingSoon ? 1 : 0.7}
               >
                 <View style={styles.paymentMethodContent}>
-                  <Text style={styles.paymentIcon}>{method.icon}</Text>
+                  <Image source={method.icon} style={styles.paymentIconImage} />
                   <View style={styles.paymentTextContainer}>
                     <Text style={styles.paymentName}>{method.name}</Text>
                     {method.description && <Text style={styles.paymentDescription}>{method.description}</Text>}
                   </View>
                 </View>
-                <RadioIcon selected={selectedPayment === method.name} />
+                {!method.comingSoon && <RadioIcon selected={selectedPayment === method.name} />}
+                {method.comingSoon && (
+                  <View style={styles.comingSoonOverlay}>
+                    <Text style={styles.comingSoonText}>Coming Soon</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
@@ -849,6 +857,11 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
             <Text style={styles.placeOrderButtonText}>Place Order</Text>
           )}
         </TouchableOpacity>
+        
+        {/* Footer */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </View>
       </View>
 
       {/* Edit Address Modal */}
@@ -1026,28 +1039,28 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingTop: isSmallScreen ? 45 : 50,
+    paddingBottom: isSmallScreen ? 15 : 20,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: isSmallScreen ? 10 : 12,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 0,
   },
   headerSubtitle: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
   },
   headerSpacer: {
@@ -1127,12 +1140,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#333333',
   },
   progressStepNumber: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   progressStepLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
     top: -15,
   },
@@ -1145,11 +1158,11 @@ const styles = StyleSheet.create({
   // Section Container
   sectionContainer: {
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
+    marginHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 8,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingVertical: isSmallScreen ? 15 : 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 15 : 20,
   },
 
   // Section Header
@@ -1160,9 +1173,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 16 : 20,
     fontWeight: 'bold',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   editButton: {
     padding: 4,
@@ -1170,10 +1184,10 @@ const styles = StyleSheet.create({
 
   // Map Container
   mapContainer: {
-    height: 170,
+    height: isSmallScreen ? 130 : 170,
     borderRadius: 8,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: isSmallScreen ? 12 : 16,
   },
   map: {
     width: '100%',
@@ -1185,23 +1199,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   addressLabel: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 14 : 18,
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 4,
+    fontFamily: 'Nexa-Heavy',
   },
   addressDetails: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
+    fontFamily: 'Nexa-ExtraLight',
   },
   addInstructionButton: {
     alignSelf: 'flex-start',
   },
   addInstructionText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#F43332',
     fontWeight: '600',
+    fontFamily: 'Nexa-Heavy',
   },
   instructionContainer: {
     marginTop: 8,
@@ -1222,11 +1239,13 @@ const styles = StyleSheet.create({
     color: '#666666',
     fontWeight: '600',
     marginBottom: 4,
+    fontFamily: 'Nexa-Heavy',
   },
   instructionText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#333333',
     marginBottom: 4,
+    fontFamily: 'Nexa-ExtraLight',
   },
   editInstructionButton: {
     padding: 4,
@@ -1245,6 +1264,7 @@ const styles = StyleSheet.create({
     minHeight: 60,
     textAlignVertical: 'top',
     marginBottom: 12,
+    fontFamily: 'Nexa-ExtraLight',
   },
   instructionButtonRow: {
     flexDirection: 'row',
@@ -1264,6 +1284,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#666666',
+    fontFamily: 'Nexa-Heavy',
   },
   saveInstructionButton: {
     flex: 1,
@@ -1277,6 +1298,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#FFFFFF',
+    fontFamily: 'Nexa-Heavy',
   },
 
   // Personal Details - List View
@@ -1292,6 +1314,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     fontWeight: '500',
+    fontFamily: 'Nexa-ExtraLight',
   },
   detailValue: {
     fontSize: 14,
@@ -1300,6 +1323,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     flex: 1,
     marginLeft: 16,
+    fontFamily: 'Nexa-Heavy',
   },
 
   // Personal Details - Edit Form
@@ -1318,6 +1342,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333333',
     marginBottom: 8,
+    fontFamily: 'Nexa-Heavy',
   },
   input: {
     backgroundColor: '#F8F8F8',
@@ -1328,10 +1353,12 @@ const styles = StyleSheet.create({
     color: '#333333',
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    fontFamily: 'Nexa-ExtraLight',
   },
   inputReadOnly: {
     backgroundColor: '#F0F0F0',
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
 
   // Action Buttons - Fresh Start
@@ -1356,6 +1383,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#666666',
+    fontFamily: 'Nexa-Heavy',
   },
   saveButtonNew: {
     flex: 1,
@@ -1369,6 +1397,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+    fontFamily: 'Nexa-Heavy',
   },
 
   // Payment Methods
@@ -1382,14 +1411,20 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
+    position: 'relative',
+  },
+  paymentMethodDisabled: {
+    opacity: 0.5,
   },
   paymentMethodContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  paymentIcon: {
-    fontSize: 20,
+  paymentIconImage: {
+    width: 48,
+    height: 38,
     marginRight: 12,
+    resizeMode: 'contain',
   },
   paymentTextContainer: {
     flexDirection: 'column',
@@ -1398,11 +1433,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
     fontWeight: '500',
+    fontFamily: 'Nexa-Heavy',
   },
   paymentDescription: {
     fontSize: 12,
     color: '#666666',
     marginTop: 2,
+    fontFamily: 'Nexa-ExtraLight',
+  },
+  comingSoonOverlay: {
+    position: 'absolute',
+    top: 16,
+    right: 0,
+    backgroundColor: '#F43332',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  comingSoonText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    fontFamily: 'Nexa-Heavy',
   },
 
   // Order Items
@@ -1419,11 +1471,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
     flex: 1,
+    fontFamily: 'Nexa-ExtraLight',
   },
   orderItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#F43332',
+    fontFamily: 'Nexa-Heavy',
   },
   separator: {
     height: 1,
@@ -1445,19 +1499,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   summaryValue: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   summarySubLabel: {
     fontSize: 14,
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
   summarySubValue: {
     fontSize: 14,
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
 
   // Bottom Padding
@@ -1498,14 +1556,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   totalAmount: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 18 : 20,
     fontWeight: 'bold',
     color: '#F43332',
+    fontFamily: 'Nexa-Heavy',
   },
   totalSeparator: {
     height: 1,
@@ -1515,7 +1575,7 @@ const styles = StyleSheet.create({
   placeOrderButton: {
     backgroundColor: '#F43332',
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 12 : 16,
     alignItems: 'center',
   },
   placeOrderButtonDisabled: {
@@ -1523,9 +1583,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   placeOrderButtonText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#FFFFFF',
+    fontFamily: 'Nexa-Heavy',
   },
 
   // Modal Styles
@@ -1540,8 +1601,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingVertical: isSmallScreen ? 12 : 16,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderBottomWidth: 1,
@@ -1550,28 +1611,30 @@ const styles = StyleSheet.create({
 
   },
   closeButton: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeButtonText: {
-    fontSize: 24,
+    fontSize: isSmallScreen ? 20 : 24,
     color: '#666666',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontWeight: '600',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   saveButton: {
     width: 60,
     alignItems: 'flex-end',
   },
   saveButtonText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#F43332',
+    fontFamily: 'Nexa-Heavy',
   },
   mapWrapperContainer: {
 
@@ -1580,7 +1643,7 @@ const styles = StyleSheet.create({
   },
   mapWrapper: {
     width: '100%',
-    height: Math.min(height * 0.35, 350),
+    height: isSmallScreen ? Math.min(height * 0.3, 250) : Math.min(height * 0.35, 350),
     position: 'relative',
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
@@ -1618,52 +1681,57 @@ const styles = StyleSheet.create({
   locationButton: {
     backgroundColor: '#F43332',
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: isSmallScreen ? 12 : 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: isSmallScreen ? 15 : 20,
   },
   locationButtonIcon: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     marginRight: 8,
   },
   locationButtonText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#FFFFFF',
+    fontFamily: 'Nexa-Heavy',
   },
   addressDisplayContainer: {
     backgroundColor: '#F8F8F8',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    padding: isSmallScreen ? 12 : 16,
+    marginBottom: isSmallScreen ? 15 : 20,
   },
   addressDisplayLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
     textTransform: 'uppercase',
     fontWeight: '600',
+    fontFamily: 'Nexa-Heavy',
   },
   addressDisplayText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#333333',
     fontWeight: '500',
     marginBottom: 4,
+    fontFamily: 'Nexa-Heavy',
   },
   addressDisplaySubtext: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
   labelContainer: {
     marginBottom: 20,
   },
   labelTitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 12,
+    marginBottom: isSmallScreen ? 10 : 12,
+    fontFamily: 'Nexa-Heavy',
   },
   labelOptions: {
     flexDirection: 'row',
@@ -1684,32 +1752,47 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   labelOptionText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
   labelOptionTextSelected: {
     color: '#F43332',
     fontWeight: '600',
+    fontFamily: 'Nexa-Heavy',
   },
   noteContainer: {
     marginBottom: 20,
   },
   noteLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
+    fontFamily: 'Nexa-Heavy',
   },
   noteInput: {
     backgroundColor: '#F8F8F8',
     borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-
-    minHeight: 60,
+    padding: isSmallScreen ? 10 : 12,
+    fontSize: isSmallScreen ? 12 : 14,
+    minHeight: isSmallScreen ? 50 : 60,
     textAlignVertical: 'top',
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    fontFamily: 'Nexa-ExtraLight',
+  },
+
+  // Footer
+  footerContainer: {
+    alignItems: 'center',
+    paddingTop: 12,
+    paddingBottom: 0,
+  },
+  footerText: {
+    fontSize: 11,
+    color: '#999999',
+    fontFamily: 'Nexa-ExtraLight',
   },
 });
 

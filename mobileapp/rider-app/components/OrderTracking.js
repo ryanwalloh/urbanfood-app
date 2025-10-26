@@ -25,6 +25,7 @@ import { locationTracker } from '../services/locationTracking';
 import API_CONFIG from '../config/apiConfig';
 
 const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 const OrderTracking = ({ orderId, onBack }) => {
   const [orderDetails, setOrderDetails] = useState(null);
@@ -934,6 +935,8 @@ const OrderTracking = ({ orderId, onBack }) => {
       if (response.success) {
         setOrderDetails(response);
         console.log('✅ Order details fetched successfully:', response);
+        console.log('💳 Payment method:', response.payment_method);
+        console.log('💳 Payment status:', response.payment_status);
         
         // Geocode restaurant and customer addresses to get real coordinates
         await geocodeAddresses(response);
@@ -1180,9 +1183,13 @@ const OrderTracking = ({ orderId, onBack }) => {
           </View>
           <View style={styles.deliveryTypeContent}>
             <Text style={styles.deliveryTypeTitle}>
-              {orderDetails.payment_method === 'Card Payment' ? 'Card Payment' : 
-               orderDetails.payment_method === 'Cash on Delivery' ? 'Cash On Delivery' :
-               orderDetails.payment_method || 'Cash On Delivery'}
+              {(() => {
+                const method = orderDetails.payment_method;
+                console.log('🔍 Rendering payment method:', method);
+                return method === 'Card Payment' ? 'Card Payment' : 
+                       method === 'Cash on Delivery' ? 'Cash On Delivery' :
+                       method || 'Cash On Delivery';
+              })()}
             </Text>
             <Text style={styles.totalAmount}>₱{orderDetails.total_amount || '0.00'}</Text>
           </View>
@@ -1594,14 +1601,14 @@ const styles = StyleSheet.create({
   },
   floatingContainer: {
     position: 'absolute',
-    top: 40,
-    left: 20,
-    right: 20,
+    top: Platform.OS === 'android' ? (isSmallScreen ? 35 : 40) : 40,
+    left: isSmallScreen ? 15 : 20,
+    right: isSmallScreen ? 15 : 20,
     backgroundColor: '#FFFFFF',
     opacity: 0.8,
     borderRadius: 12,
-    padding: 10,
-    paddingVertical: 8,
+    padding: isSmallScreen ? 8 : 10,
+    paddingVertical: isSmallScreen ? 6 : 8,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -1614,23 +1621,22 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   pinIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 12,
+    width: isSmallScreen ? 18 : 20,
+    height: isSmallScreen ? 18 : 20,
+    marginRight: isSmallScreen ? 10 : 12,
    
   },
   destinationTextContainer: {
     flex: 1,
   },
   destinationLabel: {
-    fontSize: 14,
-
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#999',
     textAlign: 'left',
     marginBottom: 0,
   },
   destinationAddress: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666666',
     textAlign: 'left',
@@ -1682,27 +1688,27 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    paddingTop: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingBottom: isSmallScreen ? 15 : 20,
+    paddingTop: isSmallScreen ? 15 : 20,
     flexGrow: 1,
   },
   orderNumberContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    bottom: 10,
+    marginBottom: isSmallScreen ? 15 : 20,
+    paddingHorizontal: isSmallScreen ? 8 : 10,
+    bottom: isSmallScreen ? 8 : 10,
     
   },
   orderNumberLabel: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666666',
   },
   orderNumberValue: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontFamily: 'Nexa-ExtraLight',
     color: '#1A1A1A',
   },
@@ -1711,32 +1717,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    padding: 12,
-    paddingVertical: 8,
+    padding: isSmallScreen ? 10 : 12,
+    paddingVertical: isSmallScreen ? 6 : 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     marginBottom: 0,
-    bottom: 20,
+    bottom: isSmallScreen ? 15 : 20,
   },
   profileIconContainer: {
-    marginRight: 15,
+    marginRight: isSmallScreen ? 12 : 15,
   },
   profileIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: isSmallScreen ? 45 : 50,
+    height: isSmallScreen ? 45 : 50,
+    borderRadius: isSmallScreen ? 22.5 : 25,
   },
   defaultProfileIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: isSmallScreen ? 45 : 50,
+    height: isSmallScreen ? 45 : 50,
+    borderRadius: isSmallScreen ? 22.5 : 25,
     backgroundColor: '#F43332',
     alignItems: 'center',
     justifyContent: 'center',
   },
   defaultProfileText: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 18 : 20,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
   },
@@ -1744,32 +1750,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   callingCardTitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 13 : 14,
     fontFamily: 'Nexa-Heavy',
     color: '#1A1A1A',
     marginBottom: 0,
     opacity: 0.8,
   },
   callingCardSubtitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666666',
   },
   callButton: {
-    padding: 10,
+    padding: isSmallScreen ? 8 : 10,
   },
   callIcon: {
-    width: 24,
-    height: 24,
+    width: isSmallScreen ? 22 : 24,
+    height: isSmallScreen ? 22 : 24,
     opacity: 0.8,
   },
   progressGuide: {
  
-    padding: 20,
+    padding: isSmallScreen ? 15 : 20,
     width: '100%',
     borderRadius: 12,
     marginBottom: 0,
-    bottom: 20,
+    bottom: isSmallScreen ? 15 : 20,
   },
   progressItem: {
     flexDirection: 'row',
@@ -1791,7 +1797,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   progressTitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-Heavy',
     color: '#1A1A1A',
     marginBottom: 0,
@@ -1799,7 +1805,7 @@ const styles = StyleSheet.create({
   },
   
   progressSubtitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666666',
   },
@@ -1812,11 +1818,11 @@ const styles = StyleSheet.create({
   },
   deliveryTypeContainer: {
     backgroundColor: '#1A1A1A',
-    padding: 10,
-    paddingHorizontal: 20,
+    padding: isSmallScreen ? 8 : 10,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 12,
-    marginBottom: 16,
-    bottom: 20,
+    marginBottom: isSmallScreen ? 12 : 16,
+    bottom: isSmallScreen ? 15 : 20,
   },
   
   deliveryTypeHeader: {
@@ -1825,12 +1831,12 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   deliveryTypeLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     fontFamily: 'Nexa-ExtraLight',
     color: '#999999',
   },
   amountLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     fontFamily: 'Nexa-ExtraLight',
     color: '#999999',
   
@@ -1841,13 +1847,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deliveryTypeTitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 13 : 14,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
     fontWeight: 'bold',
   },
   totalAmount: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
     fontWeight: 'bold',
@@ -1875,18 +1881,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: isSmallScreen ? 12 : 15,
     borderRadius: 12,
-    marginBottom: 20,
-    bottom: 20,
+    marginBottom: isSmallScreen ? 15 : 20,
+    bottom: isSmallScreen ? 15 : 20,
   },
   bagIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+    width: isSmallScreen ? 18 : 20,
+    height: isSmallScreen ? 18 : 20,
+    marginRight: isSmallScreen ? 8 : 10,
   },
   pickedUpButtonText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
   },
@@ -2184,18 +2190,18 @@ const styles = StyleSheet.create({
   // Map Controls - Brand Styled
   mapControls: {
     position: 'absolute',
-    right: 20,
-    bottom: 420,
+    right: isSmallScreen ? 15 : 20,
+    bottom: isSmallScreen ? height * 0.55 : 420,
     flexDirection: 'column',
   },
   controlButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: isSmallScreen ? 44 : 50,
+    height: isSmallScreen ? 44 : 50,
+    borderRadius: isSmallScreen ? 22 : 25,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: isSmallScreen ? 8 : 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -2208,7 +2214,7 @@ const styles = StyleSheet.create({
     borderColor: '#F7F7F7',
   },
   controlButtonText: {
-    fontSize: 24,
+    fontSize: isSmallScreen ? 20 : 24,
     fontFamily: 'Nexa-ExtraLight',
     color: '#F43332',
   },
@@ -2233,7 +2239,7 @@ const styles = StyleSheet.create({
     // The opacity will be animated in the component using Animated.Value
   },
   trackingText: {
-    fontSize: 10,
+    fontSize: isSmallScreen ? 9 : 10,
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
   },

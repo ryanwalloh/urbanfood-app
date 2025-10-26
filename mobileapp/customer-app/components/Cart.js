@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Platform } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { apiService } from '../services/api';
 import Checkout from './Checkout';
 import OrderTracking from './OrderTracking';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
-const Cart = ({ restaurant, cartItems, onBack, user }) => {
+const Cart = ({ restaurant, cartItems, onBack, onHome, user }) => {
   const [items, setItems] = useState(cartItems || []);
   const [suggestedProducts, setSuggestedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -166,8 +167,19 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
   const handleBackFromOrderTracking = () => {
     setShowOrderTracking(false);
     setOrderData(null);
-    // Navigate back to main page
+    // Navigate back to cart
     onBack();
+  };
+
+  const handleHomeFromOrderTracking = () => {
+    setShowOrderTracking(false);
+    setOrderData(null);
+    // Navigate to MainPage
+    if (onHome) {
+      onHome();
+    } else {
+      onBack(); // Fallback to onBack if onHome is not provided
+    }
   };
 
   // Show Order Tracking page if order is placed
@@ -180,6 +192,7 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
         user={user}
         address={userAddress}
         onBack={handleBackFromOrderTracking}
+        onHome={handleHomeFromOrderTracking}
       />
     );
   }
@@ -469,6 +482,11 @@ const Cart = ({ restaurant, cartItems, onBack, user }) => {
           </View>
         </View>
 
+        {/* Copyright Footer */}
+        <View style={styles.copyrightContainer}>
+          <Text style={styles.copyrightText}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </View>
+
         {/* Bottom padding for sticky total */}
         <View style={styles.bottomPadding} />
       </ScrollView>
@@ -498,22 +516,22 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingTop: isSmallScreen ? 45 : 50,
+    paddingBottom: isSmallScreen ? 15 : 20,
   },
   closeButton: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerContent: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: isSmallScreen ? 10 : 12,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 0,
@@ -522,7 +540,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
     marginBottom: 0,
     paddingHorizontal: 0,
@@ -618,12 +636,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   progressStepNumber: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   progressStepLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
     top: -15,
   },
@@ -635,22 +653,20 @@ const styles = StyleSheet.create({
 
   // Delivery Estimate
   deliveryContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-   
- 
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 20 : 30,
     paddingVertical: 10,
-    marginHorizontal: 20,
+    marginHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
   },
   deliveryLabel: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#666666',
     marginBottom: 0,
   },
   deliveryTime: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 16 : 20,
     fontWeight: 'bold',
     color: '#333333',
   },
@@ -659,7 +675,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   changeButtonText: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#F43332',
     fontWeight: '600',
   },
@@ -672,30 +688,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   deliveryIcon: {
-    width: 50,
-    height: 50,
-    marginRight: 16,
+    width: isSmallScreen ? 40 : 50,
+    height: isSmallScreen ? 40 : 50,
+    marginRight: isSmallScreen ? 12 : 16,
   },
 
   // Cart Items
   cartItemsContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
-
-    marginHorizontal: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 15 : 20,
+    marginHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 8,
     paddingVertical: 10,
   },
   cartItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 12 : 16,
   },
   cartItemImageContainer: {
-    width: 60,
-    height: 60,
+    width: isSmallScreen ? 50 : 60,
+    height: isSmallScreen ? 50 : 60,
     borderRadius: 10,
-    marginRight: 16,
+    marginRight: isSmallScreen ? 12 : 16,
     overflow: 'hidden',
   },
   cartItemImage: {
@@ -706,10 +721,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cartItemName: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -729,10 +744,10 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   quantityText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#333333',
-    marginHorizontal: 12,
+    marginHorizontal: isSmallScreen ? 10 : 12,
     minWidth: 20,
     textAlign: 'center',
   },
@@ -740,10 +755,10 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   cartItemPrice: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: 'bold',
     color: '#F43332',
-    marginLeft: 16,
+    marginLeft: isSmallScreen ? 12 : 16,
   },
   separator: {
     height: 1,
@@ -753,48 +768,48 @@ const styles = StyleSheet.create({
 
   // Add More Button
   addMoreButton: {
-    paddingVertical: 6,
+    paddingVertical: isSmallScreen ? 5 : 6,
     alignItems: 'flex-start',
-    marginTop: 10,
+    marginTop: isSmallScreen ? 8 : 10,
   },
   addMoreText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
   },
 
   // Suggested Products
   suggestedContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 20 : 30,
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
+    marginHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 8,
     paddingVertical: 10,
   },
   suggestedTitle: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 16 : 20,
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 4,
   },
   suggestedSubtitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
-    marginBottom: 16,
+    marginBottom: isSmallScreen ? 12 : 16,
   },
   suggestedScroll: {
     marginHorizontal: -20,
     paddingHorizontal: 20,
   },
   suggestedProductCard: {
-    width: 140,
-    marginRight: 16,
+    width: isSmallScreen ? 120 : 140,
+    marginRight: isSmallScreen ? 12 : 16,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
   },
   suggestedProductImageContainer: {
     position: 'relative',
-    height: 100,
+    height: isSmallScreen ? 80 : 100,
     borderRadius: 12,
   },
   suggestedProductImage: {
@@ -805,96 +820,107 @@ const styles = StyleSheet.create({
   },
   suggestedPlusButton: {
     position: 'absolute',
-    bottom: 8,
-    right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    bottom: isSmallScreen ? 6 : 8,
+    right: isSmallScreen ? 6 : 8,
+    width: isSmallScreen ? 20 : 24,
+    height: isSmallScreen ? 20 : 24,
+    borderRadius: isSmallScreen ? 10 : 12,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
   },
   suggestedProductInfo: {
-    padding: 12,
+    padding: isSmallScreen ? 10 : 12,
   },
   suggestedProductName: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
     color: '#333333',
     marginBottom: 4,
   },
   suggestedProductPrice: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     fontWeight: 'bold',
     color: '#F43332',
   },
 
   // Fees Container
   feesContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 15 : 20,
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
+    marginHorizontal: isSmallScreen ? 15 : 20,
     borderRadius: 8,
-    paddingVertical: 20,
+    paddingVertical: isSmallScreen ? 15 : 20,
   },
   feeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: isSmallScreen ? 6 : 8,
   },
   feeLabel: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontWeight: 'bold',
     color: '#333333',
   },
   feeValue: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontWeight: 'bold',
     color: '#333333',
   },
   feeSubLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
   },
   feeSubValue: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
   },
   voucherContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: isSmallScreen ? 10 : 12,
   },
   voucherIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 8,
+    width: isSmallScreen ? 18 : 20,
+    height: isSmallScreen ? 18 : 20,
+    marginRight: isSmallScreen ? 6 : 8,
   },
   voucherText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#F43332',
     fontWeight: 'bold',
   },
 
+  // Copyright Footer
+  copyrightContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  copyrightText: {
+    fontSize: isSmallScreen ? 11 : 13,
+    color: '#999',
+    textAlign: 'center',
+  },
+
   // Bottom Padding
   bottomPadding: {
-    height: 180, // Space for sticky total
+    height: isSmallScreen ? 200 : 220, // Space for sticky total + Android nav
   },
 
   // Sticky Total
   stickyTotalContainer: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    bottom: Platform.OS === 'android' ? (isSmallScreen ? 15 : 20) : (isSmallScreen ? 10 : 15),
+    left: isSmallScreen ? 15 : 20,
+    right: isSmallScreen ? 15 : 20,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingTop: isSmallScreen ? 12 : 16,
+    paddingBottom: Platform.OS === 'android' ? (isSmallScreen ? 25 : 30) : (isSmallScreen ? 15 : 20),
     borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: {
@@ -909,15 +935,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: isSmallScreen ? 10 : 12,
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#333333',
   },
   totalAmount: {
-    fontSize: 20,
+    fontSize: isSmallScreen ? 18 : 20,
     fontWeight: 'bold',
     color: '#F43332',
   },
@@ -929,11 +955,11 @@ const styles = StyleSheet.create({
   checkoutButton: {
     backgroundColor: '#F43332',
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 12 : 16,
     alignItems: 'center',
   },
   checkoutButtonText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
     color: '#FFFFFF',
   },

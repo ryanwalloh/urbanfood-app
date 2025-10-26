@@ -5,7 +5,8 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { apiService } from '../services/api';
 import API_CONFIG from '../config/apiConfig';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 // Custom map styling for cleaner appearance
 const customMapStyle = [
@@ -168,7 +169,7 @@ const decodePolyline = (encoded) => {
   return poly;
 };
 
-const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBack, address }) => {
+const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBack, onHome, address }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [order, setOrder] = useState(initialOrder);
   const [currentStatus, setCurrentStatus] = useState(initialOrder?.status || 'pending');
@@ -517,6 +518,9 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Your order</Text>
         </View>
+        <TouchableOpacity onPress={onHome || onBack} style={styles.homeButton}>
+          <Text style={styles.homeButtonText}>Home</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView 
@@ -763,7 +767,12 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
           {/* Total */}
           <View style={styles.totalRowNoBorder}>
             <Text style={styles.totalLabel}>Total (incl. fees and tax)</Text>
-            <Text style={styles.totalValue}>₱{order?.total_amount || '0.00'}</Text>
+            <View style={styles.totalValueContainer}>
+              <Text style={styles.totalValue}>₱{order?.total_amount || '0.00'}</Text>
+              {order?.payment_method === 'Card Payment' && order?.payment_status === 'succeeded' && (
+                <Text style={styles.paidBadge}>Paid</Text>
+              )}
+            </View>
           </View>
 
           {/* Separator before View Details */}
@@ -817,11 +826,34 @@ const OrderTracking = ({ order: initialOrder, restaurant, cartItems, user, onBac
               {/* Paid With */}
               <Text style={styles.paidWithLabel}>Paid with</Text>
               <View style={styles.paymentRow}>
-                <Text style={styles.paymentMethod}>COD</Text>
+                <Text style={styles.paymentMethod}>
+                  {order?.payment_method === 'Card Payment' ? 'Card Payment' : 
+                   order?.payment_method === 'Cash on Delivery' ? 'Cash On Delivery' :
+                   order?.payment_method || 'Cash On Delivery'}
+                </Text>
                 <Text style={styles.paymentAmount}>₱{order?.total_amount || '0.00'}</Text>
               </View>
+              {order?.payment_method === 'Card Payment' && order?.payment_status && (
+                <View style={styles.paymentStatusRow}>
+                  <Text style={styles.paymentStatusLabel}> </Text>
+                  <Text style={[
+                    styles.paymentStatusValue,
+                    order.payment_status === 'succeeded' && styles.paymentStatusSuccess
+                  ]}>
+                    {order.payment_status === 'succeeded' ? 'Paid' :
+                     order.payment_status === 'pending' ? 'Pending' :
+                     order.payment_status === 'failed' ? 'Failed' :
+                     'Pending'}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>© 2025 Soti Delivery. All rights reserved.</Text>
         </View>
       </ScrollView>
     </View>
@@ -843,29 +875,44 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    paddingTop: 50,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    paddingVertical: isSmallScreen ? 12 : 16,
+    paddingTop: Platform.OS === 'android' ? (isSmallScreen ? 45 : 50) : 50,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: isSmallScreen ? 6 : 8,
   },
   closeButton: {
-    width: 40,
-    height: 40,
+    width: isSmallScreen ? 36 : 40,
+    height: isSmallScreen ? 36 : 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontWeight: 'bold',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
+  },
+  homeButton: {
+    paddingHorizontal: isSmallScreen ? 12 : 16,
+    paddingVertical: isSmallScreen ? 6 : 8,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+  
+  },
+  homeButtonText: {
+    fontSize: isSmallScreen ? 13 : 14,
+    fontWeight: 'bold',
+    color: '#999',
+    fontFamily: 'Nexa-Heavy',
   },
   content: {
     flex: 1,
@@ -875,11 +922,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   statusImage: {
-    width: 200,
-    height: 200,
+    width: isSmallScreen ? 160 : 200,
+    height: isSmallScreen ? 160 : 200,
   },
   mapContainer: {
-    height: 250,
+    height: isSmallScreen ? 200 : 250,
     marginHorizontal: 0,
     borderRadius: 0,
     overflow: 'hidden',
@@ -890,58 +937,61 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   markerImage: {
-    width: 30,
-    height: 30,
+    width: isSmallScreen ? 25 : 30,
+    height: isSmallScreen ? 25 : 30,
   },
   liveIndicator: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: isSmallScreen ? 8 : 10,
+    right: isSmallScreen ? 8 : 10,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F43332',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: isSmallScreen ? 6 : 8,
+    paddingVertical: isSmallScreen ? 3 : 4,
     borderRadius: 12,
   },
   liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: isSmallScreen ? 5 : 6,
+    height: isSmallScreen ? 5 : 6,
+    borderRadius: isSmallScreen ? 2.5 : 3,
     backgroundColor: '#FFFFFF',
-    marginRight: 4,
+    marginRight: isSmallScreen ? 3 : 4,
   },
   liveText: {
-    fontSize: 10,
+    fontSize: isSmallScreen ? 9 : 10,
     color: '#FFFFFF',
     fontWeight: 'bold',
+    fontFamily: 'Nexa-Heavy',
   },
   subtitle1: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
     textAlign: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: isSmallScreen ? 30 : 40,
     marginBottom: 4,
     marginTop: 10,
+    fontFamily: 'Nexa-ExtraLight',
   },
   title1: {
-    fontSize: 24,
+    fontSize: isSmallScreen ? 20 : 24,
     fontWeight: 'bold',
     color: '#333333',
     textAlign: 'center',
-    paddingHorizontal: 40,
-    marginBottom: 24,
+    paddingHorizontal: isSmallScreen ? 30 : 40,
+    marginBottom: isSmallScreen ? 20 : 24,
+    fontFamily: 'Nexa-Heavy',
   },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 40,
-    marginBottom: 14,
+    gap: isSmallScreen ? 6 : 8,
+    paddingHorizontal: isSmallScreen ? 30 : 40,
+    marginBottom: isSmallScreen ? 12 : 14,
   },
   progressBarWrapper: {
     flex: 1,
-    height: 4,
+    height: isSmallScreen ? 3 : 4,
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
     overflow: 'hidden',
@@ -949,7 +999,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 4,
+    height: isSmallScreen ? 3 : 4,
     backgroundColor: '#E0E0E0',
     borderRadius: 2,
   },
@@ -958,8 +1008,8 @@ const styles = StyleSheet.create({
   },
   progressBarActive: {
     position: 'absolute',
-    width: 60,
-    height: 4,
+    width: isSmallScreen ? 50 : 60,
+    height: isSmallScreen ? 3 : 4,
     backgroundColor: '#F43332',
     borderRadius: 2,
     opacity: 0.6,
@@ -969,71 +1019,78 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   subtitle2: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     color: '#999999',
     textAlign: 'center',
-    paddingHorizontal: 30,
-    lineHeight: 15,
-    marginBottom: 30,
+    paddingHorizontal: isSmallScreen ? 25 : 30,
+    lineHeight: isSmallScreen ? 14 : 15,
+    marginBottom: isSmallScreen ? 20 : 30,
     fontStyle: 'italic',
+    fontFamily: 'Nexa-ExtraLight',
   },
   deliverySuccessText: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     color: '#999999',
     textAlign: 'center',
-    paddingHorizontal: 30,
-    lineHeight: 18,
-    marginBottom: 30,
+    paddingHorizontal: isSmallScreen ? 25 : 30,
+    lineHeight: isSmallScreen ? 16 : 18,
+    marginBottom: isSmallScreen ? 20 : 30,
     fontWeight: 'lighter',
     bottom: 15,
+    fontFamily: 'Nexa-ExtraLight',
   },
   subtitle2Justified: {
     textAlign: 'justify',
     alignSelf: 'center',
-    maxWidth: width - 60,
+    maxWidth: isSmallScreen ? width - 50 : width - 60,
   },
   funFactBold: {
     fontWeight: 'bold',
     color: '#F43332',
+    fontFamily: 'Nexa-Heavy',
   },
   highlightedText: {
     color: '#F43332',
+    fontFamily: 'Nexa-Heavy',
   },
   orderDetailsContainer: {
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
-    marginBottom: 30,
+    marginHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? 20 : 30,
     borderRadius: 12,
-    padding: 20,
+    padding: isSmallScreen ? 15 : 20,
   },
   orderDetailsTitle: {
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 16,
+    marginBottom: isSmallScreen ? 12 : 16,
+    fontFamily: 'Nexa-Heavy',
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
   detailRowNoBorder: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   detailLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
+    fontFamily: 'Nexa-ExtraLight',
   },
   detailValue: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '500',
     color: '#333333',
     flex: 1,
     textAlign: 'right',
+    fontFamily: 'Nexa-Heavy',
   },
   separator: {
     height: 1,
@@ -1043,70 +1100,126 @@ const styles = StyleSheet.create({
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   totalRowNoBorder: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   totalLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 13 : 14,
     fontWeight: '600',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   totalValue: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: 'bold',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
+  },
+  totalValueContainer: {
+    alignItems: 'flex-end',
+  },
+  paidBadge: {
+    fontSize: isSmallScreen ? 11 : 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginTop: 4,
+    backgroundColor: '#F433329E',
+    paddingHorizontal: isSmallScreen ? 12 : 15,
+    paddingVertical: 2,
+    borderRadius: 20,
+    fontFamily: 'Nexa-Heavy',
   },
   viewDetailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   viewDetailsText: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#F43332',
     fontWeight: '600',
+    fontFamily: 'Nexa-Heavy',
   },
   expandedDetails: {
     backgroundColor: '#F8F8F8',
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
-    marginBottom: -20,
-    paddingBottom: 20,
+    marginHorizontal: isSmallScreen ? -15 : -20,
+    paddingHorizontal: isSmallScreen ? 15 : 20,
+    marginBottom: isSmallScreen ? -15 : -20,
+    paddingBottom: isSmallScreen ? 15 : 20,
   },
   detailRowExpanded: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   totalRowExpanded: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   paidWithLabel: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     color: '#666666',
-    marginBottom: 12,
+    marginBottom: isSmallScreen ? 10 : 12,
+    fontFamily: 'Nexa-ExtraLight',
   },
   paymentRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: isSmallScreen ? 10 : 12,
   },
   paymentMethod: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
   },
   paymentAmount: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontWeight: '600',
     color: '#333333',
+    fontFamily: 'Nexa-Heavy',
+  },
+  paymentStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: isSmallScreen ? 6 : 8,
+  },
+  paymentStatusLabel: {
+    fontSize: isSmallScreen ? 11 : 12,
+    color: '#999999',
+    fontFamily: 'Nexa-ExtraLight',
+  },
+  paymentStatusValue: {
+    fontSize: isSmallScreen ? 12 : 14,
+    fontWeight: '600',
+    marginTop: 2,
+    backgroundColor: '#F433329E',
+    paddingHorizontal: isSmallScreen ? 12 : 15,
+    paddingVertical: 2,
+    borderRadius: 20,
+    fontFamily: 'Nexa-Heavy',
+  },
+  paymentStatusSuccess: {
+    color: '#FFFFFF',
+  },
+
+  // Footer
+  footerContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  footerText: {
+    fontSize: 11,
+    color: '#999999',
+    fontFamily: 'Nexa-ExtraLight',
   },
 });
 
