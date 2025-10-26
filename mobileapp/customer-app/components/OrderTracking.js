@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { apiService } from '../services/api';
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = height < 700;

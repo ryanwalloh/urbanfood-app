@@ -5,7 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { apiService } from '../services/api';
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const { width } = Dimensions.get('window');
 const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;

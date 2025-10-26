@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG } from '../config/apiConfig';
+import { API_CONFIG } from '../config/apiConfig.js';
 
 // API Base URL - from central config (Railway)
 const API_BASE_URL = API_CONFIG.API_BASE_URL;

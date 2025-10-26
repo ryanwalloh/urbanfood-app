@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { apiService } from './services/api';
-import API_CONFIG from './config/apiConfig';
+import API_CONFIG from './config/apiConfig.js';
 import MainPage from './components/MainPage';
 import WelcomePage from './components/WelcomePage';
 import LoginPage from './components/LoginPage';

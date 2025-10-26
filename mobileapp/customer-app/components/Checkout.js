@@ -5,7 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useStripe } from '@stripe/stripe-react-native';
 import { apiService } from '../services/api';
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = height < 700;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Animated, Platform } from 'react-native';
 import { apiService } from '../services/api';
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = height < 700;
