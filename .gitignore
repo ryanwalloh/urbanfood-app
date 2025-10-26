@@ -23,7 +23,7 @@ env/
 .history/
 
 # Mobile app configuration files (contain API keys)
-mobileapp/*/config/apiConfig.js
+# mobileapp/*/config/apiConfig.js  # Commented out to allow builds
 
 # Logs
 *.log
