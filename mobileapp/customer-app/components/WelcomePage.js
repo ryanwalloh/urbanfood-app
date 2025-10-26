@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Animated, TouchableOpacity, ScrollView, Platform } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 const WelcomePage = ({ onGetStarted, onCreateAccount }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -42,37 +43,46 @@ const WelcomePage = ({ onGetStarted, onCreateAccount }) => {
       {/* Dark Overlay */}
       <View style={styles.darkOverlay} />
 
-      {/* Content Container */}
-      <Animated.View style={[
-        styles.contentContainer,
-        {
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }]
-        }
-      ]}>
-        {/* Logo */}
-        <Animated.View style={[
-          styles.logoContainer,
-          {
-            transform: [{ scale: logoScaleAnim }]
-          }
-        ]}>
-          <Image 
-            source={require('../assets/sotihorizontal.png')} 
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </Animated.View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        {/* Logo and Subtitle at Top */}
+        <View style={styles.topSection}>
+          <Animated.View style={[
+            styles.topContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}>
+            {/* Logo */}
+            <Animated.View style={[
+              styles.logoContainer,
+              {
+                transform: [{ scale: logoScaleAnim }]
+              }
+            ]}>
+              <Image 
+                source={require('../assets/sotihorizontal.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </Animated.View>
 
-        {/* Subtitle */}
-        <View style={styles.textContainer}>
-          <Text style={styles.subtitle}>
-            It's the <Text style={styles.highlightedText}>food</Text> you love, delivered with care
-          </Text>
+            {/* Subtitle */}
+            <View style={styles.textContainer}>
+              <Text style={styles.subtitle}>
+                It's the <Text style={styles.highlightedText}>food</Text> you love, delivered to you
+              </Text>
+            </View>
+          </Animated.View>
         </View>
 
-        {/* Buttons and Text Container */}
-        <View style={styles.buttonsAndTextContainer}>
+        {/* Buttons and Text Container - Fixed at Bottom */}
+        <View style={styles.bottomSection}>
+          <View style={styles.buttonsAndTextContainer}>
           {/* Login Button */}
           <TouchableOpacity 
             style={styles.loginButton}
@@ -102,8 +112,12 @@ const WelcomePage = ({ onGetStarted, onCreateAccount }) => {
           <View style={styles.communitySubtitleContainer}>
             <Text style={styles.communitySubtitle}>Empowering local restaurants. Supporting riders. Serving the community.</Text>
           </View>
+
+          {/* Footer */}
+          <Text style={styles.footer}>© 2025 Soti Delivery. All rights reserved.</Text>
+          </View>
         </View>
-      </Animated.View>
+      </ScrollView>
     </View>
   );
 };
@@ -128,31 +142,44 @@ const styles = StyleSheet.create({
     height: height,
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
   },
-  contentContainer: {
+  scrollContent: {
+    flexGrow: 1,
+    minHeight: height,
+  },
+  topSection: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+  },
+  topContainer: {
     alignItems: 'center',
     paddingHorizontal: 40,
+    paddingTop: isSmallScreen ? 40 : 80,
+  },
+  bottomSection: {
+    justifyContent: 'flex-end',
+    paddingBottom: isSmallScreen ? 20 : 30,
   },
   logoContainer: {
-    marginBottom: 40,
-    bottom: 140,
+    marginBottom: isSmallScreen ? 10 : 15,
   },
   logo: {
-    width: 250,
+    width: width * 0.7,
+    maxWidth: 250,
     height: 80,
+    resizeMode: 'contain',
   },
   textContainer: {
     alignItems: 'center',
-    marginBottom: 60,
-    bottom: 180,
+    paddingHorizontal: 10,
+    width: '100%',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 13 : 15,
     fontFamily: 'Nexa-ExtraLight',
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: isSmallScreen ? 18 : 22,
+    paddingHorizontal: 10,
   },
   highlightedText: {
     color: '#F43332',
@@ -160,46 +187,47 @@ const styles = StyleSheet.create({
   },
   buttonsAndTextContainer: {
     alignItems: 'center',
-    top: 180,
+    width: '100%',
+    paddingHorizontal: 40,
   },
   loginButton: {
     backgroundColor: '#FFFFFF',
     borderRadius: 35,
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 14 : 16,
     paddingHorizontal: 60,
-
     marginBottom: 14,
-    width: 320,
+    width: width * 0.85,
+    maxWidth: 320,
     alignSelf: 'center',
   },
   loginButtonText: {
     color: '#F43332',
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontFamily: 'Nexa-Heavy',
     textAlign: 'center',
   },
   createAccountButton: {
     backgroundColor: '#F43332',
     borderRadius: 35,
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 14 : 16,
     paddingHorizontal: 60,
-
-    width: 320,
+    width: width * 0.85,
+    maxWidth: 320,
     alignSelf: 'center',
   },
   createAccountButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: isSmallScreen ? 16 : 18,
     fontFamily: 'Nexa-Heavy',
     textAlign: 'center',
   },
   registrationSubtitleContainer: {
-    marginTop: 20,
+    marginTop: isSmallScreen ? 15 : 20,
     alignItems: 'center',
-  
+    paddingHorizontal: 20,
   },
   registrationSubtitle: {
-    fontSize: 14,
+    fontSize: isSmallScreen ? 12 : 14,
     fontFamily: 'Nexa-ExtraLight',
     color: '#FFFFFF',
     textAlign: 'center',
@@ -209,17 +237,27 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-ExtraLight',
   },
   communitySubtitleContainer: {
-    marginTop: 26,
+    marginTop: isSmallScreen ? 20 : 26,
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   communitySubtitle: {
-    fontSize: 12,
+    fontSize: isSmallScreen ? 11 : 12,
     fontFamily: 'Nexa-ExtraLight',
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 16,
+    lineHeight: isSmallScreen ? 14 : 16,
     opacity: 0.8,
+  },
+  footer: {
+    fontSize: isSmallScreen ? 10 : 11,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginTop: isSmallScreen ? 15 : 20,
+    marginBottom: 20,
+    opacity: 0.7,
+    paddingHorizontal: 20,
   },
 });
 

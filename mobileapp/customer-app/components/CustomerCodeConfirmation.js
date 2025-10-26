@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   welcomeText: { fontSize: 24, color: '#333333', marginBottom: 10, textAlign: 'center' },
   subtitleText: { fontSize: 14, color: '#666666', textAlign: 'center', opacity: 0.9, lineHeight: 20 },
   emailText: { color: '#F43332' },
-  formContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFFFFF', borderTopLeftRadius: 44, borderTopRightRadius: 44, paddingHorizontal: 30, paddingTop: 30, paddingBottom: 40, minHeight: 400, alignItems: 'center' },
+  formContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFFFFF', borderTopLeftRadius: 44, borderTopRightRadius: 44, paddingHorizontal: 30, paddingTop: 30, paddingBottom: 40, minHeight: 400, alignItems: 'center', zIndex: 3 },
   codeInputContainer: { marginBottom: 30, width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 12 },
   otpBox: { width: 50, height: 60, borderWidth: 1, borderColor: '#DDD', borderRadius: 12, textAlign: 'center', fontSize: 24, color: '#333', backgroundColor: '#FFFFFF' },
   otpBoxFocused: { borderColor: '#F43332', borderWidth: 2, shadowColor: '#F43332', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },

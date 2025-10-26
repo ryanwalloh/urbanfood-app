@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions, Animated, Keyboard } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Alert, StyleSheet, Dimensions, Animated, Keyboard, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
-const CreateAccount1 = ({ regData, onNext }) => {
+const CreateAccount1 = ({ regData, onNext, onBack }) => {
   const [local, setLocal] = useState(regData);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -86,6 +87,17 @@ const CreateAccount1 = ({ regData, onNext }) => {
       {/* Dark Overlay */}
       <View style={styles.darkOverlay} />
 
+      {/* Back Button */}
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={onBack}
+      >
+        <Image 
+          source={require('../assets/back.png')}
+          style={styles.backIcon}
+        />
+      </TouchableOpacity>
+
       {/* White Logo */}
       <View style={styles.logoContainer}>
         <Image 
@@ -102,14 +114,19 @@ const CreateAccount1 = ({ regData, onNext }) => {
           transform: [{ translateY: formContainerTranslateY }]
         }
       ]}>
-        {/* Welcome Message */}
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeTitle}>Create Account</Text>
-          <Text style={styles.subtitle}>Fill in your details to get started</Text>
-        </View>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Welcome Message */}
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeTitle}>Create Account</Text>
+            <Text style={styles.subtitle}>Fill in your details to get started</Text>
+          </View>
 
-        {/* Form Fields */}
-        <View style={styles.inputsContainer}>
+          {/* Form Fields */}
+          <View style={styles.inputsContainer}>
           <View style={styles.inputContainer}>
             <TextInput 
               style={styles.input} 
@@ -199,18 +216,22 @@ const CreateAccount1 = ({ regData, onNext }) => {
               />
             </TouchableOpacity>
           </View>
-        </View>
+          </View>
 
-        {/* Next Button */}
-        <TouchableOpacity 
-          style={[styles.nextButton, isLoading && styles.nextButtonDisabled]} 
-          onPress={handleNext}
-          disabled={isLoading}
-        >
-          <Text style={styles.nextButtonText}>
-            {isLoading ? 'Processing...' : 'Next'}
-          </Text>
-        </TouchableOpacity>
+          {/* Next Button */}
+          <TouchableOpacity 
+            style={[styles.nextButton, isLoading && styles.nextButtonDisabled]} 
+            onPress={handleNext}
+            disabled={isLoading}
+          >
+            <Text style={styles.nextButtonText}>
+              {isLoading ? 'Processing...' : 'Next'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Footer */}
+          <Text style={styles.footer}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </ScrollView>
       </Animated.View>
     </View>
   );
@@ -240,15 +261,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 0.5,
   },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 3,
+    padding: 10,
+  },
+  backIcon: {
+    width: 32,
+    height: 32,
+  },
   logoContainer: {
     position: 'absolute',
-    top: 10,
+    top: isSmallScreen ? 20 : 40,
     right: 20,
     zIndex: 1,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: width * 0.35,
+    maxWidth: 150,
+    height: width * 0.35,
+    maxHeight: 150,
+    resizeMode: 'contain',
   },
   formContainer: {
     position: 'absolute',
@@ -258,25 +293,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
-    paddingHorizontal: 30,
-    paddingTop: 30,
-    paddingBottom: 40,
-    minHeight: 600,
+    paddingHorizontal: isSmallScreen ? 20 : 30,
+    paddingTop: isSmallScreen ? 20 : 30,
+    paddingBottom: isSmallScreen ? 10 : 10,
+    maxHeight: height * 0.75,
+    minHeight: isSmallScreen ? height * 0.7 : 650,
     zIndex: 2,
+  },
+  scrollContent: {
+    paddingBottom: 30,
   },
   welcomeContainer: {
     alignItems: 'left',
-    marginBottom: 30,
+    marginBottom: isSmallScreen ? 20 : 30,
   },
   welcomeTitle: {
-    fontSize: 28,
+    fontSize: isSmallScreen ? 24 : 28,
     fontFamily: 'Nexa-ExtraLight',
     color: '#333',
     marginBottom: 0,
     textAlign: 'left',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
     textAlign: 'left',
@@ -300,8 +339,8 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    fontSize: 16,
+    paddingVertical: isSmallScreen ? 12 : 16,
+    fontSize: isSmallScreen ? 14 : 16,
     backgroundColor: '#FFFFFF',
     color: '#000000',
     fontFamily: 'Nexa-ExtraLight',
@@ -309,7 +348,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: 'absolute',
     right: 16,
-    top: 16,
+    top: isSmallScreen ? 12 : 16,
     padding: 4,
   },
   eyeIcon: {
@@ -319,17 +358,25 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: '#F43332',
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: isSmallScreen ? 14 : 16,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: isSmallScreen ? 15 : 20,
   },
   nextButtonDisabled: {
     backgroundColor: '#B0B0B0',
   },
   nextButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontWeight: '600',
+  },
+  footer: {
+    fontSize: isSmallScreen ? 10 : 11,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#666',
+    textAlign: 'center',
+    marginTop: isSmallScreen ? 10 : 15,
+    marginBottom: 10,
   },
 });
 

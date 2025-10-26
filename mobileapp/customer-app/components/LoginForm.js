@@ -17,6 +17,10 @@ const LoginForm = ({ onLoginSuccess, onCreateAccount }) => {
   // Focus states
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  
+  // Label opacity states (for built app compatibility)
+  const [emailLabelOpacity] = useState(new Animated.Value(0));
+  const [passwordLabelOpacity] = useState(new Animated.Value(0));
 
   // Animation functions
   const animateLabelUp = (animation) => {
@@ -38,24 +42,46 @@ const LoginForm = ({ onLoginSuccess, onCreateAccount }) => {
   const handleEmailFocus = () => {
     setEmailFocused(true);
     animateLabelUp(emailLabelAnimation);
+    // Animate label opacity for built app compatibility
+    Animated.timing(emailLabelOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handleEmailBlur = () => {
     setEmailFocused(false);
     if (!email) {
       animateLabelDown(emailLabelAnimation);
+      Animated.timing(emailLabelOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
     }
   };
 
   const handlePasswordFocus = () => {
     setPasswordFocused(true);
     animateLabelUp(passwordLabelAnimation);
+    // Animate label opacity for built app compatibility
+    Animated.timing(passwordLabelOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handlePasswordBlur = () => {
     setPasswordFocused(false);
     if (!password) {
       animateLabelDown(passwordLabelAnimation);
+      Animated.timing(passwordLabelOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
     }
   };
 
@@ -125,10 +151,8 @@ const LoginForm = ({ onLoginSuccess, onCreateAccount }) => {
               inputRange: [0, 1],
               outputRange: [16, 12],
             }),
-            color: emailLabelAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['transparent', '#666'],
-            }),
+            opacity: emailLabelOpacity,
+            color: '#666',
           }
         ]}>
           Email
@@ -162,10 +186,8 @@ const LoginForm = ({ onLoginSuccess, onCreateAccount }) => {
               inputRange: [0, 1],
               outputRange: [16, 12],
             }),
-            color: passwordLabelAnimation.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['transparent', '#666'],
-            }),
+            opacity: passwordLabelOpacity,
+            color: '#666',
           }
         ]}>
           Password

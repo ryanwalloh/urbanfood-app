@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Image, TextInput, TouchableOpacity, Alert, StyleSheet, Platform, Dimensions, Animated, Keyboard } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Alert, StyleSheet, Platform, Dimensions, Animated, Keyboard, ScrollView } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -10,7 +10,7 @@ import API_CONFIG from '../config/apiConfig';
 const { width } = Dimensions.get('window');
 const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 
-const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
+const CreateAccount2 = ({ regData, addressData, onSuccess, onBack }) => {
   const [localAddr, setLocalAddr] = useState(addressData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMapMoving, setIsMapMoving] = useState(false);
@@ -251,6 +251,17 @@ const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
       {/* Dark Overlay */}
       <View style={styles.darkOverlay} />
 
+      {/* Back Button */}
+      <TouchableOpacity 
+        style={styles.backButton}
+        onPress={onBack}
+      >
+        <Image 
+          source={require('../assets/back.png')}
+          style={styles.backIcon}
+        />
+      </TouchableOpacity>
+
       {/* White Logo */}
       <View style={styles.logoContainer}>
         <Image 
@@ -296,7 +307,7 @@ const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
           <View style={styles.inputContainer}>
             <TextInput 
               style={styles.input} 
-              placeholder="Phone number (optional)" 
+              placeholder="Phone number" 
               placeholderTextColor="#999" 
               value={localAddr.phoneNumber || ''} 
               onChangeText={(t) => setLocalAddr({...localAddr, phoneNumber: t})}
@@ -305,16 +316,19 @@ const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput 
-              style={[styles.input, styles.readOnlyInput]} 
-              placeholder="Street" 
-              placeholderTextColor="#999" 
-              value={localAddr.street} 
-              editable={false}
-              fontFamily="Nexa-ExtraLight"
-            />
-          </View>
+          {/* Street field hidden - used for storing +codes in real-time */}
+          {false && (
+            <View style={styles.inputContainer}>
+              <TextInput 
+                style={[styles.input, styles.readOnlyInput]} 
+                placeholder="Street" 
+                placeholderTextColor="#999" 
+                value={localAddr.street} 
+                editable={false}
+                fontFamily="Nexa-ExtraLight"
+              />
+            </View>
+          )}
           
           <View style={styles.inputContainer}>
             <TextInput 
@@ -349,6 +363,9 @@ const CreateAccount2 = ({ regData, addressData, onSuccess }) => {
             {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </Text>
         </TouchableOpacity>
+
+        {/* Footer */}
+        <Text style={styles.footer}>© 2025 Soti Delivery. All rights reserved.</Text>
       </Animated.View>
     </View>
   );
@@ -379,6 +396,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
     zIndex: 0.5,
     pointerEvents: 'none',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 3,
+    padding: 10,
+  },
+  backIcon: {
+    width: 32,
+    height: 32,
   },
   logoContainer: {
     position: 'absolute',
@@ -522,6 +550,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Nexa-ExtraLight',
+  },
+  footer: {
+    fontSize: 11,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

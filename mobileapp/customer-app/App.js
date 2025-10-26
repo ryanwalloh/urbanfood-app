@@ -36,8 +36,6 @@ const GOOGLE_MAPS_API_KEY = API_CONFIG.GOOGLE_MAPS_API_KEY;
 // Independent LoginForm component with its own state
 
 export default function App() {
-  const [showLanding, setShowLanding] = useState(true);
-  const [showLogin, setShowLogin] = useState(false);
   const [currentPage, setCurrentPage] = useState('landing'); // 'landing', 'welcome', 'login', 'create1', 'create2', 'verify', 'onboarding1', 'main'
   const [user, setUser] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -89,30 +87,33 @@ export default function App() {
         const sessionData = await AsyncStorage.getItem('user_session');
         const appState = await AsyncStorage.getItem('app_state');
         
-        if (sessionData) {
+        console.log('🔍 Loading session - sessionData:', sessionData ? 'exists' : 'null');
+        console.log('🔍 Loading session - appState:', appState ? 'exists' : 'null');
+        
+                 if (sessionData) {
           const userData = JSON.parse(sessionData);
           console.log('📱 Loaded existing session:', userData);
           setUser(userData);
           
-          // Restore app state if it exists
-          if (appState) {
-            try {
-              const state = JSON.parse(appState);
-              const validPages = ['landing', 'welcome', 'login', 'create1', 'create2', 'verify', 'onboarding1', 'onboarding2', 'onboarding3', 'main'];
-              if (state.currentPage && validPages.includes(state.currentPage)) {
-                console.log('🔄 Restoring app state:', state);
-                setCurrentPage(state.currentPage);
-              } else {
-                console.log('⚠️ Invalid saved page, defaulting to main');
-                setCurrentPage('main');
-              }
-            } catch (e) {
-              console.log('⚠️ Error parsing app state, defaulting to main:', e);
-              setCurrentPage('main');
-            }
-          } else {
-            setCurrentPage('main');
+          // Clear any old app state since we always go to main when logged in
+          try {
+            await AsyncStorage.removeItem('app_state');
+          } catch (error) {
+            console.log('Error clearing app state:', error);
           }
+          
+          // If user is logged in, go directly to main page
+          // Don't restore intermediate pages like login/welcome/onboarding
+          setCurrentPage('main');
+        } else {
+          // No session - clear any saved app state and start fresh
+          console.log('🚀 No session found - starting fresh from landing page');
+          try {
+            await AsyncStorage.removeItem('app_state');
+          } catch (error) {
+            console.log('Error clearing app state:', error);
+          }
+          setCurrentPage('landing');
         }
       } catch (error) {
         console.log('Error loading session:', error);
@@ -127,15 +128,24 @@ export default function App() {
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async (nextAppState) => {
       if (nextAppState === 'background') {
-        // App going to background - save current state
-        try {
-          const appState = {
-            currentPage,
-          };
-          await AsyncStorage.setItem('app_state', JSON.stringify(appState));
-          console.log('💾 Saved app state:', appState);
-        } catch (error) {
-          console.log('Error saving app state:', error);
+        // App going to background - only save state if user is logged in
+        if (user) {
+          try {
+            const appState = {
+              currentPage,
+            };
+            await AsyncStorage.setItem('app_state', JSON.stringify(appState));
+            console.log('💾 Saved app state:', appState);
+          } catch (error) {
+            console.log('Error saving app state:', error);
+          }
+        } else {
+          // Clear app state if user is not logged in
+          try {
+            await AsyncStorage.removeItem('app_state');
+          } catch (error) {
+            console.log('Error clearing app state:', error);
+          }
         }
       } else if (nextAppState === 'active') {
         // App came to foreground, restore session if user is null
@@ -182,7 +192,10 @@ export default function App() {
   }, [user, currentPage]);
 
   useEffect(() => {
-    if (!fontsLoaded) return;
+    if (!fontsLoaded || currentPage !== 'landing') return;
+    
+    // Reset animation values when landing page loads
+    fadeAnim.setValue(1);
     
     // Start transition after 2 seconds
     const timer = setTimeout(() => {
@@ -193,13 +206,13 @@ export default function App() {
         useNativeDriver: true,
       }).start(() => {
         // After landing page fades out, switch to welcome page
-        setShowLanding(false);
         setCurrentPage('welcome');
       });
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [fontsLoaded]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fontsLoaded, currentPage]);
 
   // Handle successful login
   const handleLoginSuccess = (userData) => {
@@ -243,16 +256,15 @@ export default function App() {
   // Handle logout
   const handleLogout = async () => {
     try {
-      // Clear the session from AsyncStorage
+      // Clear the session and app state from AsyncStorage
       await AsyncStorage.removeItem('user_session');
-      console.log('🚪 User logged out, session cleared');
+      await AsyncStorage.removeItem('app_state');
+      console.log('🚪 User logged out, session and app state cleared');
     } catch (error) {
       console.log('Error clearing session:', error);
     }
     setUser(null);
     setCurrentPage('landing');
-    setShowLanding(true);
-    setShowLogin(false);
     // Reset landing page animation
     fadeAnim.setValue(1);
   };
@@ -262,23 +274,28 @@ export default function App() {
   const handleGetStarted = () => setCurrentPage('login');
 
   const LandingPage = () => (
-    <Animated.View style={[styles.landingContainer, { opacity: fadeAnim }]}>
-      <Animated.View style={[
-        styles.logoContainer,
-        {
-          transform: [
-            { scale: logoScaleAnim },
-            { translateY: logoPositionAnim }
-          ]
-        }
-      ]}>
-        <Image 
-          source={require('./assets/sotilogored.png')} 
-          style={styles.landingLogo}
-          resizeMode="contain"
-        />
+    <View style={styles.landingWrapper}>
+      <Animated.View style={[styles.landingContainer, { opacity: fadeAnim }]}>
+        <Animated.View style={[
+          styles.logoContainer,
+          {
+            transform: [
+              { scale: logoScaleAnim },
+              { translateY: logoPositionAnim }
+            ]
+          }
+        ]}>
+          <Image 
+            source={require('./assets/sotilogored.png')} 
+            style={styles.landingLogo}
+            resizeMode="contain"
+          />
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
+      
+      {/* Footer - outside animation container */}
+      <Text style={styles.landingFooter}>© 2025 Soti Delivery. All rights reserved.</Text>
+    </View>
   );
 
 
@@ -297,11 +314,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {currentPage === 'landing' && showLanding && <LandingPage />}
+      {currentPage === 'landing' && <LandingPage />}
       {currentPage === 'welcome' && <WelcomePage onGetStarted={handleGetStarted} onCreateAccount={openCreateAccount} />}
       {currentPage === 'login' && <LoginPage onLoginSuccess={handleLoginSuccess} onCreateAccount={openCreateAccount} />}
-      {currentPage === 'create1' && <CreateAccount1 regData={regData} onNext={(data) => { setRegData(data); setCurrentPage('create2'); }} />}
-      {currentPage === 'create2' && <CreateAccount2 regData={regData} addressData={addressData} onSuccess={handleRegistrationSuccess} />}
+      {currentPage === 'create1' && <CreateAccount1 regData={regData} onNext={(data) => { setRegData(data); setCurrentPage('create2'); }} onBack={() => setCurrentPage('login')} />}
+      {currentPage === 'create2' && <CreateAccount2 regData={regData} addressData={addressData} onSuccess={handleRegistrationSuccess} onBack={() => setCurrentPage('create1')} />}
       {currentPage === 'verify' && verificationData && (
         <CustomerCodeConfirmation 
           email={verificationData.userData.email}
@@ -326,6 +343,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   // Landing Page Styles
+  landingWrapper: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    width: '100%',
+  },
   landingContainer: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -339,6 +361,16 @@ const styles = StyleSheet.create({
   landingLogo: {
     width: 200,
     height: 200,
+  },
+  landingFooter: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    fontSize: 11,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999',
+    textAlign: 'center',
   },
   // Login Page Styles
   loginContainer: {

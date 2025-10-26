@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, Animated, Keyboard } from 'react-native';
+import { View, Text, Image, StyleSheet, Dimensions, Animated, Keyboard, ScrollView } from 'react-native';
 import LoginForm from './LoginForm';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+const isSmallScreen = height < 700;
 
 const LoginPage = ({ onLoginSuccess, onCreateAccount }) => {
   // Animation for form container lift
@@ -60,14 +61,23 @@ const LoginPage = ({ onLoginSuccess, onCreateAccount }) => {
           transform: [{ translateY: formContainerTranslateY }]
         }
       ]}>
-        {/* Welcome Message */}
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeTitle}>Welcome Back</Text>
-          <Text style={styles.loginTitle}>Login to order your favorite food</Text>
-        </View>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Welcome Message */}
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeTitle}>Welcome Back</Text>
+            <Text style={styles.loginTitle}>Login to order your favorite food</Text>
+          </View>
 
-        {/* Login Form */}
-        <LoginForm onLoginSuccess={onLoginSuccess} onCreateAccount={onCreateAccount} />
+          {/* Login Form */}
+          <LoginForm onLoginSuccess={onLoginSuccess} onCreateAccount={onCreateAccount} />
+          
+          {/* Footer */}
+          <Text style={styles.footer}>© 2025 Soti Delivery. All rights reserved.</Text>
+        </ScrollView>
       </Animated.View>
     </View>
   );
@@ -99,14 +109,16 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     position: 'absolute',
-    top: 10,
+    top: isSmallScreen ? 20 : 40,
     left: 20,
     zIndex: 1,
- 
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: width * 0.35,
+    maxWidth: 150,
+    height: width * 0.35,
+    maxHeight: 150,
+    resizeMode: 'contain',
   },
   formContainer: {
     position: 'absolute',
@@ -116,28 +128,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 44,
     borderTopRightRadius: 44,
-    paddingHorizontal: 30,
-    paddingTop: 30,
-    paddingBottom: 40,
-    minHeight: 400,
+    paddingHorizontal: isSmallScreen ? 20 : 30,
+    paddingTop: isSmallScreen ? 20 : 30,
+    paddingBottom: isSmallScreen ? 20 : 40,
+    maxHeight: height * 0.65,
+    minHeight: isSmallScreen ? height * 0.6 : 400,
     zIndex: 2,
+  },
+  scrollContent: {
+    paddingBottom: 10,
   },
   welcomeContainer: {
     alignItems: 'left',
-    marginBottom: 30,
+    marginBottom: isSmallScreen ? 20 : 30,
   },
   welcomeTitle: {
-    fontSize: 28,
+    fontSize: isSmallScreen ? 24 : 28,
     fontFamily: 'Nexa-ExtraLight',
     color: '#333',
     marginBottom: 0,
     textAlign: 'left',
   },
   loginTitle: {
-    fontSize: 16,
+    fontSize: isSmallScreen ? 14 : 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
     textAlign: 'left',
+  },
+  footer: {
+    fontSize: isSmallScreen ? 10 : 11,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999',
+    textAlign: 'center',
+    marginTop: isSmallScreen ? 15 : 20,
   },
 });
 
