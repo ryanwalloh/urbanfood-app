@@ -813,6 +813,8 @@ def save_address(request):
                     'barangay': barangay,
                     'note': note,
                     'label': label,
+                    'latitude': latitude,
+                    'longitude': longitude,
                 }
             )
             

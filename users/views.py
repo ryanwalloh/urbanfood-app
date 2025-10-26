@@ -169,6 +169,8 @@ def verify_sms_code(request):
                 barangay = user_data.get('barangay')
                 note = user_data.get('note') or ''
                 label = user_data.get('label') or 'home'
+                latitude = user_data.get('latitude')
+                longitude = user_data.get('longitude')
 
                 # Create user (no phone required for customers)
                 user = User.objects.create_user(
@@ -201,6 +203,8 @@ def verify_sms_code(request):
                                 'barangay': barangay or '',
                                 'note': note,
                                 'label': label,
+                                'latitude': latitude,
+                                'longitude': longitude,
                             }
                         )
                     except Exception:
