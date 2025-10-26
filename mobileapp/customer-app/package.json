@@ -9,6 +9,8 @@
     "web": "expo start --web",
     "build:dev:android": "eas build --profile development --platform android",
     "build:dev:ios": "eas build --profile development --platform ios",
+    "build:preview:android": "eas build --profile preview --platform android",
+    "build:preview:ios": "eas build --profile preview --platform ios",
     "build:prod": "eas build --profile production --platform all",
     "start:dev": "expo start --dev-client"
   },
