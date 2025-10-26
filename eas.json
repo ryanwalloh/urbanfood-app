@@ -1,0 +1,8 @@
+{
+  "cli": {
+    "version": ">= 16.20.4",
+    "appVersionSource": "remote",
+    "workingDirectory": "mobileapp/customer-app"
+  }
+}
+
