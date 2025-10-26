@@ -965,3 +965,165 @@ def get_user_address(request):
             return JsonResponse({'error': f'Internal server error: {str(e)}'}, status=500)
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def get_customer_orders(request):
+    """Get all orders for a customer from mobile app"""
+    if request.method == 'POST':
+        try:
+            from orders.models import Order
+            from users.models import User
+            from restaurant.models import Restaurant
+            
+            # Parse JSON data
+            try:
+                data = json.loads(request.body or b"{}")
+            except Exception:
+                data = request.POST.dict()
+            
+            user_id = data.get('user_id')
+            
+            if not user_id:
+                return JsonResponse({'success': False, 'error': 'user_id is required'}, status=400)
+            
+            # Get user
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+            
+            # Get all orders for this customer
+            orders = Order.objects.filter(customer=user).order_by('-created_at')
+            
+            # Separate active and delivered orders
+            active_orders = []
+            recent_orders = []
+            
+            for order in orders:
+                try:
+                    # Get restaurant info
+                    restaurant = Restaurant.objects.get(user=order.restaurant)
+                    
+                    order_data = {
+                        'id': order.id,
+                        'token_number': order.token_number,
+                        'restaurant_name': restaurant.name,
+                        'total_amount': str(order.total_amount),
+                        'payment_method': order.payment_method,
+                        'status': order.status,
+                        'created_at': order.created_at.isoformat(),
+                    }
+                    
+                    # Add to appropriate list based on status
+                    if order.status not in ['delivered', 'cancelled']:
+                        active_orders.append(order_data)
+                    else:
+                        recent_orders.append(order_data)
+                except Exception as e:
+                    print(f'Error processing order {order.id}: {e}')
+                    continue
+            
+            return JsonResponse({
+                'success': True,
+                'active_orders': active_orders,
+                'recent_orders': recent_orders,
+            })
+            
+        except Exception as e:
+            print(f'Error getting customer orders: {e}')
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+@csrf_exempt
+def search_products_and_restaurants(request):
+    """Search for products and restaurants based on query"""
+    print('🔍 search_products_and_restaurants called!')
+    print(f'🔍 Request method: {request.method}')
+    print(f'🔍 Query params: {request.GET.dict()}')
+    
+    if request.method == 'GET':
+        try:
+            from menu.models import Product
+            from restaurant.models import Restaurant
+            from django.db.models import Q
+            
+            query = request.GET.get('q', '').strip()
+            print(f'🔍 Search query: {query}')
+            
+            if not query:
+                return JsonResponse({
+                    'success': True,
+                    'products': [],
+                    'restaurants': []
+                })
+            
+            # Build absolute URL for media files
+            base_url = request.build_absolute_uri('/')[:-1]  # Remove trailing slash
+            
+            # Search products (case-insensitive)
+            products = Product.objects.filter(
+                Q(name__icontains=query) | Q(description__icontains=query)
+            ).select_related('restaurant')[:10]  # Limit to 10 results
+            
+            products_data = []
+            for product in products:
+                # Get product picture URL (Cloudinary URLs are already absolute)
+                product_picture_url = None
+                if product.product_picture:
+                    pic_url = str(product.product_picture)
+                    if pic_url.startswith('http'):
+                        product_picture_url = pic_url
+                    else:
+                        product_picture_url = base_url + product.product_picture.url
+                
+                products_data.append({
+                    'id': product.id,
+                    'name': product.name,
+                    'price': str(product.price),
+                    'product_picture': product_picture_url,
+                    'restaurant_id': product.restaurant.id,
+                    'restaurant_name': product.restaurant.name,
+                })
+            
+            # Search restaurants (case-insensitive)
+            restaurants = Restaurant.objects.filter(
+                Q(name__icontains=query) | Q(barangay__icontains=query) | Q(address__icontains=query)
+            ).filter(is_approved=True)[:10]  # Limit to 10 results and only approved
+            
+            restaurants_data = []
+            for restaurant in restaurants:
+                # Get profile picture URL (Cloudinary URLs are already absolute)
+                profile_picture_url = None
+                if restaurant.profile_picture:
+                    pic_url = str(restaurant.profile_picture)
+                    if pic_url.startswith('http'):
+                        profile_picture_url = pic_url
+                    else:
+                        profile_picture_url = base_url + restaurant.profile_picture.url
+                
+                restaurants_data.append({
+                    'id': restaurant.id,
+                    'name': restaurant.name,
+                    'address': restaurant.address,
+                    'barangay': restaurant.barangay,
+                    'profile_picture': profile_picture_url,
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'products': products_data,
+                'restaurants': restaurants_data
+            })
+            
+        except Exception as e:
+            print(f'Error searching products and restaurants: {e}')
+            import traceback
+            traceback.print_exc()
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

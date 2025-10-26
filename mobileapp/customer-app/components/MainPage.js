@@ -5,6 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import { apiService } from '../services/api';
 import RestaurantOrder from './RestaurantOrder';
 import CustomerProfile from './CustomerProfile';
+import Orders from './Orders';
 
 const { width } = Dimensions.get('window');
 
@@ -15,6 +16,12 @@ const MainPage = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState({ products: [], restaurants: [] });
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchTimeoutRef = useRef(null);
   // Animated values for search field transition
   // Initial: -30 (overlapping hero), Scrolled: 30 (with top padding)
   const searchTranslateY = useRef(new Animated.Value(-30)).current;
@@ -33,6 +40,15 @@ const MainPage = ({ user, onLogout }) => {
   // Fetch restaurants on component mount
   useEffect(() => {
     fetchRestaurants();
+  }, []);
+
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, []);
 
   const fetchRestaurants = async () => {
@@ -60,6 +76,71 @@ const MainPage = ({ user, onLogout }) => {
 
   const handleBackFromRestaurant = () => {
     setSelectedRestaurant(null);
+  };
+
+  // Handle search input change with debouncing
+  const handleSearchChange = (text) => {
+    setSearchQuery(text);
+    
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!text.trim()) {
+      setSearchResults({ products: [], restaurants: [] });
+      setShowSearchResults(false);
+      setIsSearching(false);
+      return;
+    }
+
+    // Only search if user typed at least 2 characters (optimization)
+    if (text.trim().length < 2) {
+      setSearchResults({ products: [], restaurants: [] });
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    
+    // Debounce search (wait 400ms after user stops typing for better backend optimization)
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const result = await apiService.searchProductsAndRestaurants(text);
+        if (result.success) {
+          setSearchResults({
+            products: result.products || [],
+            restaurants: result.restaurants || [],
+          });
+          setShowSearchResults(true);
+        }
+      } catch (error) {
+        console.log('Search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400); // Increased from 300ms to 400ms for better optimization
+  };
+
+  // Handle product selection - navigate to restaurant page
+  const handleProductSelect = async (product) => {
+    // Find the restaurant for this product
+    const restaurantData = restaurants.find(r => r.id === product.restaurant_id);
+    
+    if (restaurantData) {
+      // Close search results
+      setShowSearchResults(false);
+      setSearchQuery('');
+      // Navigate to restaurant page
+      setSelectedRestaurant(restaurantData);
+    }
+  };
+
+  // Handle restaurant selection from search
+  const handleRestaurantSelectFromSearch = (restaurant) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    setSelectedRestaurant(restaurant);
   };
 
   // Handle scroll to detect when search becomes sticky
@@ -103,6 +184,45 @@ const MainPage = ({ user, onLogout }) => {
         onBack={handleBackFromRestaurant}
         user={user}
       />
+    );
+  }
+
+  // Show Orders page when orders tab is active
+  if (activeNav === 'orders') {
+    return (
+      <View style={styles.mainContainer}>
+        <Orders user={user} onBack={() => setActiveNav('home')} />
+        {/* Sticky Bottom Navigation */}
+        <View style={styles.bottomNavigation}>
+          <TouchableOpacity 
+            style={styles.navItem}
+            onPress={() => setActiveNav('home')}
+          >
+            <View style={[styles.navIconContainer, activeNav === 'home' && styles.navIconActive]}>
+              <Image source={require('../assets/home.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'home' && styles.navLabelActive]}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('orders')}>
+            <View style={[styles.navIconContainer, activeNav === 'orders' && styles.navIconActive]}>
+              <Image source={require('../assets/orders.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'orders' && styles.navLabelActive]}>Orders</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('support')}>
+            <View style={[styles.navIconContainer, activeNav === 'support' && styles.navIconActive]}>
+              <Image source={require('../assets/support.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'support' && styles.navLabelActive]}>Support</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem} onPress={() => setActiveNav('profile')}>
+            <View style={[styles.navIconContainer, activeNav === 'profile' && styles.navIconActive]}>
+              <Image source={require('../assets/profile.png')} style={styles.navIcon} resizeMode="contain" />
+            </View>
+            <Text style={[styles.navLabel, activeNav === 'profile' && styles.navLabelActive]}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 
@@ -198,9 +318,80 @@ const MainPage = ({ user, onLogout }) => {
                 style={styles.searchInput}
                 placeholder="Looking for something?"
                 placeholderTextColor="#999"
+                value={searchQuery}
+                onChangeText={handleSearchChange}
+                onFocus={() => {
+                  if (searchQuery.trim() && searchResults.products.length === 0 && searchResults.restaurants.length === 0) {
+                    setShowSearchResults(false);
+                  } else if (searchQuery.trim()) {
+                    setShowSearchResults(true);
+                  }
+                }}
+                onBlur={() => {
+                  // Delay hiding to allow selection
+                  setTimeout(() => setShowSearchResults(false), 200);
+                }}
               />
             </View>
           </Animated.View>
+          
+          {/* Search Results Dropdown */}
+          {showSearchResults && (
+            <View style={styles.searchResultsContainer}>
+              {/* Products Section */}
+              {searchResults.products.length > 0 && (
+                <View style={styles.searchResultsSection}>
+                  <Text style={styles.searchResultsSectionTitle}>Products</Text>
+                  {searchResults.products.map((product, index) => (
+                    <TouchableOpacity
+                      key={`product-${product.id}-${index}`}
+                      style={styles.searchResultItem}
+                      onPress={() => handleProductSelect(product)}
+                    >
+                      <View style={styles.searchResultItemContent}>
+                        <Text style={styles.searchResultProductName}>{product.name}</Text>
+                        <Text style={styles.searchResultRestaurantLabel}>from {product.restaurant_name}</Text>
+                      </View>
+                      <Text style={styles.searchResultPrice}>₱{product.price}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              
+              {/* Restaurants Section */}
+              {searchResults.restaurants.length > 0 && (
+                <View style={styles.searchResultsSection}>
+                  <Text style={styles.searchResultsSectionTitle}>Restaurants</Text>
+                  {searchResults.restaurants.map((restaurant, index) => (
+                    <TouchableOpacity
+                      key={`restaurant-${restaurant.id}-${index}`}
+                      style={styles.searchResultItem}
+                      onPress={() => handleRestaurantSelectFromSearch(restaurant)}
+                    >
+                      <View style={styles.searchResultItemContent}>
+                        <Text style={styles.searchResultRestaurantName}>{restaurant.name}</Text>
+                        <Text style={styles.searchResultAddress}>{restaurant.barangay}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              
+              {/* No Results */}
+              {searchResults.products.length === 0 && searchResults.restaurants.length === 0 && !isSearching && (
+                <View style={styles.noResultsContainer}>
+                  <Text style={styles.noResultsText}>No results found</Text>
+                </View>
+              )}
+              
+              {/* Loading */}
+              {isSearching && (
+                <View style={styles.noResultsContainer}>
+                  <Text style={styles.loadingText}>Searching...</Text>
+                </View>
+              )}
+            </View>
+          )}
         </View>
 
         {/* Categories Section */}
@@ -580,6 +771,83 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Nexa-ExtraLight',
     color: '#666',
+  },
+  // Search Results Dropdown
+  searchResultsContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginTop: 10,
+    marginHorizontal: 20,
+    maxHeight: 400,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  searchResultsSection: {
+    paddingVertical: 8,
+  },
+  searchResultsSectionTitle: {
+    fontSize: 14,
+    fontFamily: 'Nexa-Heavy',
+    color: '#666',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#F8F8F8',
+  },
+  searchResultItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  searchResultItemContent: {
+    flex: 1,
+  },
+  searchResultProductName: {
+    fontSize: 15,
+    fontFamily: 'Nexa-Heavy',
+    color: '#333',
+    marginBottom: 4,
+  },
+  searchResultRestaurantLabel: {
+    fontSize: 13,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#666',
+  },
+  searchResultRestaurantName: {
+    fontSize: 15,
+    fontFamily: 'Nexa-Heavy',
+    color: '#333',
+    marginBottom: 4,
+  },
+  searchResultAddress: {
+    fontSize: 13,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#666',
+  },
+  searchResultPrice: {
+    fontSize: 15,
+    fontFamily: 'Nexa-Heavy',
+    color: '#F43332',
+  },
+  noResultsContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 14,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999',
   },
 });
 

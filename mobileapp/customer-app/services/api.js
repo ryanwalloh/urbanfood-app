@@ -1010,6 +1010,130 @@ export const apiService = {
     }
   },
 
+  // Get customer orders (active and recent)
+  getCustomerOrders: async (userId) => {
+    try {
+      console.log('📦 Getting customer orders for user:', userId);
+      
+      // Use cached URL or find working URL
+      let workingUrl = cachedWorkingUrl;
+      if (!workingUrl) {
+        workingUrl = await testMultipleUrls();
+        if (!workingUrl) {
+          return {
+            success: false,
+            error: 'No working URL found',
+            message: 'Cannot reach Django server!'
+          };
+        }
+      }
+      
+      console.log('🌐 Using working URL for get customer orders:', workingUrl);
+      
+      const ordersApi = axios.create({
+        baseURL: workingUrl,
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const response = await ordersApi.post('/getCustomerOrders/', { user_id: userId }, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      });
+      
+      console.log('✅ Get customer orders response:', response.data);
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          activeOrders: response.data.active_orders || [],
+          recentOrders: response.data.recent_orders || [],
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.error,
+          message: response.data.message || 'Failed to get customer orders!'
+        };
+      }
+    } catch (error) {
+      console.log('❌ Get customer orders error:', error);
+      cachedWorkingUrl = null;
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to get customer orders!'
+      };
+    }
+  },
+
+  // Search products and restaurants
+  searchProductsAndRestaurants: async (query) => {
+    try {
+      console.log('🔍 Searching for:', query);
+      
+      // Use cached URL or find working URL
+      let workingUrl = cachedWorkingUrl;
+      if (!workingUrl) {
+        workingUrl = await testMultipleUrls();
+        if (!workingUrl) {
+          return {
+            success: false,
+            error: 'No working URL found',
+            message: 'Cannot reach Django server!'
+          };
+        }
+      }
+      
+      console.log('🌐 Using working URL for search:', workingUrl);
+      console.log('🔗 Full search URL:', `${workingUrl}/search/?q=${encodeURIComponent(query)}`);
+      
+      const searchApi = axios.create({
+        baseURL: workingUrl,
+        timeout: 5000, // Shorter timeout for search
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const response = await searchApi.get('/search/', {
+        params: { q: query },
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        }
+      });
+      
+      console.log('✅ Search response:', response.data);
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          products: response.data.products || [],
+          restaurants: response.data.restaurants || [],
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.error,
+          message: response.data.message || 'Failed to search!'
+        };
+      }
+    } catch (error) {
+      console.log('❌ Search error:', error);
+      console.log('❌ Error details:', error.response?.data || error.message);
+      console.log('❌ Error status:', error.response?.status);
+      cachedWorkingUrl = null;
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to search!'
+      };
+    }
+  },
+
 };
 
 export default api;
