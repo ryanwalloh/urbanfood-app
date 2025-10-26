@@ -24,6 +24,9 @@ from customer.models import Customer
 from menu.models import Product
 from django.views.decorators.csrf import csrf_exempt
 from restaurant.models import Restaurant
+import stripe
+import os
+from django.views.decorators.http import require_POST
 
 
 def landing_page(request):
@@ -732,6 +735,260 @@ def place_order(request):
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+
+
+# ==========================================
+# STRIPE PAYMENT INTEGRATION ENDPOINTS
+# ==========================================
+
+# Initialize Stripe with API key from environment
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+
+
+@csrf_exempt
+@require_POST
+def create_payment_intent(request):
+    """
+    Create a Stripe Payment Intent
+    Endpoint: POST /api/stripe/create-payment-intent/
+    """
+    try:
+        # Parse JSON data
+        try:
+            data = json.loads(request.body or b"{}")
+        except Exception:
+            data = request.POST.dict()
+        
+        user_id = data.get('user_id')
+        restaurant_id = data.get('restaurant_id')
+        total_amount = float(data.get('total_amount', 0))
+        
+        if not user_id or not restaurant_id or not total_amount:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing required fields: user_id, restaurant_id, total_amount'
+            }, status=400)
+        
+        # Verify user and restaurant exist
+        try:
+            customer = User.objects.get(id=user_id, role='customer')
+            restaurant = Restaurant.objects.get(id=restaurant_id)
+        except (User.DoesNotExist, Restaurant.DoesNotExist) as e:
+            return JsonResponse({
+                'success': False,
+                'error': 'User or restaurant not found'
+            }, status=404)
+        
+        # Create Payment Intent with Stripe
+        # Convert to cents (Stripe uses smallest currency unit)
+        amount_in_cents = int(total_amount * 100)
+        
+        payment_intent = stripe.PaymentIntent.create(
+            amount=amount_in_cents,
+            currency='php',  # Philippine Peso
+            payment_method_types=['card'],
+            metadata={
+                'user_id': user_id,
+                'restaurant_id': restaurant_id,
+                'customer_name': f"{customer.first_name} {customer.last_name}",
+                'restaurant_name': restaurant.name,
+            }
+        )
+        
+        print(f'✅ Payment Intent created: {payment_intent.id}')
+        
+        return JsonResponse({
+            'success': True,
+            'client_secret': payment_intent.client_secret,
+            'payment_intent_id': payment_intent.id,
+        })
+        
+    except stripe.error.StripeError as e:
+        print(f'❌ Stripe error: {str(e)}')
+        return JsonResponse({
+            'success': False,
+            'error': f'Stripe error: {str(e)}'
+        }, status=400)
+    except Exception as e:
+        print(f'❌ Error creating payment intent: {str(e)}')
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def confirm_payment(request):
+    """
+    Confirm payment and create order
+    Endpoint: POST /api/stripe/confirm-payment/
+    """
+    try:
+        # Parse JSON data
+        try:
+            data = json.loads(request.body or b"{}")
+        except Exception:
+            data = request.POST.dict()
+        
+        payment_intent_id = data.get('payment_intent_id')
+        user_id = data.get('user_id')
+        restaurant_id = data.get('restaurant_id')
+        total_amount = data.get('total_amount')
+        payment_method = data.get('payment_method', 'Card Payment')
+        
+        if not payment_intent_id or not user_id or not restaurant_id or not total_amount:
+            return JsonResponse({
+                'success': False,
+                'error': 'Missing required fields'
+            }, status=400)
+        
+        # Retrieve payment intent from Stripe
+        try:
+            payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+        except stripe.error.StripeError as e:
+            return JsonResponse({
+                'success': False,
+                'error': f'Payment intent not found: {str(e)}'
+            }, status=400)
+        
+        # Check if payment was successful
+        if payment_intent.status != 'succeeded':
+            return JsonResponse({
+                'success': False,
+                'error': f'Payment not completed. Status: {payment_intent.status}'
+            }, status=400)
+        
+        # Get user and restaurant
+        try:
+            customer = User.objects.get(id=user_id, role='customer')
+            restaurant = Restaurant.objects.get(id=restaurant_id)
+            restaurant_user = restaurant.user
+        except (User.DoesNotExist, Restaurant.DoesNotExist) as e:
+            return JsonResponse({
+                'success': False,
+                'error': 'User or restaurant not found'
+            }, status=404)
+        
+        # Get cart items for this user and restaurant
+        cart_items = CartItem.objects.filter(user=customer, restaurant=restaurant)
+        
+        if not cart_items.exists():
+            return JsonResponse({
+                'success': False,
+                'error': 'No items in cart'
+            }, status=400)
+        
+        # Create order with Stripe payment details
+        order = Order.objects.create(
+            customer=customer,
+            restaurant=restaurant_user,
+            total_amount=total_amount,
+            payment_method=payment_method,
+            payment_status='succeeded',
+            stripe_payment_intent_id=payment_intent_id,
+            stripe_charge_id=payment_intent.latest_charge,
+            rider_fee=29.00,
+            small_order_fee=19.00,
+            status='pending'
+        )
+        
+        print(f'✅ Order created with Stripe payment: Order #{order.id}')
+        
+        # Create order lines from cart items
+        for cart_item in cart_items:
+            OrderLine.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                subtotal=cart_item.product.price * cart_item.quantity
+            )
+        
+        # Clear cart items after successful order
+        cart_items.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Payment confirmed and order created successfully',
+            'order': {
+                'id': order.id,
+                'token_number': order.token_number,
+                'total_amount': str(order.total_amount),
+                'payment_method': order.payment_method,
+                'payment_status': order.payment_status,
+                'status': order.status,
+                'created_at': order.created_at.isoformat(),
+            }
+        })
+        
+    except Exception as e:
+        print(f'❌ Error confirming payment: {str(e)}')
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_POST
+def stripe_webhook(request):
+    """
+    Handle Stripe webhook events
+    Endpoint: POST /api/stripe/webhook/
+    """
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+    
+    try:
+        # Verify webhook signature
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError:
+        # Invalid payload
+        print('⚠️ Invalid payload in webhook')
+        return JsonResponse({'error': 'Invalid payload'}, status=400)
+    except stripe.error.SignatureVerificationError:
+        # Invalid signature
+        print('⚠️ Invalid signature in webhook')
+        return JsonResponse({'error': 'Invalid signature'}, status=400)
+    
+    # Handle the event
+    print(f'📬 Webhook received: {event["type"]}')
+    
+    if event['type'] == 'payment_intent.succeeded':
+        payment_intent = event['data']['object']
+        payment_intent_id = payment_intent['id']
+        
+        # Update order with payment status
+        try:
+            order = Order.objects.get(stripe_payment_intent_id=payment_intent_id)
+            order.payment_status = 'succeeded'
+            order.stripe_charge_id = payment_intent.get('latest_charge')
+            order.save()
+            print(f'✅ Updated order #{order.id} payment status to succeeded')
+        except Order.DoesNotExist:
+            print(f'⚠️ Order not found for payment intent: {payment_intent_id}')
+    
+    elif event['type'] == 'payment_intent.payment_failed':
+        payment_intent = event['data']['object']
+        payment_intent_id = payment_intent['id']
+        
+        # Update order with payment status
+        try:
+            order = Order.objects.get(stripe_payment_intent_id=payment_intent_id)
+            order.payment_status = 'failed'
+            order.save()
+            print(f'❌ Updated order #{order.id} payment status to failed')
+        except Order.DoesNotExist:
+            print(f'⚠️ Order not found for payment intent: {payment_intent_id}')
+    
+    return JsonResponse({'success': True})
 
 
 @csrf_exempt

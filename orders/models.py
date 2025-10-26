@@ -39,6 +39,21 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     proof_of_delivery_url = models.URLField(max_length=500, blank=True, null=True, help_text="AWS S3 URL for proof of delivery image/file")
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Stripe Payment Fields
+    stripe_payment_intent_id = models.CharField(max_length=255, blank=True, null=True, help_text="Stripe Payment Intent ID")
+    stripe_client_secret = models.CharField(max_length=255, blank=True, null=True, help_text="Stripe Client Secret for payment sheet")
+    stripe_charge_id = models.CharField(max_length=255, blank=True, null=True, help_text="Stripe Charge ID")
+    
+    # Payment Status
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('succeeded', 'Succeeded'),
+        ('failed', 'Failed'),
+        ('cancelled', 'Cancelled'),
+        ('refunded', 'Refunded'),
+    ]
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending', help_text="Payment processing status")
 
 class OrderLine(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')

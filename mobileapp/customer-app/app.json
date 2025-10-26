@@ -12,6 +12,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.ryamazingw.sotidelivery",
+          "enableGooglePay": true
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true
     },

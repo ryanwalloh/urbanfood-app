@@ -10,6 +10,10 @@ export const API_CONFIG = {
   
   // WebSocket URL (Railway)
   WS_BASE_URL: 'wss://soti-delivery.up.railway.app',
+  
+  // Stripe Publishable Key (Test Mode)
+  // Get from: https://stripe.com/docs/keys
+  STRIPE_PUBLISHABLE_KEY: 'pk_test_51SMVqmJAiW57btKoSHW90pbFU3X7p6gFFxSFBq1IpatB6vD3LtUsjDShOV470HrGTZnuIUyQt0PDperJ13XfG1ue00iSbUd3Dp',
 };
 
 export default API_CONFIG;

@@ -26,4 +26,9 @@ urlpatterns = [
     path('getCustomerOrders/', views.get_customer_orders, name='get_customer_orders'),
     path('search/', views.search_products_and_restaurants, name='search_products_and_restaurants'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    
+    # Stripe Payment Integration URLs
+    path('api/stripe/create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
+    path('api/stripe/confirm-payment/', views.confirm_payment, name='confirm_payment'),
+    path('api/stripe/webhook/', views.stripe_webhook, name='stripe_webhook'),
 ]
