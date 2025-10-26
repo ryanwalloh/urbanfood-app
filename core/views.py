@@ -21,7 +21,7 @@ from django.contrib.auth import authenticate
 from django.utils.timezone import now
 from django.contrib.auth.hashers import make_password
 from customer.models import Customer
-from menu.models import Product
+from menu.models import Product, CartItem
 from django.views.decorators.csrf import csrf_exempt
 from restaurant.models import Restaurant
 import stripe
