@@ -393,10 +393,14 @@ const MainPage = ({ user, onLogout }) => {
         {/* Hero Image Container */}
         <View style={styles.heroContainer}>
           <Image 
-            source={require('../assets/imageHero.webp')} 
+            source={activeTab === 'pharmacies' ? require('../assets/pharmacy.png') : require('../assets/imageHero.webp')} 
             style={styles.heroImage}
             resizeMode="cover"
           />
+          {/* Dark Overlay for Pharmacies */}
+          {activeTab === 'pharmacies' && (
+            <View style={styles.heroOverlay} />
+          )}
           <View style={styles.heroButtons}>
             <TouchableOpacity 
               style={[styles.heroButton, activeTab === 'restaurants' && styles.heroButtonActive]}
@@ -405,7 +409,11 @@ const MainPage = ({ user, onLogout }) => {
               <Text style={styles.heroButtonText}>Restaurants</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.heroButton, activeTab === 'pharmacies' && styles.heroButtonActive]}
+              style={[
+                styles.heroButton, 
+                activeTab === 'pharmacies' && styles.heroButtonActive,
+                activeTab === 'pharmacies' && { backgroundColor: '#1390AE' }
+              ]}
               onPress={() => setActiveTab('pharmacies')}
             >
               <Text style={styles.heroButtonText}>Pharmacies</Text>
@@ -413,7 +421,9 @@ const MainPage = ({ user, onLogout }) => {
           </View>
           {/* Title inside hero image */}
           <View style={styles.heroTitleContainer}>
-            <Text style={styles.heroTitleText}>Order your{'\n'}favorite food</Text>
+            <Text style={styles.heroTitleText}>
+              {activeTab === 'pharmacies' ? 'Your health\n delivered with care' : 'Order your\n favorite food'}
+            </Text>
           </View>
           
           {/* Spacer to create overlap effect */}
@@ -428,15 +438,23 @@ const MainPage = ({ user, onLogout }) => {
               transform: [{ translateY: searchTranslateY }]
             }
           ]}>
-            <View style={styles.searchInputContainer}>
+            <View style={[
+              styles.searchInputContainer,
+              activeTab === 'pharmacies' && styles.searchInputContainerDisabled
+            ]}>
               <SearchIcon />
               <TextInput
-                style={styles.searchInput}
-                placeholder="Looking for something?"
-                placeholderTextColor="#999"
+                style={[
+                  styles.searchInput,
+                  activeTab === 'pharmacies' && styles.searchInputDisabled
+                ]}
+                placeholder={activeTab === 'pharmacies' ? 'Coming soon for pharmacies' : "Looking for something?"}
+                placeholderTextColor={activeTab === 'pharmacies' ? '#ccc' : '#999'}
                 value={searchQuery}
                 onChangeText={handleSearchChange}
+                editable={activeTab === 'restaurants'}
                 onFocus={() => {
+                  if (activeTab === 'pharmacies') return;
                   if (searchQuery.trim() && searchResults.products.length === 0 && searchResults.restaurants.length === 0) {
                     setShowSearchResults(false);
                   } else if (searchQuery.trim()) {
@@ -515,65 +533,80 @@ const MainPage = ({ user, onLogout }) => {
         </View>
 
         {/* Categories Section */}
-        <View style={styles.sectionContainer}>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.categoriesScroll}
-          >
-            {categories.map((category, index) => (
-              <TouchableOpacity key={index} style={styles.categoryItem}>
-                <View style={styles.categoryIconContainer}>
-                  <Image source={category.icon} style={styles.categoryIcon} resizeMode="contain" />
-                </View>
-                <Text style={styles.categoryLabel}>{category.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
+        {activeTab === 'restaurants' && (
+          <View style={styles.sectionContainer}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.categoriesScroll}
+            >
+              {categories.map((category, index) => (
+                <TouchableOpacity key={index} style={styles.categoryItem}>
+                  <View style={styles.categoryIconContainer}>
+                    <Image source={category.icon} style={styles.categoryIcon} resizeMode="contain" />
+                  </View>
+                  <Text style={styles.categoryLabel}>{category.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
+        {/* Coming Soon Section for Pharmacies */}
+        {activeTab === 'pharmacies' && (
+          <View style={styles.comingSoonSection}>
+            <Text style={styles.comingSoonTitle}>Coming Soon</Text>
+            <Text style={styles.comingSoonMessage}>
+              We're working hard to bring you pharmacy delivery services. 
+              Stay tuned for updates!
+            </Text>
+          </View>
+        )}
 
         {/* Featured Restaurants Section */}
-        <View style={styles.sectionContainer}>
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading restaurants...</Text>
-            </View>
-          ) : restaurants.length > 0 ? (
-            restaurants.map((restaurant, index) => (
-              <TouchableOpacity 
-                key={restaurant.id || index} 
-                style={styles.restaurantCard}
-                onPress={() => handleRestaurantPress(restaurant)}
-              >
-                <View style={styles.restaurantImageContainer}>
-                  {restaurant.profile_picture ? (
-                    <Image 
-                      source={{ uri: restaurant.profile_picture }} 
-                      style={styles.restaurantImage} 
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={styles.restaurantImage} />
-                  )}
-                  <TouchableOpacity style={styles.heartIcon}>
-                    <Text style={styles.heartIconText}>♡</Text>
-                  </TouchableOpacity>
-                  <View style={styles.barangayOverlay}>
-                    <Text style={styles.barangayText}>{restaurant.barangay}</Text>
+        {activeTab === 'restaurants' && (
+          <View style={styles.sectionContainer}>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading restaurants...</Text>
+              </View>
+            ) : restaurants.length > 0 ? (
+              restaurants.map((restaurant, index) => (
+                <TouchableOpacity 
+                  key={restaurant.id || index} 
+                  style={styles.restaurantCard}
+                  onPress={() => handleRestaurantPress(restaurant)}
+                >
+                  <View style={styles.restaurantImageContainer}>
+                    {restaurant.profile_picture ? (
+                      <Image 
+                        source={{ uri: restaurant.profile_picture }} 
+                        style={styles.restaurantImage} 
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.restaurantImage} />
+                    )}
+                    <TouchableOpacity style={styles.heartIcon}>
+                      <Text style={styles.heartIconText}>♡</Text>
+                    </TouchableOpacity>
+                    <View style={styles.barangayOverlay}>
+                      <Text style={styles.barangayText}>{restaurant.barangay}</Text>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.restaurantInfo}>
-                  <Text style={styles.restaurantName}>{restaurant.name}</Text>
-                  <Text style={styles.restaurantAddress}>{restaurant.address}</Text>
-                </View>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No restaurants available</Text>
-            </View>
-          )}
-        </View>
+                  <View style={styles.restaurantInfo}>
+                    <Text style={styles.restaurantName}>{restaurant.name}</Text>
+                    <Text style={styles.restaurantAddress}>{restaurant.address}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No restaurants available</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Copyright Footer */}
         <View style={styles.copyrightContainer}>
@@ -645,6 +678,14 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   heroButtons: {
     position: 'absolute',
@@ -719,10 +760,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-ExtraLight',
     color: '#333',
   },
+  searchInputContainerDisabled: {
+    backgroundColor: '#FFFFFF',
+  },
+  searchInputDisabled: {
+    color: '#999',
+  },
   // Section Styles
   sectionContainer: {
     paddingHorizontal: isSmallScreen ? 15 : 20,
-    marginBottom: isSmallScreen ? 25 : 40,
+    marginBottom: isSmallScreen ? 20 : 30,
     marginTop: 10,
   },
   sectionHeader: {
@@ -774,7 +821,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F4F4',
     borderRadius: 16,
     marginBottom: isSmallScreen ? 12 : 16,
-    bottom: isSmallScreen ? 15 : 20,
+    bottom: isSmallScreen ? 5 : 10,
    
   },
   restaurantImageContainer: {
@@ -879,7 +926,7 @@ const styles = StyleSheet.create({
   },
   // Bottom Padding
   bottomPadding: {
-    height: isSmallScreen ? 80 : 100,
+    height: isSmallScreen ? 60 : 10,
   },
   // Loading and Empty States
   loadingContainer: {
@@ -989,6 +1036,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-ExtraLight',
     color: '#999',
     textAlign: 'center',
+  },
+  // Coming Soon Section
+  comingSoonSection: {
+    backgroundColor: '#F8F8F8',
+    paddingHorizontal: isSmallScreen ? 20 : 30,
+    paddingVertical: isSmallScreen ? 40 : 60,
+    alignItems: 'center',
+    marginHorizontal: isSmallScreen ? 15 : 20,
+    marginTop: isSmallScreen ? 20 : 30,
+    borderRadius: 12,
+  },
+  comingSoonTitle: {
+    fontSize: isSmallScreen ? 28 : 32,
+    fontFamily: 'Nexa-Heavy',
+    color: '#333',
+    marginBottom: isSmallScreen ? 12 : 16,
+    textAlign: 'center',
+  },
+  comingSoonMessage: {
+    fontSize: isSmallScreen ? 14 : 16,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: isSmallScreen ? 22 : 24,
   },
 });
 

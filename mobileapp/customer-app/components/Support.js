@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, Dimensions, Platform } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = height < 700;
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: isSmallScreen ? 20 : 24,
-    paddingTop: isSmallScreen ? 45 : 50,
+    paddingTop: Platform.OS === 'android' ? (isSmallScreen ? 50 : 55) : (isSmallScreen ? 45 : 50),
     paddingBottom: isSmallScreen ? 15 : 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     lineHeight: isSmallScreen ? 18 : 22,
   },
   bottomPadding: {
-    height: isSmallScreen ? 100 : 120,
+    height: isSmallScreen ? (Platform.OS === 'android' ? 120 : 100) : (Platform.OS === 'android' ? 140 : 120),
   },
   // Copyright Footer
   copyrightContainer: {
