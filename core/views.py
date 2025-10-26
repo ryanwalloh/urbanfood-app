@@ -1065,13 +1065,44 @@ def search_products_and_restaurants(request):
             # Build absolute URL for media files
             base_url = request.build_absolute_uri('/')[:-1]  # Remove trailing slash
             
-            # Search products (case-insensitive)
+            # Search restaurants FIRST to filter them out from products
+            # Search restaurants (case-insensitive)
+            restaurants = Restaurant.objects.filter(
+                Q(name__icontains=query) | Q(barangay__icontains=query) | Q(address__icontains=query)
+            ).filter(is_approved=True)[:10]  # Limit to 10 results and only approved
+            
+            # Get restaurant IDs that matched the query (to exclude from products)
+            matched_restaurant_ids = list(restaurants.values_list('id', flat=True))
+            print(f'🍽️ Found {len(matched_restaurant_ids)} matching restaurants: {list(restaurants.values_list("name", flat=True))}')
+            
+            # Search products (case-insensitive) - EXCLUDE products that match only by restaurant name
             products = Product.objects.filter(
                 Q(name__icontains=query) | Q(description__icontains=query)
-            ).select_related('restaurant')[:10]  # Limit to 10 results
+            ).select_related('restaurant')
+            print(f'📦 Found {products.count()} total products matching query')
             
+            # Filter out products where the match was only in the restaurant name
+            # (Only keep products that match in their own name or description)
             products_data = []
             for product in products:
+                # Check if product name or description matches
+                product_name_match = query.lower() in product.name.lower()
+                product_description_match = query.lower() in product.description.lower() if product.description else False
+                
+                # Only include product if it matches in its own fields (not just restaurant name)
+                if product_name_match or product_description_match:
+                    products_data.append(product)
+                    print(f'✅ Including product: {product.name} (matched: name={product_name_match}, desc={product_description_match})')
+                else:
+                    print(f'❌ Excluding product: {product.name} (restaurant: {product.restaurant.name})')
+                
+                # Limit to 10 results
+                if len(products_data) >= 10:
+                    break
+            
+            # Now build the products data with URLs
+            final_products_data = []
+            for product in products_data:
                 # Get product picture URL (Cloudinary URLs are already absolute)
                 product_picture_url = None
                 if product.product_picture:
@@ -1081,7 +1112,7 @@ def search_products_and_restaurants(request):
                     else:
                         product_picture_url = base_url + product.product_picture.url
                 
-                products_data.append({
+                final_products_data.append({
                     'id': product.id,
                     'name': product.name,
                     'price': str(product.price),
@@ -1089,11 +1120,6 @@ def search_products_and_restaurants(request):
                     'restaurant_id': product.restaurant.id,
                     'restaurant_name': product.restaurant.name,
                 })
-            
-            # Search restaurants (case-insensitive)
-            restaurants = Restaurant.objects.filter(
-                Q(name__icontains=query) | Q(barangay__icontains=query) | Q(address__icontains=query)
-            ).filter(is_approved=True)[:10]  # Limit to 10 results and only approved
             
             restaurants_data = []
             for restaurant in restaurants:
@@ -1114,9 +1140,11 @@ def search_products_and_restaurants(request):
                     'profile_picture': profile_picture_url,
                 })
             
+            print(f'📤 Returning {len(final_products_data)} products and {len(restaurants_data)} restaurants')
+            
             return JsonResponse({
                 'success': True,
-                'products': products_data,
+                'products': final_products_data,
                 'restaurants': restaurants_data
             })
             

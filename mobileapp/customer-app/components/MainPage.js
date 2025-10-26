@@ -133,73 +133,84 @@ const MainPage = ({ user, onLogout }) => {
 
   // Handle product selection - navigate to restaurant page
   const handleProductSelect = async (product) => {
+    console.log('🎯 ========== PRODUCT SELECTED ==========');
     console.log('🔍 Product selected:', product);
     console.log('🔍 Product restaurant_id:', product.restaurant_id);
     console.log('🔍 Product restaurant_id type:', typeof product.restaurant_id);
     console.log('🔍 Loaded restaurants count:', restaurants.length);
     console.log('🔍 Loaded restaurant IDs:', restaurants.map(r => ({ id: r.id, type: typeof r.id })));
     
-    // Normalize restaurant_id to number for comparison
-    const restaurantId = typeof product.restaurant_id === 'string' ? parseInt(product.restaurant_id, 10) : product.restaurant_id;
-    console.log('🔍 Normalized restaurant_id:', restaurantId);
-    
-    // Try to find in loaded restaurants first
-    let restaurantData = restaurants.find(r => r.id === restaurantId);
-    
-    console.log('🔍 Found in loaded restaurants:', restaurantData ? 'YES' : 'NO');
-    
-    // If not found in loaded restaurants, fetch all restaurants and find it
-    if (!restaurantData) {
-      console.log('⚠️ Restaurant not found in loaded restaurants, fetching all restaurants...');
-      try {
-        const result = await apiService.getRestaurants();
-        if (result.success && result.restaurants) {
-          console.log('📋 Fetched restaurants:', result.restaurants.map(r => ({ id: r.id, name: r.name })));
-          restaurantData = result.restaurants.find(r => r.id === restaurantId);
-          console.log('🔍 Found after fetching:', restaurantData ? 'YES' : 'NO');
-        }
-      } catch (error) {
-        console.log('❌ Error fetching restaurants:', error);
-      }
-    }
-    
-    // If still not found, create from product data as fallback
-    if (!restaurantData) {
-      console.log('⚠️ Restaurant not found anywhere, creating from product data...');
-      restaurantData = {
-        id: restaurantId,
-        name: product.restaurant_name,
-        address: '',
-        barangay: '',
-        street: '',
-        restaurant_type: 'Unknown',
-        phone: '',
-        profile_picture: null,
-      };
-      console.log('📝 Created fallback restaurant data:', restaurantData);
-    }
-    
-    console.log('✅ Final restaurant data:', restaurantData);
-    console.log('✅ Restaurant ID:', restaurantData?.id);
-    console.log('✅ Restaurant ID type:', typeof restaurantData?.id);
-    
-    // Always try to navigate
-    // Reset activeNav to 'home' to ensure proper navigation
-    setActiveNav('home');
+    // Close search results immediately
     setShowSearchResults(false);
-    setSearchQuery('');
-    setSelectedRestaurant(restaurantData);
-    console.log('✅ Navigation triggered with restaurant:', restaurantData?.name);
+    
+    try {
+      // Normalize restaurant_id to number for comparison
+      const restaurantId = typeof product.restaurant_id === 'string' ? parseInt(product.restaurant_id, 10) : product.restaurant_id;
+      console.log('🔍 Normalized restaurant_id:', restaurantId);
+      
+      // Try to find in loaded restaurants first
+      let restaurantData = restaurants.find(r => r.id === restaurantId);
+      
+      console.log('🔍 Found in loaded restaurants:', restaurantData ? 'YES' : 'NO');
+      
+      // If not found in loaded restaurants, fetch all restaurants and find it
+      if (!restaurantData) {
+        console.log('⚠️ Restaurant not found in loaded restaurants, fetching all restaurants...');
+        try {
+          const result = await apiService.getRestaurants();
+          if (result.success && result.restaurants) {
+            console.log('📋 Fetched restaurants:', result.restaurants.map(r => ({ id: r.id, name: r.name })));
+            restaurantData = result.restaurants.find(r => r.id === restaurantId);
+            console.log('🔍 Found after fetching:', restaurantData ? 'YES' : 'NO');
+          }
+        } catch (error) {
+          console.log('❌ Error fetching restaurants:', error);
+        }
+      }
+      
+      // If still not found, create from product data as fallback
+      if (!restaurantData) {
+        console.log('⚠️ Restaurant not found anywhere, creating from product data...');
+        restaurantData = {
+          id: restaurantId,
+          name: product.restaurant_name,
+          address: '',
+          barangay: '',
+          street: '',
+          restaurant_type: 'Unknown',
+          phone: '',
+          profile_picture: null,
+        };
+        console.log('📝 Created fallback restaurant data:', restaurantData);
+      }
+      
+      console.log('✅ Final restaurant data:', restaurantData);
+      console.log('✅ Restaurant ID:', restaurantData?.id);
+      console.log('✅ Restaurant ID type:', typeof restaurantData?.id);
+    
+      // Always try to navigate
+      // Reset activeNav to 'home' to ensure proper navigation
+      setActiveNav('home');
+      setSearchQuery('');
+      setSelectedRestaurant(restaurantData);
+      console.log('✅ Navigation triggered with restaurant:', restaurantData?.name);
+    } catch (error) {
+      console.error('❌ Error in handleProductSelect:', error);
+    }
   };
 
   // Handle restaurant selection from search
   const handleRestaurantSelectFromSearch = (restaurant) => {
+    console.log('🏪 ========== RESTAURANT SELECTED ==========');
     console.log('🏪 Restaurant selected from search:', restaurant);
     console.log('🏪 Restaurant data type check:', typeof restaurant);
     console.log('🏪 Restaurant ID:', restaurant?.id);
+    
+    // Close search results immediately
+    setShowSearchResults(false);
+    
     // Reset activeNav to 'home' to ensure proper navigation
     setActiveNav('home');
-    setShowSearchResults(false);
     setSearchQuery('');
     setSelectedRestaurant(restaurant);
     console.log('✅ Navigating to restaurant:', restaurant?.name);
@@ -391,10 +402,6 @@ const MainPage = ({ user, onLogout }) => {
                     setShowSearchResults(true);
                   }
                 }}
-                onBlur={() => {
-                  // Delay hiding to allow selection
-                  setTimeout(() => setShowSearchResults(false), 200);
-                }}
               />
             </View>
           </Animated.View>
@@ -410,7 +417,11 @@ const MainPage = ({ user, onLogout }) => {
                     <TouchableOpacity
                       key={`product-${product.id}-${index}`}
                       style={styles.searchResultItem}
-                      onPress={() => handleProductSelect(product)}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        console.log('🖱️ Product item pressed:', product.name);
+                        handleProductSelect(product);
+                      }}
                     >
                       <View style={styles.searchResultItemContent}>
                         <Text style={styles.searchResultProductName}>{product.name}</Text>
@@ -430,7 +441,11 @@ const MainPage = ({ user, onLogout }) => {
                     <TouchableOpacity
                       key={`restaurant-${restaurant.id}-${index}`}
                       style={styles.searchResultItem}
-                      onPress={() => handleRestaurantSelectFromSearch(restaurant)}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        console.log('🖱️ Restaurant item pressed:', restaurant.name);
+                        handleRestaurantSelectFromSearch(restaurant);
+                      }}
                     >
                       <View style={styles.searchResultItemContent}>
                         <Text style={styles.searchResultRestaurantName}>{restaurant.name}</Text>
@@ -840,7 +855,7 @@ const styles = StyleSheet.create({
   searchResultsContainer: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    marginTop: 10,
+    marginTop: 0,
     marginHorizontal: 20,
     maxHeight: 400,
     shadowColor: '#000',
