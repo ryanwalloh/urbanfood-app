@@ -1175,13 +1175,31 @@ const OrderTracking = ({ orderId, onBack }) => {
         {/* Delivery Type and Amount */}
         <View style={styles.deliveryTypeContainer}>
           <View style={styles.deliveryTypeHeader}>
-            <Text style={styles.deliveryTypeLabel}>Delivery Type</Text>
+            <Text style={styles.deliveryTypeLabel}>Payment Method</Text>
             <Text style={styles.amountLabel}>Amount</Text>
           </View>
           <View style={styles.deliveryTypeContent}>
-            <Text style={styles.deliveryTypeTitle}>Cash On Delivery</Text>
+            <Text style={styles.deliveryTypeTitle}>
+              {orderDetails.payment_method === 'Card Payment' ? 'Card Payment' : 
+               orderDetails.payment_method === 'Cash on Delivery' ? 'Cash On Delivery' :
+               orderDetails.payment_method || 'Cash On Delivery'}
+            </Text>
             <Text style={styles.totalAmount}>₱{orderDetails.total_amount || '0.00'}</Text>
           </View>
+          {orderDetails.payment_method === 'Card Payment' && (
+            <View style={styles.paymentStatusContainer}>
+              <Text style={styles.paymentStatusLabel}>Status: </Text>
+              <Text style={[
+                styles.paymentStatusValue,
+                orderDetails.payment_status === 'succeeded' && styles.paymentStatusSuccess
+              ]}>
+                {orderDetails.payment_status === 'succeeded' ? 'Paid' :
+                 orderDetails.payment_status === 'pending' ? 'Pending' :
+                 orderDetails.payment_status === 'failed' ? 'Failed' :
+                 'Pending'}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Order Picked Up Button */}
@@ -1833,6 +1851,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Nexa-Heavy',
     color: '#FFFFFF',
     fontWeight: 'bold',
+  },
+  paymentStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  paymentStatusLabel: {
+    fontSize: 12,
+    fontFamily: 'Nexa-ExtraLight',
+    color: '#999999',
+  },
+  paymentStatusValue: {
+    fontSize: 12,
+    fontFamily: 'Nexa-Heavy',
+    color: '#FFFFFF',
+  },
+  paymentStatusSuccess: {
+    color: '#4CAF50',
   },
   pickedUpButton: {
     backgroundColor: '#F43332',

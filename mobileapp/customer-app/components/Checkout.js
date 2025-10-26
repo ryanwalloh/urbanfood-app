@@ -396,9 +396,12 @@ const Checkout = ({ cartItems, restaurant, user, onBack, onPlaceOrder }) => {
         paymentIntentClientSecret: paymentIntentResult.client_secret,
         defaultBillingDetails: {
           name: `${personalDetails.firstName || user?.firstName || ''} ${personalDetails.lastName || user?.lastName || ''}`.trim() || 'Customer',
+          email: user?.email || personalDetails.email || 'customer@example.com',
           address: {
             country: 'PH',
-            postalCode: '0000', // Default Philippines postal code
+            postalCode: '0000',
+            city: address?.barangay || 'City',
+            line1: address?.street || 'Address',
           },
         },
         appearance: {

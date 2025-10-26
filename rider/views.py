@@ -363,6 +363,8 @@ def fetch_order_details(request):
                 'rider_fee': float(order.rider_fee),
                 'small_order_fee': float(order.small_order_fee),
                 'subtotal': float(subtotal),
+                'payment_method': order.payment_method,  # Add payment method
+                'payment_status': order.payment_status,  # Add payment status
             }
 
             return JsonResponse(response_data)
