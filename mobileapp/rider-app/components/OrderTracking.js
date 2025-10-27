@@ -22,7 +22,7 @@ import * as FileSystem from 'expo-file-system';
 // Using backend presigned URLs; no direct S3 client needed on device
 import { apiService } from '../services/api';
 import { locationTracker } from '../services/locationTracking';
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = height < 700;

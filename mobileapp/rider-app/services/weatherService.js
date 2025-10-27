@@ -10,7 +10,7 @@
 // FREE TIER LIMITS: 1,000 calls/day, 60 calls/minute
 // Perfect for personal/testing use!
 
-import API_CONFIG from '../config/apiConfig';
+import API_CONFIG from '../config/apiConfig.js';
 
 const OPENWEATHER_API_KEY = API_CONFIG.OPENWEATHER_API_KEY;
 

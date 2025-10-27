@@ -1,5 +1,5 @@
 // Lightweight API client for rider-app using fetch (no axios required)
-import { API_CONFIG } from '../config/apiConfig';
+import { API_CONFIG } from '../config/apiConfig.js';
 
 let cachedWorkingUrl = null;
 
