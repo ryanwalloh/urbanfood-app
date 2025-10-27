@@ -4,6 +4,15 @@
     "slug": "rider-app",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "sotirider",
+    "plugins": [
+      [
+        "expo-dev-client",
+        {
+          "scheme": "sotirider"
+        }
+      ]
+    ],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
@@ -31,6 +40,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fe14a901-9b7c-4794-9108-3377d61f66ef"
+      }
     }
   }
 }
